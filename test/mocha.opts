@@ -1,7 +1,9 @@
---require ts-node/register
+--require ts-node/register/transpile-only
 --require source-map-support/register
 --timeout 60000
+--reporter spec
 --bail
 --extension ts
 --recursive
+--watch
 --exit

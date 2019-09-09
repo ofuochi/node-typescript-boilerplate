@@ -1,63 +1,65 @@
 {
-	"name": "node-typescript-template",
-	"version": "1.0.0",
-	"description": "An enterprise startup boilerplate for your next NodeJs and Typescript API project",
-	"main": "index.ts",
-	"scripts": {
-		"test": "mocha"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/ofuochi/node-typescript-template.git"
-	},
-	"keywords": [
-		"node",
-		"typescript",
-		"mocha"
-	],
-	"author": "Fortune <fortuneochi@gmail.com>",
-	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/ofuochi/node-typescript-template/issues"
-	},
-	"homepage": "https://github.com/ofuochi/node-typescript-template#readme",
-	"dependencies": {
-		"bcrypt": "^3.0.6",
-		"body-parser": "^1.19.0",
-		"celebrate": "^10.0.1",
-		"cors": "^2.8.5",
-		"dotenv": "^8.1.0",
-		"express": "^4.17.1",
-		"http-status": "^1.3.2",
-		"inversify": "^5.0.1",
-		"jsonwebtoken": "^8.5.1",
-		"mongoose": "^5.6.13",
-		"node": "^12.10.0",
-		"reflect-metadata": "^0.1.13",
-		"winston": "^3.2.1"
-	},
-	"devDependencies": {
-		"@hapi/joi": "^15.1.1",
-		"@types/bcrypt": "^3.0.0",
-		"@types/body-parser": "^1.17.1",
-		"@types/cors": "^2.8.6",
-		"@types/dotenv": "^6.1.1",
-		"@types/express": "^4.17.1",
-		"@types/hapi__joi": "^15.0.4",
-		"@types/http-status": "^0.2.30",
-		"@types/inversify": "^2.0.33",
-		"@types/jsonwebtoken": "^8.3.3",
-		"@types/mocha": "^5.2.7",
-		"@types/mongoose": "^5.5.17",
-		"@types/node": "^12.7.4",
-		"@types/reflect-metadata": "^0.1.0",
-		"@types/winston": "^2.4.4",
-		"chai": "^4.2.0",
-		"eslint": "^6.3.0",
-		"eslint-config-airbnb-base": "^14.0.0",
-		"eslint-plugin-import": "^2.18.2",
-		"mocha": "^6.2.0",
-		"ts-node": "^8.3.0",
-		"typescript": "^3.6.2"
-	}
+    "name": "node-typescript-template",
+    "version": "1.0.0",
+    "description": "An enterprise startup boilerplate for your next NodeJs and Typescript API project",
+    "main": "index.ts",
+    "scripts": {
+        "test": "mocha"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ofuochi/node-typescript-template.git"
+    },
+    "keywords": [
+        "node",
+        "typescript",
+        "mocha"
+    ],
+    "author": "Fortune <fortuneochi@gmail.com>",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/ofuochi/node-typescript-template/issues"
+    },
+    "homepage": "https://github.com/ofuochi/node-typescript-template#readme",
+    "dependencies": {
+        "bcrypt": "^3.0.6",
+        "body-parser": "^1.19.0",
+        "celebrate": "^10.0.1",
+        "cors": "^2.8.5",
+        "dotenv": "^8.1.0",
+        "express": "^4.17.1",
+        "http-status": "^1.3.2",
+        "inversify": "^5.0.1",
+        "jsonwebtoken": "^8.5.1",
+        "mongoose": "^5.7.0",
+        "node": "^12.10.0",
+        "reflect-metadata": "^0.1.13",
+        "winston": "^3.2.1"
+    },
+    "devDependencies": {
+        "@hapi/joi": "^15.1.1",
+        "@types/bcrypt": "^3.0.0",
+        "@types/body-parser": "^1.17.1",
+        "@types/chai": "^4.2.2",
+        "@types/cors": "^2.8.6",
+        "@types/dotenv": "^6.1.1",
+        "@types/express": "^4.17.1",
+        "@types/hapi__joi": "^15.0.4",
+        "@types/http-status": "^0.2.30",
+        "@types/inversify": "^2.0.33",
+        "@types/jsonwebtoken": "^8.3.3",
+        "@types/mocha": "^5.2.7",
+        "@types/mongoose": "^5.5.17",
+        "@types/node": "^12.7.4",
+        "@types/reflect-metadata": "^0.1.0",
+        "@types/winston": "^2.4.4",
+        "chai": "^4.2.0",
+        "eslint": "^6.3.0",
+        "eslint-config-airbnb-base": "^14.0.0",
+        "eslint-plugin-import": "^2.18.2",
+        "mocha": "^6.2.0",
+        "ts-node": "^7.0.1",
+        "ts-node-dev": "^1.0.0-pre.42",
+        "typescript": "^3.6.2"
+    }
 }
