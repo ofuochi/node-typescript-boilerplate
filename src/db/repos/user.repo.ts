@@ -1,23 +1,13 @@
 import "reflect-metadata";
-import { injectable, inject } from "inversify";
-import { Model, Document } from "mongoose";
-
-import { TYPES } from "../../config/dependencyInjection/typeMapping";
-import UserEntity from "../../models/entities/UserEntity";
+import { injectable } from "inversify";
+import IUserRepo from "../../core/services/interfaces/repo/IUserRepo";
+import User from "../../core/entities/User";
+import { BaseRepo } from "./base.repo";
+import { UserDto } from "../../models/DTO/user.dto";
 
 @injectable()
-export default class UserRepo {
-    private readonly _userDbModel: UserDbModel;
-
-    constructor(@inject(TYPES.UserDbContext) userDbCtx: UserDbModel) {
-        this._userDbModel = userDbCtx;
-    }
-
-    save = async (entity: UserEntity): Promise<UserDbContext> => {
-        const user = await this._userDbModel.findOne({
-            _id: entity.email,
-            tenant: entity.tenantId
-        });
-        return this._userDbModel.create(user);
-    };
+export default class UserRepo extends BaseRepo<UserRepo,User>{
+constructor() {
+    super()
+}
 }

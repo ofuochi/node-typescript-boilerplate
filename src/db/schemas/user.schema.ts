@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import UserEntity from "../../models/entities/UserEntity";
+import User from "../../core/entities/User";
 
 const User = new mongoose.Schema(
     {
@@ -42,4 +42,4 @@ const User = new mongoose.Schema(
     { timestamps: true }
 );
 
-export default mongoose.model<UserEntity & mongoose.Document>("User", User);
+export default mongoose.model<UserDbContext>("User", User);

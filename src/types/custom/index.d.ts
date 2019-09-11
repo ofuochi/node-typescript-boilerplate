@@ -1,11 +1,11 @@
 import { Document, Model } from "mongoose";
 
-import UserEntity from "../../models/entities/UserEntity";
+import User from "../../core/entities/User";
 
 declare global {
     export interface Request {
-        currentUser: UserEntity & Document;
+        currentUser: User & Document;
     }
-    export type UserDbModel = Model<UserEntity & Document>;
-    export type UserDbContext = UserEntity & Document;
+    export type UserDbModel = Model<User & Document>;
+    export type UserDbContext = User & Document;
 }

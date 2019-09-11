@@ -3,8 +3,12 @@ import { expect } from "chai";
 
 import UserEntity from "../../src/models/entities/UserEntity";
 import UserRepo from "../../src/db/repos/user.repo";
+import container from "./../../src/config/dependencyInjection/inversify.config";
+import { TYPES } from "../../src/config/dependencyInjection/typeMapping";
 
-describe("Hello here", () => {
+before("Running Before", async () => {
+    console.log("".italics());
+    expect(1 + 2).to.equal(3);
     const user = UserEntity.createInstance({
         firstName: "FirstName",
         lastName: "LastName",
@@ -13,13 +17,7 @@ describe("Hello here", () => {
         username: "username",
         tenantId: "tenantId"
     });
-    user.setAsDeleted();
-    console.log(user);
-    const repo = UserRepo;
-    console.log(repo);
-    before("Running Before", () => {
-        console.log(user);
-
-        expect(1 + 2).to.equal(3);
-    });
+    const newUser = await container.get<UserRepo>(TYPES.UserRepo);
+    console.log(newUser);
 });
+describe("Hello here", async () => {});

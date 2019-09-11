@@ -1,11 +1,11 @@
-import MustHaveTenantId from "./MustHaveTenantIdBaseEntity";
+import MustHaveTenantId from "./MustHaveTenantIdBase";
 
 export enum UserRoleEnum {
     USER = 0,
     ADMIN
 }
 
-export default class UserEntity extends MustHaveTenantId {
+export default class User extends MustHaveTenantId {
     private _tenantId: string;
     public get tenantId(): string {
         return this._tenantId;
@@ -84,8 +84,8 @@ export default class UserEntity extends MustHaveTenantId {
         lastName: string;
         email: string;
         username: string;
-        password: string;
         tenantId: string;
+        password?: string;
     }) {
         super();
         this._firstName = this.setFirstName(firstName);
@@ -111,10 +111,10 @@ export default class UserEntity extends MustHaveTenantId {
         lastName: string;
         email: string;
         username: string;
-        password: string;
         tenantId: string;
+        password?: string;
     }) => {
-        return new UserEntity({
+        return new User({
             firstName,
             lastName,
             email,
