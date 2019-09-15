@@ -1,10 +1,14 @@
 {
-    "name": "farm_pro",
+    "name": "node-typescript-boilerplate",
     "version": "1.0.0",
-    "description": "",
-    "main": "index.js",
-    "keywords": [],
-    "author": "Remo H. Jansen <remo.jansen@wolksoftware.com> (http://www.remojansen.com)",
+    "description": "Enterprise NodeJs/Typescript API boilerplate",
+    "main": "index.ts",
+    "keywords": [
+        "node",
+        "typescript",
+        "API"
+    ],
+    "author": "Fortune Ochi <fortuneochi@gmail.com>",
     "license": "MIT",
     "scripts": {
         "rm-files": "rm -r -f coverage .nyc_output dist",
