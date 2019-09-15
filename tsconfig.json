@@ -1,22 +1,21 @@
 {
-    "compilerOptions": {
-        "target": "es2017",
-        "lib": ["es2017", "esnext.asynciterable"],
-        "typeRoots": ["./node_modules/@types", "./src/types"],
-        "allowSyntheticDefaultImports": true,
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": true,
-        "forceConsistentCasingInFileNames": true,
-        "moduleResolution": "node",
-        "module": "commonjs",
-        "pretty": true,
-        "sourceMap": true,
-        "outDir": "./build",
-        "allowJs": true,
-        "noEmit": false,
-        "esModuleInterop": true,
-        "types": ["reflect-metadata", "mocha"]
-    },
-    "include": ["./src/**/*"],
-    "exclude": ["node_modules", "tests"]
+	"compilerOptions": {
+		"target": "es6",
+		"lib": ["es6", "dom"],
+		"types": ["express", "inversify", "mocha", "reflect-metadata"],
+		"module": "commonjs",
+		"moduleResolution": "node",
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"strictNullChecks": true,
+		"noImplicitAny": true,
+		"sourceMap": true,
+		"noUnusedLocals": true,
+		"esModuleInterop": true,
+		"allowUnreachableCode": false,
+		"noImplicitThis": true,
+		"outDir": "dist"
+	},
+	"include": ["./src/**/*.ts", "./src/types/*"],
+	"exclude": ["node_modules"]
 }

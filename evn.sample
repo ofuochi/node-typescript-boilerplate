@@ -1,0 +1,4 @@
+NODE_ENV="development"
+APP_PORT=3000
+DB_HOST="localhost"
+DB_NAME="node-typescript-boilerplate"

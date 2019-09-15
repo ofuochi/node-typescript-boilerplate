@@ -1,7 +1,12 @@
---require ts-node/register/transpile-only
---require source-map-support/register
+-r ts-node/register 
+-r reflect-metadata/Reflect
+-r source-map-support/register
+--full-trace
 --timeout 60000
 --bail
+--reporter dot
 --extension ts
 --recursive
+--check-leaks true
+--color true
 --exit
