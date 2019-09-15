@@ -56,11 +56,11 @@ The application exposes a few REST endpoints:
 You can use the following code snippet to call the secured endpoint:
 
 ```js
-fetch("http://localhost:8080/api/secure", {
+fetch("http://localhost:3000/api/secure", {
     method: "GET",
     headers: {
         "Content-Type": "application/json",
-        "x-auth-token": "SOME_VALID_DEMO_CREDENTIAL"
+        "x-auth-token": "SOME_VALID_CREDENTIAL"
     }
 })
     .then(r => {
@@ -76,11 +76,11 @@ fetch("http://localhost:8080/api/secure", {
 You can use the following code snippet to call the secured endpoint with an invalid `x-auth-token` header:
 
 ```js
-fetch("http://localhost:8080/api/secure", {
+fetch("http://localhost:3000/api/secure", {
     method: "GET",
     headers: {
         "Content-Type": "application/json",
-        "x-auth-token": "SOME_WRONG_DEMO_CREDENTIAL"
+        "x-auth-token": "SOME_WRONG_CREDENTIAL"
     }
 })
     .then(r => {
