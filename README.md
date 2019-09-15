@@ -13,7 +13,7 @@ git clonehttps://github.com/ofuochi/node-typescript-boilerplate.git
 Copy the sample env file into a .env file:
 
 ```sh
-cp evn.sample .env
+cp env.sample .env
 ```
 
 Install dependencies:
