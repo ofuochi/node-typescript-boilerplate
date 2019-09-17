@@ -1,4 +1,3 @@
-import "reflect-metadata";
 import { Server } from "http";
 import dotenv from "dotenv";
 import { bootstrap } from "./infrastructure/bootstrapping/bootstrap";

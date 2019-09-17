@@ -12,7 +12,6 @@ import { Movie } from "../../../domain/model/movie";
 @controller("/api/movies")
 export class MovieController {
     @movieRepository private _movieRepository: IMovieRepository;
-
     @httpGet("/")
     public async get(): Promise<Movie[]> {
         return await this._movieRepository.findAll();

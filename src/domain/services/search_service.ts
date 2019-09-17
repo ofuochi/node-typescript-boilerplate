@@ -15,7 +15,7 @@ import {
 } from "../interfaces/repositories";
 
 @injectable()
-export class SearchService implements ISearchService {
+export default class SearchService implements ISearchService {
     @movieRepository private _movieRepository: IMovieRepository;
     @actorRepository private _actorRepository: IActorRepository;
     @directorRepository private _directorRepository: IDirectorRepository;

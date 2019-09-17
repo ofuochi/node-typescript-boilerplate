@@ -1,5 +1,4 @@
 import { Movie } from "../model/movie";
-import { User } from "../model/user";
 
 export interface ISearchService {
     search(query: string): Promise<Movie[]>;
@@ -10,11 +9,13 @@ export interface IMailService {
         to: string,
         subject: string,
         text: string
-    ): Promise<{ delivered: string; status: string }>;
-    startEmailSequence(
-        sequence: string,
-        user: Partial<User>
-    ): { delivered: number; status: string };
+    ): Promise<boolean>;
 }
 
-export interface ILoggerService {}
+export interface ILoggerService {
+    silly(message: string): void;
+    error(message: string): void;
+    info(message: string): void;
+    debug(message: string): void;
+    warn(message: string): void;
+}

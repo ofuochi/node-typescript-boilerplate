@@ -23,9 +23,14 @@ import { UserRepository } from "../infrastructure/db/repositories/user_repositor
 import { ActorRepository } from "../infrastructure/db/repositories/actor_repository";
 
 // Services
-import { ISearchService, IMailService } from "../domain/interfaces/services";
-import { SearchService } from "../domain/services/search_service";
+import {
+    ISearchService,
+    IMailService,
+    ILoggerService
+} from "../domain/interfaces/services";
+import SearchService from "../domain/services/search_service";
 import MailService from "../infrastructure/services/mail_service";
+import LoggerService from "./../domain/services/log_service";
 
 export const referenceDataIoCModule = new ContainerModule(bind => {
     // Repositories
@@ -52,5 +57,8 @@ export const referenceDataIoCModule = new ContainerModule(bind => {
 
     bind<IMailService>(TYPES.MailService)
         .to(MailService)
+        .inSingletonScope();
+    bind<ILoggerService>(TYPES.LoggerService)
+        .to(LoggerService)
         .inSingletonScope();
 });
