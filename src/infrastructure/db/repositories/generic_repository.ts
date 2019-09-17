@@ -20,7 +20,7 @@ export class BaseRepository<TEntity, TModel extends Document>
     ) {
         this._name = name;
         const schema = new Schema(schemaDefinition, { collection: this._name });
-
+        dbClient.models = {};
         this.Model = dbClient.model<TModel>(this._name, schema);
     }
 

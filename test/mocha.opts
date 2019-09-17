@@ -1,6 +1,8 @@
 -r ts-node/register 
 -r reflect-metadata/Reflect
 -r source-map-support/register
+--file test/index.ts
+
 --full-trace
 --timeout 60000
 --bail

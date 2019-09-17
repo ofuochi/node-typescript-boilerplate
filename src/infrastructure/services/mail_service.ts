@@ -25,7 +25,7 @@ export default class MailService implements IMailService {
          */
         // Added example for sending mail from mailgun
 
-        const result = await this._mailgun
+        await this._mailgun
             .messages()
             .send({ from: config.emails.from, to, subject, text });
 

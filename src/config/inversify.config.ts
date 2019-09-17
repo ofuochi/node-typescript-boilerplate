@@ -1,4 +1,4 @@
-import { ContainerModule, decorate, injectable, unmanaged } from "inversify";
+import { ContainerModule } from "inversify";
 
 // Interfaces & Types
 import { TYPES } from "../domain/constants/types";
@@ -26,7 +26,6 @@ import { ActorRepository } from "../infrastructure/db/repositories/actor_reposit
 import { ISearchService, IMailService } from "../domain/interfaces/services";
 import { SearchService } from "../domain/services/search_service";
 import MailService from "../infrastructure/services/mail_service";
-import Mailgun = require("mailgun-js");
 
 export const referenceDataIoCModule = new ContainerModule(bind => {
     // Repositories
@@ -50,9 +49,6 @@ export const referenceDataIoCModule = new ContainerModule(bind => {
     bind<ISearchService>(TYPES.SearchService)
         .to(SearchService)
         .inSingletonScope();
-
-    decorate(injectable(), Mailgun);
-    decorate(unmanaged(), Mailgun, 0);
 
     bind<IMailService>(TYPES.MailService)
         .to(MailService)

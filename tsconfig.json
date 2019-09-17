@@ -1,21 +1,21 @@
 {
-	"compilerOptions": {
-		"target": "es6",
-		"lib": ["es6", "dom"],
-		"types": ["express", "inversify", "mocha", "reflect-metadata"],
-		"module": "commonjs",
-		"moduleResolution": "node",
-		"experimentalDecorators": true,
-		"emitDecoratorMetadata": true,
-		"strictNullChecks": true,
-		"noImplicitAny": true,
-		"sourceMap": true,
-		"noUnusedLocals": true,
-		"esModuleInterop": true,
-		"allowUnreachableCode": false,
-		"noImplicitThis": true,
-		"outDir": "dist"
-	},
-	"include": ["./src/**/*.ts", "./src/types/*"],
-	"exclude": ["node_modules"]
+    "compilerOptions": {
+        "target": "es6",
+        "lib": ["es6", "dom"],
+        "types": ["express", "inversify", "mocha", "reflect-metadata"],
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "strictNullChecks": true,
+        "noImplicitAny": true,
+        "sourceMap": true,
+        "noUnusedLocals": true,
+        "esModuleInterop": true,
+        "allowUnreachableCode": false,
+        "noImplicitThis": true,
+        "outDir": "dist"
+    },
+    "include": ["./src/**/*.ts", "./src/types/*"],
+    "exclude": ["node_modules"]
 }
