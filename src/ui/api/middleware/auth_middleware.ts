@@ -1,6 +1,6 @@
 import * as express from "express";
 import { Container } from "inversify";
-import { IAccountRepository } from "../../../domain/interfaces/repositories";
+import { IUserRepository } from "../../../domain/interfaces/repositories";
 import { TYPES } from "../../../domain/constants/types";
 import { container } from "../../../infrastructure/utils/ioc_container";
 
@@ -24,8 +24,8 @@ function authMiddlewareFactory(container: Container) {
             res: express.Response,
             next: express.NextFunction
         ) => {
-            const accountRepository = container.get<IAccountRepository>(
-                TYPES.AccountRepository
+            const accountRepository = container.get<IUserRepository>(
+                TYPES.UserRepository
             );
 
             (async () => {

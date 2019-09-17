@@ -1,4 +1,9 @@
+PORT=3000
+LOG_LEVEL="debug"
 NODE_ENV="development"
-APP_PORT=3000
-DB_HOST="localhost"
-DB_NAME="node-typescript-boilerplate"
+HOST="http://localhost:3000"
+JWT_SECRET="jhsfhjh98r5df+mc="
+MONGODB_URI="mongodb://localhost:27017/node-typescript-boilerplate"
+MAIL_API_KEY="your mail client api key"
+MAIL_API_DOMAIN="your mail client domoain"
+APP_EMAIL="node-typescript-boilerplate@sample.com"
