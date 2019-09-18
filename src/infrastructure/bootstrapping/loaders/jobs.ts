@@ -1,5 +1,5 @@
 import Agenda from "agenda";
-import config from "../../config/config";
+import config from "../../config/env";
 import EmailSequenceJob from "../../jobs/email_jobs";
 
 export const Jobs = {

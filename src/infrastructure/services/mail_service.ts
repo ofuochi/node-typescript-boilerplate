@@ -2,7 +2,7 @@ import { injectable } from "inversify";
 
 import { IMailService } from "../../domain/interfaces/services";
 import Mailgun = require("mailgun-js");
-import config from "../config/config";
+import config from "../config/env";
 
 @injectable()
 export default class MailService implements IMailService {

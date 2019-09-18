@@ -2,7 +2,7 @@ import { Server } from "http";
 import { bootstrap } from "./infrastructure/bootstrapping";
 import { container } from "./infrastructure/utils/ioc_container";
 import { referenceDataIoCModule } from "./infrastructure/config/inversify.config";
-import config from "./infrastructure/config/config";
+import config from "./infrastructure/config/env";
 import { App } from "./infrastructure/bootstrapping/loaders/express";
 import { TYPES } from "./domain/constants/types";
 import logger from "./infrastructure/bootstrapping/loaders/logger";
