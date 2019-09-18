@@ -1,6 +1,8 @@
+import "reflect-metadata";
 import { Container, ContainerModule } from "inversify";
 import { InversifyExpressServer } from "inversify-express-utils";
-// import { makeLoggerMiddleware } from "inversify-logger-middleware";
+import cors from "cors";
+import methodOverride from "method-override";
 
 import bodyParser from "body-parser";
 import helmet from "helmet";
@@ -36,11 +38,34 @@ export async function bootstrap({
         const server = new InversifyExpressServer(container);
 
         server.setConfig(app => {
+            app.get("/status", (_req, res) => {
+                res.status(200).end();
+            });
+            app.head("/status", (_req, res) => {
+                res.status(200).end();
+            });
+
+            // Useful if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
+            // It shows the real origin IP in the heroku or Cloudwatch logs
+            app.enable("trust proxy");
+
+            // Enable Cross Origin Resource Sharing to all origins by default
+            app.use(cors());
+
+            // Some sauce that always add since 2014
+            // "Lets you use HTTP verbs such as PUT or DELETE in places where the client doesn't support it."
+            // Maybe not needed anymore ?
+            app.use(methodOverride());
+
             // Disable default cache
             app.set("etag", false);
 
             // Configure requests body parsing
-            app.use(bodyParser.urlencoded({ extended: true }));
+            app.use(
+                bodyParser.urlencoded({
+                    extended: true
+                })
+            );
             app.use(bodyParser.json());
 
             // Adds some security defaults

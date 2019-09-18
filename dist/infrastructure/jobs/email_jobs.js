@@ -17,36 +17,31 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const inversify_1 = require("inversify");
-const Mailgun = require("mailgun-js");
-const config_1 = __importDefault(require("../config"));
-let MailService = class MailService {
-    constructor() {
-        this._mailgun = Mailgun({
-            apiKey: config_1.default.emails.apiKey,
-            domain: config_1.default.emails.domain
-        });
-    }
-    sendWelcomeEmail(to, subject, text) {
+const decorators_1 = require("../../domain/constants/decorators");
+class EmailSequenceJob {
+    static sendWelcomeEmail(job, done) {
         return __awaiter(this, void 0, void 0, function* () {
-            /**
-             * @TODO Call Mailchimp/Sendgrid or whatever
-             */
-            // Added example for sending mail from mailgun
-            const resp = yield this._mailgun
-                .messages()
-                .send({ from: config_1.default.emails.from, to, subject, text });
-            return resp != null;
+            try {
+                this._logger.debug("✌️ Email Sequence Job triggered!");
+                const { email, firstName } = job.attrs.data;
+                yield this._mailService.sendWelcomeEmail(email, "Welcome to Travela", `Hello ${firstName}.\nWelcome to Travela`);
+                done();
+            }
+            catch (e) {
+                this._logger.error("🔥 Error with Email Sequence Job: %o", e);
+                done(e);
+            }
         });
     }
-};
-MailService = __decorate([
-    inversify_1.injectable(),
-    __metadata("design:paramtypes", [])
-], MailService);
-exports.default = MailService;
-//# sourceMappingURL=mail_service.js.map
+}
+__decorate([
+    decorators_1.mailService,
+    __metadata("design:type", Object)
+], EmailSequenceJob, "_mailService", void 0);
+__decorate([
+    decorators_1.loggerService,
+    __metadata("design:type", Object)
+], EmailSequenceJob, "_logger", void 0);
+exports.default = EmailSequenceJob;
+//# sourceMappingURL=email_jobs.js.map

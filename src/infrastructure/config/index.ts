@@ -19,8 +19,11 @@ const envConfigSchema = Joi.object({
     HOST: Joi.string().default("http://localhost:3000"),
     APP_EMAIL: Joi.string().default("node-typescript-boilerplate@sample.com"),
     LOG_LEVEL: Joi.string().default("silly"),
-    MAIL_API_KEY: Joi.string().description("Mail gun API key"),
-    MAIL_API_DOMAIN: Joi.string(),
+    MAILGUN_API_KEY: Joi.string().description("Mail gun API key"),
+    MAILGUN_API_DOMAIN: Joi.string(),
+    AGENDA_DB_COLLECTION: Joi.string().default("jobs"),
+    AGENDA_POOL_TIME: Joi.number().default(200),
+    AGENDA_CONCURRENCY: Joi.number().default(20),
     MONGODB_URI: Joi.string().default(
         "mongodb://localhost:27017/node-typescript-boilerplate"
     )
@@ -35,7 +38,7 @@ export default {
     port: parseInt(envConfig.PORT as string),
     baseUrl: envConfig.HOST as string,
     env: envConfig.NODE_ENV as string,
-    conStr: envConfig.MONGODB_URI as string,
+    mongoDbConnection: envConfig.MONGODB_URI as string,
     jwtSecret: envConfig.JWT_SECRET as string,
 
     /**
@@ -69,8 +72,8 @@ export default {
     /**
      * Mailgun email credentials
      */ emails: {
-        apiKey: envConfig.MAIL_API_KEY as string,
-        domain: envConfig.MAIL_API_DOMAIN as string,
+        apiKey: envConfig.MAILGUN_API_KEY as string,
+        domain: envConfig.MAILGUN_API_DOMAIN as string,
         from: envConfig.APP_EMAIL as string
     }
 };

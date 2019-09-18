@@ -2,58 +2,27 @@ import winston from "winston";
 import { injectable } from "inversify";
 
 import { ILoggerService } from "../interfaces/services";
-import config from "../../config";
+import loggerInstance from "../../infrastructure/config/loaders/logger";
 
 @injectable()
 export default class LoggerService implements ILoggerService {
     private readonly _logClient: winston.Logger;
     constructor() {
-        this._logClient = this.createLoggerInstance();
+        this._logClient = loggerInstance;
     }
-    silly(message: string) {
-        this._logClient.silly(message);
+    silly(message: string, meta?: any): void {
+        this._logClient.silly(message, meta);
     }
-    error(message: string) {
-        this._logClient.error(message);
+    error(message: string, meta?: any): void {
+        this._logClient.error(message, meta);
     }
-    info(message: string) {
-        this._logClient.info(message);
+    info(message: string, meta?: any): void {
+        this._logClient.info(message, meta);
     }
-    debug(message: string) {
-        this._logClient.debug(message);
+    debug(message: string, meta?: any): void {
+        this._logClient.debug(message, meta);
     }
-    warn(message: string) {
-        this._logClient.warn(message);
-    }
-    private setupTransports() {
-        const transports = [];
-        if (config.env !== "development")
-            transports.push(new winston.transports.Console());
-        else
-            transports.push(
-                new winston.transports.Console({
-                    format: winston.format.combine(
-                        winston.format.cli(),
-                        winston.format.splat()
-                    )
-                })
-            );
-        return transports;
-    }
-    private createLoggerInstance() {
-        const transports = this.setupTransports();
-        return winston.createLogger({
-            level: config.logs.level,
-            levels: winston.config.npm.levels,
-            format: winston.format.combine(
-                winston.format.timestamp({
-                    format: "YYYY-MM-DD HH:mm:ss"
-                }),
-                winston.format.errors({ stack: true }),
-                winston.format.splat(),
-                winston.format.json()
-            ),
-            transports
-        });
+    warn(message: string, meta?: any): void {
+        this._logClient.warn(message, meta);
     }
 }

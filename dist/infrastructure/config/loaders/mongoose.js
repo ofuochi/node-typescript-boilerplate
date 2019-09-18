@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const config_1 = __importDefault(require("../../config"));
 exports.default = () => __awaiter(void 0, void 0, void 0, function* () {
-    const connection = yield mongoose_1.default.connect(config_1.default.conStr, {
+    const connection = yield mongoose_1.default.connect(config_1.default.mongoDbConnection, {
         useNewUrlParser: true,
         useCreateIndex: true
     });

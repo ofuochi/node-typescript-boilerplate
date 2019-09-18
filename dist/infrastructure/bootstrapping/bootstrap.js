@@ -19,12 +19,6 @@ const helmet_1 = __importDefault(require("helmet"));
 const interceptor_middleware_1 = require("../middleware/interceptor_middleware");
 const db_client_1 = require("../db/db_client");
 const types_1 = require("../../domain/constants/types");
-// Controllers
-require("../../ui/api/controllers/movie_controller");
-require("../../ui/api/controllers/director_controller");
-require("../../ui/api/controllers/actor_controller");
-require("../../ui/api/controllers/secure_controller");
-require("../../ui/api/controllers/search_controller");
 function bootstrap({ container, appPort, dbHost, dbName, containerModules = [] }) {
     return __awaiter(this, void 0, void 0, function* () {
         if (container.isBound(types_1.TYPES.Server) === false) {
@@ -35,10 +29,18 @@ function bootstrap({ container, appPort, dbHost, dbName, containerModules = [] }
             // Configure express server
             const server = new inversify_express_utils_1.InversifyExpressServer(container);
             server.setConfig(app => {
+                app.get("/status", (_req, res) => {
+                    res.status(200).end();
+                });
+                app.head("/status", (_req, res) => {
+                    res.status(200).end();
+                });
                 // Disable default cache
                 app.set("etag", false);
                 // Configure requests body parsing
-                app.use(body_parser_1.default.urlencoded({ extended: true }));
+                app.use(body_parser_1.default.urlencoded({
+                    extended: true
+                }));
                 app.use(body_parser_1.default.json());
                 // Adds some security defaults
                 app.use(helmet_1.default());

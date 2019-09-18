@@ -12,11 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-require("reflect-metadata");
 const dotenv_1 = __importDefault(require("dotenv"));
 const bootstrap_1 = require("./infrastructure/bootstrapping/bootstrap");
 const ioc_container_1 = require("./infrastructure/utils/ioc_container");
-const inversify_config_1 = require("./config/inversify.config");
+const inversify_config_1 = require("./infrastructure/config/inversify.config");
 dotenv_1.default.config();
 exports.startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     return yield bootstrap_1.bootstrap({

@@ -2,7 +2,7 @@ import { Server } from "http";
 import dotenv from "dotenv";
 import { bootstrap } from "./infrastructure/bootstrapping/bootstrap";
 import { container } from "./infrastructure/utils/ioc_container";
-import { referenceDataIoCModule } from "./config/inversify.config";
+import { referenceDataIoCModule } from "./infrastructure/config/inversify.config";
 
 dotenv.config();
 

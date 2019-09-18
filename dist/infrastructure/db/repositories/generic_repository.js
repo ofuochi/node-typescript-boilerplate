@@ -28,6 +28,7 @@ let BaseRepository = class BaseRepository {
     constructor(dbClient, name, schemaDefinition) {
         this._name = name;
         const schema = new mongoose_1.Schema(schemaDefinition, { collection: this._name });
+        dbClient.models = {};
         this.Model = dbClient.model(this._name, schema);
     }
     // We wrap the mongoose API here so we can use async / await

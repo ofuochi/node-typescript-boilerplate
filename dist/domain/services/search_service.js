@@ -71,5 +71,5 @@ __decorate([
 SearchService = __decorate([
     inversify_1.injectable()
 ], SearchService);
-exports.SearchService = SearchService;
+exports.default = SearchService;
 //# sourceMappingURL=search_service.js.map

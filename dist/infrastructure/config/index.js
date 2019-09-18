@@ -22,8 +22,11 @@ const envConfigSchema = joi_1.default.object({
     HOST: joi_1.default.string().default("http://localhost:3000"),
     APP_EMAIL: joi_1.default.string().default("node-typescript-boilerplate@sample.com"),
     LOG_LEVEL: joi_1.default.string().default("silly"),
-    MAIL_API_KEY: joi_1.default.string().description("Mail gun API key"),
-    MAIL_API_DOMAIN: joi_1.default.string(),
+    MAILGUN_API_KEY: joi_1.default.string().description("Mail gun API key"),
+    MAILGUN_API_DOMAIN: joi_1.default.string(),
+    AGENDA_DB_COLLECTION: joi_1.default.string().default("jobs"),
+    AGENDA_POOL_TIME: joi_1.default.number().default(200),
+    AGENDA_CONCURRENCY: joi_1.default.number().default(20),
     MONGODB_URI: joi_1.default.string().default("mongodb://localhost:27017/node-typescript-boilerplate")
 })
     .unknown()
@@ -35,7 +38,7 @@ exports.default = {
     port: parseInt(envConfig.PORT),
     baseUrl: envConfig.HOST,
     env: envConfig.NODE_ENV,
-    conStr: envConfig.MONGODB_URI,
+    mongoDbConnection: envConfig.MONGODB_URI,
     jwtSecret: envConfig.JWT_SECRET,
     /**
      * Used by winston logger
@@ -67,8 +70,8 @@ exports.default = {
     /**
      * Mailgun email credentials
      */ emails: {
-        apiKey: envConfig.MAIL_API_KEY,
-        domain: envConfig.MAIL_API_DOMAIN,
+        apiKey: envConfig.MAILGUN_API_KEY,
+        domain: envConfig.MAILGUN_API_DOMAIN,
         from: envConfig.APP_EMAIL
     }
 };
