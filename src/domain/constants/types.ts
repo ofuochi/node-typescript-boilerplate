@@ -1,5 +1,5 @@
 export const TYPES = {
-    Server: Symbol("Server"),
+    App: Symbol("App"),
     DbClient: Symbol("DbClient"),
 
     MovieRepository: Symbol("MovieRepository"),

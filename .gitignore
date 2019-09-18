@@ -63,3 +63,7 @@ typings/
 # rest client file
 .http
 .rest
+
+# builds
+dist
+build

@@ -22,7 +22,6 @@ const envConfigSchema = Joi.object({
     MAILGUN_API_KEY: Joi.string().description("Mail gun API key"),
     MAILGUN_API_DOMAIN: Joi.string(),
     AGENDA_DB_COLLECTION: Joi.string().default("jobs"),
-    AGENDA_POOL_TIME: Joi.number().default(200),
     AGENDA_CONCURRENCY: Joi.number().default(20),
     MONGODB_URI: Joi.string().default(
         "mongodb://localhost:27017/node-typescript-boilerplate"
@@ -36,7 +35,7 @@ if (error) throw new Error(`Config validation error: ${error.message}`);
 
 export default {
     port: parseInt(envConfig.PORT as string),
-    baseUrl: envConfig.HOST as string,
+    host: envConfig.HOST as string,
     env: envConfig.NODE_ENV as string,
     mongoDbConnection: envConfig.MONGODB_URI as string,
     jwtSecret: envConfig.JWT_SECRET as string,
@@ -52,9 +51,8 @@ export default {
      * Agenda.js stuff
      */
     agenda: {
-        dbCollection: process.env.AGENDA_DB_COLLECTION,
-        pooltime: process.env.AGENDA_POOL_TIME,
-        concurrency: parseInt(process.env.AGENDA_CONCURRENCY as string, 10)
+        dbCollection: envConfig.AGENDA_DB_COLLECTION as string,
+        concurrency: parseInt(envConfig.AGENDA_CONCURRENCY as string, 10)
     },
     /**
      * Agendash config
@@ -67,7 +65,7 @@ export default {
      * API configs
      */
     api: {
-        prefix: "/api"
+        prefix_v1: "/api/v1"
     },
     /**
      * Mailgun email credentials

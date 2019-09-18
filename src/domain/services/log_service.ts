@@ -2,13 +2,13 @@ import winston from "winston";
 import { injectable } from "inversify";
 
 import { ILoggerService } from "../interfaces/services";
-import loggerInstance from "../../infrastructure/config/loaders/logger";
+import logger from "../../infrastructure/bootstrapping/loaders/logger";
 
 @injectable()
 export default class LoggerService implements ILoggerService {
     private readonly _logClient: winston.Logger;
     constructor() {
-        this._logClient = loggerInstance;
+        this._logClient = logger;
     }
     silly(message: string, meta?: any): void {
         this._logClient.silly(message, meta);

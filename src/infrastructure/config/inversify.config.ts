@@ -1,4 +1,3 @@
-import Agenda from "agenda";
 import { ContainerModule } from "inversify";
 
 // Interfaces & Types
@@ -32,7 +31,6 @@ import {
 import SearchService from "../../domain/services/search_service";
 import MailService from "../../infrastructure/services/mail_service";
 import LoggerService from "./../../domain/services/log_service";
-import agendaFactory from "./loaders/agenda";
 
 export const referenceDataIoCModule = new ContainerModule(bind => {
     // Repositories
@@ -56,14 +54,10 @@ export const referenceDataIoCModule = new ContainerModule(bind => {
     bind<ISearchService>(TYPES.SearchService)
         .to(SearchService)
         .inSingletonScope();
-
     bind<IMailService>(TYPES.MailService)
         .to(MailService)
         .inSingletonScope();
     bind<ILoggerService>(TYPES.LoggerService)
         .to(LoggerService)
         .inSingletonScope();
-
-    // Third Party Services
-    bind<Agenda>("Agenda").toConstantValue(agendaFactory());
 });

@@ -1,18 +1,27 @@
 import { Server } from "http";
-import dotenv from "dotenv";
-import { bootstrap } from "./infrastructure/bootstrapping/bootstrap";
+import { bootstrap } from "./infrastructure/bootstrapping";
 import { container } from "./infrastructure/utils/ioc_container";
 import { referenceDataIoCModule } from "./infrastructure/config/inversify.config";
-
-dotenv.config();
+import config from "./infrastructure/config/config";
+import { App } from "./infrastructure/bootstrapping/loaders/express";
+import { TYPES } from "./domain/constants/types";
+import logger from "./infrastructure/bootstrapping/loaders/logger";
 
 export const startServer = async (): Promise<Server> => {
-    return await bootstrap({
+    const app = await bootstrap({
         container,
-        appPort: parseInt(process.env.APP_PORT || "3000"),
-        dbHost: process.env.DB_HOST || "localhost",
-        dbName: process.env.DB_NAME || "node-typescript-boilerplate",
+        connStr: config.mongoDbConnection,
         containerModules: [referenceDataIoCModule]
+    });
+    // Run express server
+    return app.listen(config.port, err => {
+        if (err) {
+            logger.error(err);
+            process.exit(1);
+            return;
+        }
+        container.bind<App>(TYPES.App).toConstantValue(app);
+        logger.info(`✔️  Server listening on port: ${config.port}`);
     });
 };
 

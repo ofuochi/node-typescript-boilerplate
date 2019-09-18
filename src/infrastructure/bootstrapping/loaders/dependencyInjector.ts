@@ -24,7 +24,7 @@
 
 //         return { agenda: agendaInstance };
 //     } catch (e) {
-//         loggerInstance.error("🔥 Error on dependency injector loader: %o", e);
+//         loggerInstance.error("❌ Error on dependency injector loader: %o", e);
 //         throw e;
 //     }
 // };

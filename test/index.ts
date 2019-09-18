@@ -1,4 +1,4 @@
-//import { cleanUpMetadata } from "inversify-express-utils";
+import "reflect-metadata";
 import { Server } from "http";
 import supertest = require("supertest");
 import { startServer } from "../src";
@@ -9,8 +9,8 @@ let server: Server;
 
 before(async () => {
     server = await startServer();
-    req = supertest(server);
     cleanUpMetadata();
+    req = supertest(server);
 });
 after("Teardown", async () => {
     await server.close();
