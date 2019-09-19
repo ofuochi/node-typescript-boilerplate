@@ -9,6 +9,7 @@ import logger from "./loaders/logger";
 import getAgendaInstance from "./loaders/agenda";
 import { Jobs } from "./loaders/jobs";
 import expressLoader, { App } from "./loaders/express";
+import "./loaders/events";
 
 export async function bootstrap({
     container,

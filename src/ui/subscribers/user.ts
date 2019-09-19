@@ -3,9 +3,12 @@ import { EventSubscriber, On } from "event-dispatch";
 import events from "./events";
 import { User } from "../../domain/model/user";
 import { container } from "../../infrastructure/utils/ioc_container";
+import { loggerService } from "../../domain/constants/decorators";
+import { ILoggerService } from "../../domain/interfaces/services";
 
 @EventSubscriber()
 export default class UserSubscriber {
+    @loggerService private readonly _logger: ILoggerService;
     /**
      * A great example of an event that you want to handle
      * save the last time a user sign-in, your boss will be pleased.
@@ -18,8 +21,6 @@ export default class UserSubscriber {
      */
     @On(events.user.signIn)
     public onUserSignIn({ id }: Partial<User>) {
-        const Logger = container.get<any>("logger");
-
         try {
             const UserModel = container.get("UserModel") as mongoose.Model<
                 User & mongoose.Document
@@ -27,9 +28,10 @@ export default class UserSubscriber {
 
             UserModel.update({ id }, { $set: { lastLogin: new Date() } });
         } catch (e) {
-            Logger.error(`❌ Error on event ${events.user.signIn}: %o`, e);
-
-            // Throw the error so the process die (check src/app.ts)
+            this._logger.error(
+                `❌ Error on event ${events.user.signIn}: %o`,
+                e
+            );
             throw e;
         }
     }

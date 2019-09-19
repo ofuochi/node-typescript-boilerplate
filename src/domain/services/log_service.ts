@@ -10,19 +10,19 @@ export default class LoggerService implements ILoggerService {
     constructor() {
         this._logClient = logger;
     }
-    silly(message: string, meta?: any): void {
+    silly = (message: string, meta?: any): void => {
         this._logClient.silly(message, meta);
-    }
-    error(message: string, meta?: any): void {
+    };
+    error = (message: string, meta?: any): void => {
         this._logClient.error(message, meta);
-    }
-    info(message: string, meta?: any): void {
+    };
+    info = (message: string, meta?: any): void => {
         this._logClient.info(message, meta);
-    }
-    debug(message: string, meta?: any): void {
+    };
+    debug = (message: string, meta?: any): void => {
         this._logClient.debug(message, meta);
-    }
-    warn(message: string, meta?: any): void {
+    };
+    warn = (message: string, meta?: any): void => {
         this._logClient.warn(message, meta);
-    }
+    };
 }

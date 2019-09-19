@@ -1,2 +1,2 @@
 //Here we import all events
-import "../../ui/subscribers/user";
+import "../../../ui/subscribers/user";

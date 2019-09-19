@@ -1,7 +1,7 @@
 import { injectable } from "inversify";
 
 import { IMailService } from "../../domain/interfaces/services";
-import Mailgun = require("mailgun-js");
+import Mailgun from "mailgun-js";
 import config from "../config/env";
 
 @injectable()
@@ -23,7 +23,6 @@ export default class MailService implements IMailService {
          * @TODO Call Mailchimp/Sendgrid or whatever
          */
         // Added example for sending mail from mailgun
-
         const resp = await this._mailgun
             .messages()
             .send({ from: config.emails.from, to, subject, text });

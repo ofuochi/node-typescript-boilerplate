@@ -1,3 +1,4 @@
+import { EventDispatcher } from "event-dispatch";
 import {
     controller,
     httpGet,
@@ -12,15 +13,15 @@ import {
 } from "../../../domain/constants/decorators";
 import { Movie } from "../../../domain/model/movie";
 
-import { IEventDispatcher } from "../../../infrastructure/bootstrapping/eventDispatcher";
+import events from "../../subscribers/events";
 
 @controller("/api/movies")
 export class MovieController {
     @movieRepository private readonly _movieRepository: IMovieRepository;
-    @eventDispatcher private readonly _event: IEventDispatcher;
+    @eventDispatcher private readonly _event: EventDispatcher;
     @httpGet("/")
     public async get(): Promise<Movie[]> {
-        this._event.dispatch("Hello", { hi: "kd" });
+        this._event.dispatch(events.user.signIn, { hi: "kd" });
         return await this._movieRepository.findAll();
     }
     @httpGet("/:id")

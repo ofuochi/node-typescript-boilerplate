@@ -7,7 +7,7 @@
 Clone the repository:
 
 ```sh
-git clonehttps://github.com/ofuochi/node-typescript-boilerplate.git
+git clone https://github.com/ofuochi/node-typescript-boilerplate.git
 ```
 
 Copy the sample env file into a .env file:
