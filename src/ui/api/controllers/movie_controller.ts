@@ -16,8 +16,8 @@ export class MovieController {
     @httpGet("/")
     public async get(): Promise<Movie[]> {
         // this._event.dispatch(events.user.signUp, {
-        //     firstName: "Fortune",
-        //     email: "fortuneochi@gmail.com"
+        //     firstName: "Mark",
+        //     email: "mark@gmail.com"
         // });
         return await this._movieRepository.findAll();
     }
