@@ -12,11 +12,11 @@ export async function getDatabaseClient(connStr: string) {
         });
         const db = mongoose.connection;
         db.on("error", (e: Error) => {
-            logger.error("❌  Db connection error: ", e);
+            logger.error("❌ Db connection error:", e);
             reject(e);
         });
         db.once("open", () => {
-            logger.info("✔️  Db connection successful");
+            logger.info(`✔️  Db connection successful`);
             resolve(mongoose);
         });
     });

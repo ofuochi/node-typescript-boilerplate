@@ -1,4 +1,3 @@
-import { EventDispatcher } from "event-dispatch";
 import { ContainerModule } from "inversify";
 
 // Interfaces & Types
@@ -61,8 +60,4 @@ export const referenceDataIoCModule = new ContainerModule(bind => {
     bind<ILoggerService>(TYPES.LoggerService)
         .to(LoggerService)
         .inSingletonScope();
-
-    bind<EventDispatcher>(TYPES.EventDispatcher).toConstantValue(
-        new EventDispatcher()
-    );
 });

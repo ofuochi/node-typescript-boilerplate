@@ -9,6 +9,7 @@ import logger from "./infrastructure/bootstrapping/loaders/logger";
 
 export const startServer = async (): Promise<Server> => {
     try {
+        
         const app = await bootstrap({
             container,
             connStr: config.mongoDbConnection,
@@ -25,8 +26,8 @@ export const startServer = async (): Promise<Server> => {
             logger.info(`✔️  Server listening on port: ${config.port}`);
         });
     } catch (error) {
-        logger.error("❌  Cannot start server: ", error);
-        process.exit(1);
+        logger.error(`❌  Cannot start server: ${error}`);
+process.exit(1)
         throw error;
     }
 };

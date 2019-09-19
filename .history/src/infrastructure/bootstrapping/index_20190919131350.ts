@@ -41,8 +41,9 @@ export async function bootstrap({
             app.use(exceptionLoggerMiddleware);
         });
 
-        return server.build();
+        const app = server.build();
 
+        return app;
     } else {
         return container.get<App>(TYPES.App);
     }

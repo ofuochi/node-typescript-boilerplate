@@ -6,20 +6,14 @@ import {
     requestBody
 } from "inversify-express-utils";
 import { IMovieRepository } from "../../../domain/interfaces/repositories";
-import {
-    movieRepository,
-    eventDispatcher
-} from "../../../domain/constants/decorators";
+import { movieRepository } from "../../../domain/constants/decorators";
 import { Movie } from "../../../domain/model/movie";
-import { EventDispatcher as IEventDispatcher } from "event-dispatch";
 
 @controller("/api/movies")
 export class MovieController {
-    @movieRepository private readonly _movieRepository: IMovieRepository;
-    @eventDispatcher private readonly _event: IEventDispatcher;
+    @movieRepository private _movieRepository: IMovieRepository;
     @httpGet("/")
     public async get(): Promise<Movie[]> {
-        this._event.dispatch("hello", { hello: "Hello string" });
         return await this._movieRepository.findAll();
     }
     @httpGet("/:id")

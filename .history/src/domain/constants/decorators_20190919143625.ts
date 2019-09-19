@@ -13,4 +13,7 @@ export const loggerService = inject(TYPES.LoggerService);
 export const mailService = inject(TYPES.MailService);
 export const searchService = inject(TYPES.SearchService);
 
-export const eventDispatcher = inject(TYPES.EventDispatcher);
+export const eventDispatcher = () => {
+    return (target: any, targetKey: string, index?: number | undefined) =>
+        void {};
+};

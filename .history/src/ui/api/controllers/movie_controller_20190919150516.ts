@@ -16,7 +16,7 @@ import { EventDispatcher as IEventDispatcher } from "event-dispatch";
 @controller("/api/movies")
 export class MovieController {
     @movieRepository private readonly _movieRepository: IMovieRepository;
-    @eventDispatcher private readonly _event: IEventDispatcher;
+    @eventDispatcher() private readonly _event: IEventDispatcher;
     @httpGet("/")
     public async get(): Promise<Movie[]> {
         this._event.dispatch("hello", { hello: "Hello string" });
