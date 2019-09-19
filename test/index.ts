@@ -1,4 +1,3 @@
-import "reflect-metadata";
 import { Server } from "http";
 import supertest = require("supertest");
 import { startServer } from "../src";
@@ -12,6 +11,7 @@ before(async () => {
     cleanUpMetadata();
     req = supertest(server);
 });
+
 after("Teardown", async () => {
     await server.close();
 });

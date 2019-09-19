@@ -19,32 +19,29 @@ export async function bootstrap({
     connStr: string;
     containerModules?: ContainerModule[];
 }): Promise<App> {
-    if (container.isBound(TYPES.App) === false) {
-        // container.applyMiddleware(makeLoggerMiddleware());
-        const dbClient = await getDatabaseClient(connStr);
-
-        container.bind<DbClient>(TYPES.DbClient).toConstantValue(dbClient);
-        container.load(...containerModules);
-        logger.info("✔️  Dependency Injector loaded");
-
-        await Jobs.sendWelcomeEmail(getAgendaInstance);
-        logger.info("✔️  Jobs loaded");
-
-        // Configure express server using inversify IoC
-        const server = new InversifyExpressServer(container);
-
-        server.setConfig(app => expressLoader(app));
-        logger.info("✔️  Express loaded");
-
-        server.setErrorConfig(app => {
-            // Catch and log all exceptions
-            app.use(exceptionLoggerMiddleware);
-        });
-
-        const app = server.build();
-
-        return app;
-    } else {
+    if (container.isBound(TYPES.App) === true)
         return container.get<App>(TYPES.App);
-    }
+
+    // container.applyMiddleware(makeLoggerMiddleware());
+    const dbClient = await getDatabaseClient(connStr);
+
+    container.bind<DbClient>(TYPES.DbClient).toConstantValue(dbClient);
+    container.load(...containerModules);
+    logger.info("✔️  Dependency Injector loaded");
+
+    await Jobs.sendWelcomeEmail(getAgendaInstance);
+    logger.info("✔️  Jobs loaded");
+
+    // Configure express server using inversify IoC
+    const server = new InversifyExpressServer(container);
+
+    server.setConfig(app => expressLoader(app));
+    logger.info("✔️  Express loaded");
+
+    server.setErrorConfig(app => {
+        // Catch and log all exceptions
+        app.use(exceptionLoggerMiddleware);
+    });
+
+    return server.build();
 }
