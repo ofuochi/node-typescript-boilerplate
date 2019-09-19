@@ -67,4 +67,4 @@ typings/
 # builds
 dist
 build
-.history
+## .history
