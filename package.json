@@ -18,6 +18,7 @@
         "tsc": "tsc -p tsconfig.json",
         "no-build": "npx ts-node src/index.ts",
         "start-node": "node dist/index.js",
+        "non-build:start": "npx ts-code src/index.ts",
         "start": "npm run rm-files && npm run tsc && npm run start-node"
     },
     "dependencies": {

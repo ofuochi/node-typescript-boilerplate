@@ -15,7 +15,7 @@ if (process.env.NODE_ENV !== "development") {
     );
 }
 
-const logger = winston.createLogger({
+const winstonLoggerInstance = winston.createLogger({
     level: config.logs.level,
     levels: winston.config.npm.levels,
     format: winston.format.combine(
@@ -28,5 +28,5 @@ const logger = winston.createLogger({
     ),
     transports
 });
-
-export default logger;
+export type IWinstonLogger = winston.Logger;
+export default winstonLoggerInstance;

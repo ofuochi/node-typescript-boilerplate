@@ -6,7 +6,7 @@ import { referenceDataIoCModule } from "./infrastructure/config/inversify.config
 import { App } from "./infrastructure/bootstrapping/loaders/express";
 import { TYPES } from "./domain/constants/types";
 import config from "./infrastructure/config/env";
-import logger from "./infrastructure/bootstrapping/loaders/logger";
+import winstonLoggerInstance from "./infrastructure/bootstrapping/loaders/logger";
 
 export const startServer = async (): Promise<Server> => {
     try {
@@ -18,17 +18,20 @@ export const startServer = async (): Promise<Server> => {
         return app.listen(config.port, error => {
             if (error) exitProcess(error);
             container.bind<App>(TYPES.App).toConstantValue(app);
-            logger.info(`✔️  Server listening on port: ${config.port}`);
+            winstonLoggerInstance.info(
+                `✔️  Server listening on port: ${config.port}`
+            );
         });
     } catch (error) {
         exitProcess(error);
+
         throw error;
     }
     // Run express server
 };
 
 function exitProcess(error: any): void {
-    logger.error(`❌  ${error}`);
+    winstonLoggerInstance.error(`❌  ${error}`);
     process.exit(1);
 }
 

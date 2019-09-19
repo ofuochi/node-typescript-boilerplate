@@ -12,5 +12,6 @@ export const TYPES = {
     MailService: Symbol("MailService"),
     AuthService: Symbol("AuthService"),
 
-    EventDispatcher: Symbol("EventDispatcher")
+    EventDispatcher: Symbol("EventDispatcher"),
+    Agenda: Symbol("Agenda")
 };

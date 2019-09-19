@@ -1,14 +1,21 @@
-import mongoose from "mongoose";
 import { EventSubscriber, On } from "event-dispatch";
-import events from "./events";
+import mongoose from "mongoose";
+
+import { ILoggerService, IMailService } from "../../domain/interfaces/services";
 import { User } from "../../domain/model/user";
 import { container } from "../../infrastructure/utils/ioc_container";
-import { loggerService } from "../../domain/constants/decorators";
-import { ILoggerService } from "../../domain/interfaces/services";
+import { TYPES } from "./../../domain/constants/types";
+import events from "./events";
+import { MailJobType } from "../../infrastructure/jobs/mail_job";
 
 @EventSubscriber()
 export default class UserSubscriber {
-    @loggerService private readonly _logger: ILoggerService;
+    private readonly _logger = container.get<ILoggerService>(
+        TYPES.LoggerService
+    );
+    private readonly _mailService = container.get<IMailService>(
+        TYPES.MailService
+    );
     /**
      * A great example of an event that you want to handle
      * save the last time a user sign-in, your boss will be pleased.
@@ -21,6 +28,7 @@ export default class UserSubscriber {
      */
     @On(events.user.signIn)
     public onUserSignIn({ id }: Partial<User>) {
+        this._logger.debug(id);
         try {
             const UserModel = container.get("UserModel") as mongoose.Model<
                 User & mongoose.Document
@@ -28,28 +36,22 @@ export default class UserSubscriber {
 
             UserModel.update({ id }, { $set: { lastLogin: new Date() } });
         } catch (e) {
-            this._logger.error(
-                `❌ Error on event ${events.user.signIn}: %o`,
-                e
-            );
-            throw e;
+            this._logger.error(`❌  Error on event ${events.user.signIn}: `, e);
+
+            // Throw the error so the process dies (check src/app.ts)
+            throw new Error(e);
         }
     }
     @On(events.user.signUp)
-    public onUserSignUp({ email, id }: Partial<User>) {
-        const Logger = container.get<any>("logger");
-
+    public onUserSignUp({ firstName, email }: User) {
         try {
-            /**
-             * @TODO implement this
-             */
-            // Call the tracker tool so your investor knows that there is a new signup
-            // and leave you alone for another hour.
-            // TrackerService.track('user.signup', { email, _id })
             // Start your email sequence or whatever
-            // MailService.startSequence('user.welcome', { email, name })
+            this._mailService.startEmailSequence(
+                MailJobType.SEND_WELCOME_MAIL,
+                { firstName, email }
+            );
         } catch (e) {
-            Logger.error(`❌ Error on event ${events.user.signUp}: %o`, e);
+            this._logger.error(`❌  Error on event ${events.user.signUp}: `, e);
 
             // Throw the error so the process dies (check src/app.ts)
             throw e;

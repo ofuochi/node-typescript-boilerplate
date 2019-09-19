@@ -20,7 +20,7 @@
 //         Container.set("agendaInstance", agendaInstance);
 //         Container.set("logger", loggerInstance);
 
-//         loggerInstance.info("✌️ Agenda injected into container");
+//         loggerInstance.info("✔️  Agenda injected into container");
 
 //         return { agenda: agendaInstance };
 //     } catch (e) {

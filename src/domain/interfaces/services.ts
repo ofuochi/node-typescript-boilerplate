@@ -1,3 +1,4 @@
+import { MailJobType } from "../../infrastructure/jobs/mail_job";
 import { Movie } from "../model/movie";
 
 export interface ISearchService {
@@ -10,6 +11,7 @@ export interface IMailService {
         subject: string,
         text: string
     ): Promise<boolean>;
+    startEmailSequence(sequenceType: MailJobType, data: any): void;
 }
 
 export interface ILoggerService {

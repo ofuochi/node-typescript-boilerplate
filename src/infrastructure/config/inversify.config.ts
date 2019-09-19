@@ -1,5 +1,6 @@
 import { ContainerModule } from "inversify";
 import { EventDispatcher } from "event-dispatch";
+import Agenda from "agenda";
 
 // Interfaces & Types
 import { TYPES } from "../../domain/constants/types";
@@ -9,13 +10,6 @@ import {
     IDirectorRepository,
     IUserRepository
 } from "../../domain/interfaces/repositories";
-
-// Controllers
-import "../../ui/api/controllers/movie_controller";
-import "../../ui/api/controllers/director_controller";
-import "../../ui/api/controllers/actor_controller";
-import "../../ui/api/controllers/secure_controller";
-import "../../ui/api/controllers/search_controller";
 
 // Repositories
 import { MovieRepository } from "../../infrastructure/db/repositories/movie_repository";
@@ -31,7 +25,16 @@ import {
 } from "../../domain/interfaces/services";
 import SearchService from "../../domain/services/search_service";
 import MailService from "../../infrastructure/services/mail_service";
-import LoggerService from "./../../domain/services/log_service";
+import LoggerService from "../../domain/services/logger_service";
+
+import agendaInstance from "../bootstrapping/loaders/agenda";
+
+// Controllers
+import "../../ui/api/controllers/movie_controller";
+import "../../ui/api/controllers/director_controller";
+import "../../ui/api/controllers/actor_controller";
+import "../../ui/api/controllers/secure_controller";
+import "../../ui/api/controllers/search_controller";
 
 export const referenceDataIoCModule = new ContainerModule(bind => {
     // Repositories
@@ -58,6 +61,7 @@ export const referenceDataIoCModule = new ContainerModule(bind => {
     bind<IMailService>(TYPES.MailService)
         .to(MailService)
         .inSingletonScope();
+
     bind<ILoggerService>(TYPES.LoggerService)
         .to(LoggerService)
         .inSingletonScope();
@@ -65,4 +69,6 @@ export const referenceDataIoCModule = new ContainerModule(bind => {
     bind<EventDispatcher>(TYPES.EventDispatcher).toConstantValue(
         new EventDispatcher()
     );
+
+    bind<Agenda>(TYPES.Agenda).toConstantValue(agendaInstance);
 });
