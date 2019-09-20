@@ -1,6 +1,8 @@
-import { loggerService, mailService } from "../../domain/constants/decorators";
+import { mailService } from "../../domain/constants/decorators";
+import { TYPES } from "../../domain/constants/types";
 import { ILoggerService, IMailService } from "../../domain/interfaces/services";
 import { User } from "../../domain/model/user";
+import { container } from "../utils/ioc_container";
 
 export enum MailJobType {
     SEND_WELCOME_MAIL
@@ -8,13 +10,12 @@ export enum MailJobType {
 
 export default class MailJob {
     @mailService private readonly _mailService: IMailService;
-    @loggerService private readonly _logger: ILoggerService;
 
     async sendWelcomeEmail(job: any, done: Function): Promise<void> {
+        const logger = container.get<ILoggerService>(TYPES.LoggerService);
         try {
-            this._logger.debug("✔️  Email Sequence Job triggered!");
+            logger.debug("✔️  Email Sequence Job triggered!");
             const { email, firstName }: User = job.attrs.data;
-            console.log(email);
             await this._mailService.sendWelcomeEmail(
                 email,
                 "Welcome to Travela",
@@ -22,7 +23,7 @@ export default class MailJob {
             );
             done();
         } catch (e) {
-            this._logger.error("❌  Error with Email Sequence Job: ", e);
+            logger.error("❌  Error with Email Sequence Job: ", e);
             done(e);
         }
     }

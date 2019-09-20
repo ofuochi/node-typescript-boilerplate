@@ -34,7 +34,11 @@ export default class MailService implements IMailService {
         const agenda = container.get<Agenda>(TYPES.Agenda);
         switch (sequenceType) {
             case MailJobType.SEND_WELCOME_MAIL:
-                agenda.now(MailJobType.SEND_WELCOME_MAIL.toString(), data);
+                agenda.schedule(
+                    "in 2 minutes",
+                    MailJobType[MailJobType.SEND_WELCOME_MAIL],
+                    data
+                );
                 break;
             default:
                 break;
