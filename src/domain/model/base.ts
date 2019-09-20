@@ -3,18 +3,18 @@ export default abstract class BaseEntity extends Typegoose {
     @prop({ required: true })
     createdAt!: Date;
     @prop({ required: true })
-    createdBy!: string;
+    createdBy!: any;
 
     @prop()
     updatedAt?: Date;
     @prop()
-    updatedBy?: Date;
+    updatedBy?: any;
 
     @prop({ required: true })
     isDeleted!: boolean;
 
     @prop()
-    deletedBy?: string;
+    deletedBy?: any;
     @prop()
     deletionTime?: Date;
 }
