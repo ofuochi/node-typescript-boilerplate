@@ -1,8 +1,8 @@
 import { Actor } from "../model/actor";
 import { Director } from "../model/director";
 import { Movie } from "../model/movie";
+import Tenant from "../model/tenant";
 import { User } from "../model/user";
-import { IBaseRepository } from "../interfaces/repositories";
 
 export type Query<T> = {
     [P in keyof T]?: T[P] | { $regex: RegExp };
@@ -20,3 +20,4 @@ export type IMovieRepository = IBaseRepository<Movie>;
 export type IActorRepository = IBaseRepository<Actor>;
 export type IDirectorRepository = IBaseRepository<Director>;
 export type IUserRepository = IBaseRepository<User>;
+export type ITenantRepository = IBaseRepository<Tenant>;

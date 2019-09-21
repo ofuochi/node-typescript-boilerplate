@@ -10,6 +10,7 @@ import { exceptionLoggerMiddleware } from "../middleware/interceptor_middleware"
 import expressLoader, { App } from "./loaders/express";
 import { Jobs } from "./loaders/jobs";
 import winstonLoggerInstance from "./loaders/logger";
+import config from "../config";
 
 import "./loaders/events";
 
@@ -36,7 +37,9 @@ export async function bootstrap({
     winstonLoggerInstance.info("✔️  Jobs loaded");
 
     // Configure express server using inversify IoC
-    const server = new InversifyExpressServer(container);
+    const server = new InversifyExpressServer(container, null, {
+        rootPath: config.api.prefix
+    });
 
     server.setConfig(app => expressLoader(app));
     winstonLoggerInstance.info("✔️  Express loaded");

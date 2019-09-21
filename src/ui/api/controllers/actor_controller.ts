@@ -2,7 +2,7 @@ import { controller, httpGet, requestParam } from "inversify-express-utils";
 import { actorRepository } from "../../../domain/constants/decorators";
 import { IActorRepository } from "../../../domain/interfaces/repositories";
 
-@controller("/api/actors")
+@controller("/actors")
 export class ActorController {
     @actorRepository public _actorRepository: IActorRepository;
 

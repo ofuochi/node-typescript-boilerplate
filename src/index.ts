@@ -5,7 +5,7 @@ import { container } from "./infrastructure/utils/ioc_container";
 import { referenceDataIoCModule } from "./infrastructure/config/inversify.config";
 import { App } from "./infrastructure/bootstrapping/loaders/express";
 import { TYPES } from "./domain/constants/types";
-import config from "./infrastructure/config/env";
+import config from "./infrastructure/config";
 import winstonLoggerInstance from "./infrastructure/bootstrapping/loaders/logger";
 
 export const startServer = async (): Promise<Server> => {

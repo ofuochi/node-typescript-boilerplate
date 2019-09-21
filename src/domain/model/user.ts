@@ -1,4 +1,6 @@
-export interface User {
+import { Typegoose } from "@hasezoey/typegoose";
+
+export class User extends Typegoose {
     id?: any;
     firstName: string;
     lastName: string;

@@ -48,7 +48,10 @@ export default class UserSubscriber {
             // Start your email sequence or whatever
             this._mailService.startEmailSequence(
                 MailJobType.SEND_WELCOME_MAIL,
-                { firstName, email }
+                {
+                    firstName,
+                    email
+                }
             );
         } catch (e) {
             this._logger.error(`❌  Error on event ${events.user.signUp}: `, e);

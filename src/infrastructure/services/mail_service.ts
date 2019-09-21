@@ -2,7 +2,7 @@ import { injectable } from "inversify";
 
 import { IMailService } from "../../domain/interfaces/services";
 import Mailgun from "mailgun-js";
-import config from "../config/env";
+import config from "../config";
 import { MailJobType } from "../jobs/mail_job";
 import { container } from "../utils/ioc_container";
 import Agenda from "agenda";

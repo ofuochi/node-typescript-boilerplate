@@ -1,5 +1,5 @@
 import Agenda from "agenda";
-import config from "../../config/env";
+import config from "../../config";
 
 export default new Agenda({
     db: {

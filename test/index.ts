@@ -1,9 +1,12 @@
 import { Server } from "http";
-import supertest = require("supertest");
-import { startServer } from "../src";
 import { cleanUpMetadata } from "inversify-express-utils";
+import supertest from "supertest";
 
-let req: supertest.SuperTest<supertest.Test>;
+import { startServer } from "../src";
+import config from "../src/infrastructure/config";
+
+export { config };
+export let req: supertest.SuperTest<supertest.Test>;
 let server: Server;
 
 before(async () => {
@@ -15,5 +18,3 @@ before(async () => {
 after("Teardown", async () => {
     await server.close();
 });
-
-export { req };

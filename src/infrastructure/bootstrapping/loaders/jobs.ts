@@ -1,6 +1,6 @@
 import Agenda from "agenda";
 
-import config from "../../config/env";
+import config from "../../config";
 import MailJob, { MailJobType } from "../../jobs/mail_job";
 
 async function sendWelcomeEmail(agenda: Agenda): Promise<void> {

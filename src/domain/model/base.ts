@@ -1,20 +1,35 @@
-import { Typegoose, prop } from "typegoose";
+import { Typegoose, prop } from "@hasezoey/typegoose";
+
+// This will allow you to change readonly properties
+export type Writable<T> = {
+    -readonly [K in keyof T]: T[K];
+};
 export default abstract class BaseEntity extends Typegoose {
-    @prop({ required: true })
-    createdAt!: Date;
-    @prop({ required: true })
-    createdBy!: any;
+    @prop({ required: true, default: new Date() })
+    readonly createdAt: Date = new Date();
+    @prop()
+    readonly createdBy?: any;
 
     @prop()
-    updatedAt?: Date;
+    readonly updatedAt?: Date;
     @prop()
-    updatedBy?: any;
+    readonly updatedBy?: any;
 
-    @prop({ required: true })
-    isDeleted!: boolean;
+    @prop({ required: true, default: false })
+    readonly isDeleted: boolean = false;
 
     @prop()
-    deletedBy?: any;
+    readonly deletedBy?: any;
     @prop()
-    deletionTime?: Date;
+    readonly deletionTime?: Date;
+
+    @prop({ required: true, default: true })
+    readonly isActive: boolean = true;
+
+    delete = (): void => {
+        (this as Writable<BaseEntity>).isDeleted = true;
+    };
+    deactivate = (): void => {
+        (this as Writable<BaseEntity>).isActive = false;
+    };
 }
