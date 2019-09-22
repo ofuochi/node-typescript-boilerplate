@@ -52,9 +52,7 @@ export default class AuthService implements IAuthService {
             }
             this._logger.silly("Sending welcome email");
 
-            this._eventDispatcher.dispatch(events.user.signUp, {
-                user: dto
-            });
+            this._eventDispatcher.dispatch(events.user.signUp, { ...dto });
 
             const userDto: UserDto = {
                 firstName: dto.firstName,
