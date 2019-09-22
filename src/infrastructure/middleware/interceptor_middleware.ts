@@ -4,6 +4,7 @@ import httpStatus from "http-status-codes";
 import { TYPES } from "../../domain/constants/types";
 import { ILoggerService } from "../../domain/interfaces/services";
 import { container } from "../utils/ioc_container";
+import { CurrentTenant } from "../../domain/utils/currentTenant";
 
 export function reqMiddleware(
     req: express.Request,
@@ -18,7 +19,8 @@ export function reqMiddleware(
             .status(httpStatus.BAD_REQUEST)
             .end("x-tenant-id header is missing");
 
-    container.bind<string>("tenant").toConstantValue(req.tenant);
+    global.currentTenant = new CurrentTenant(req.tenant);
+
     log.info(`
     ----------------------------------
     REQUEST MIDDLEWARE

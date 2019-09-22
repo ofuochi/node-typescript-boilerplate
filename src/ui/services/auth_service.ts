@@ -16,7 +16,6 @@ import {
 import { ILoggerService } from "../../domain/interfaces/services";
 import { User } from "../../domain/model/user";
 import config from "../../infrastructure/config";
-import { container } from "../../infrastructure/utils/ioc_container";
 import { IAuthService } from "../interfaces/auth_service";
 import events from "../subscribers/events";
 import { SignUpInput, UserDto } from "./../models/user_dto";
@@ -32,8 +31,9 @@ export default class AuthService implements IAuthService {
         dto: SignUpInput
     ): Promise<{ user: UserDto; token: string }> {
         try {
-            const tenantId = container.get<string>("tenant");
-            const tenant = await this._tenantRepository.findById(tenantId);
+            const tenant = await this._tenantRepository.findById(
+                global.currentTenant.tenantId
+            );
             if (!tenant) throw new Error("Tenant not found");
 
             const hashedPassword = await bcrypt.hash(dto.password, 10);

@@ -28,11 +28,11 @@ before("Startup", async () => {
 });
 
 after("Teardown", async () => {
-    const collections = await mongoose.connection.db
-        .listCollections(null, { nameOnly: true })
-        .toArray();
-    collections.forEach(async collection => {
-        await mongoose.connection.db.dropCollection(collection.name);
-    });
+    // const collections = await mongoose.connection.db
+    //     .listCollections(null, { nameOnly: true })
+    //     .toArray();
+    // collections.forEach(async collection => {
+    //     await mongoose.connection.db.dropCollection(collection.name);
+    // });
     await server.close();
 });
