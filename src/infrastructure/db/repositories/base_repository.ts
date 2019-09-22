@@ -1,7 +1,6 @@
 import { injectable, unmanaged } from "inversify";
-import { Schema, Document, Model, SchemaDefinition } from "mongoose";
-import { DbClient } from "../db_client";
-import { dbClient } from "../../../domain/constants/decorators";
+import { Document, Model } from "mongoose";
+
 import {
     IBaseRepository,
     Query
@@ -10,18 +9,10 @@ import {
 @injectable()
 export class BaseRepository<TEntity, TModel extends Document>
     implements IBaseRepository<TEntity> {
-    private _name: string;
     protected Model: Model<TModel>;
 
-    public constructor(
-        @dbClient dbClient: DbClient,
-        @unmanaged() name: string,
-        @unmanaged() schemaDefinition: SchemaDefinition
-    ) {
-        this._name = name;
-        const schema = new Schema(schemaDefinition, { collection: this._name });
-        dbClient.models = {};
-        this.Model = dbClient.model<TModel>(this._name, schema);
+    public constructor(@unmanaged() model: Model<TModel>) {
+        this.Model = model;
     }
 
     // We wrap the mongoose API here so we can use async / await

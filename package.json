@@ -24,7 +24,6 @@
     "dependencies": {
         "@hapi/joi": "^16.0.1",
         "@hasezoey/typegoose": "^5.9.2",
-        "@types/http-status-codes": "^1.2.0",
         "agenda": "^2.1.0",
         "bcrypt": "^3.0.6",
         "body-parser": "^1.19.0",
@@ -56,6 +55,7 @@
         "@types/express": "^4.17.1",
         "@types/hapi__joi": "^15.0.4",
         "@types/helmet": "0.0.44",
+        "@types/http-status-codes": "^1.2.0",
         "@types/jsonwebtoken": "^8.3.3",
         "@types/mailgun-js": "^0.22.3",
         "@types/method-override": "0.0.31",
@@ -65,6 +65,7 @@
         "@types/winston": "^2.4.4",
         "chai": "^4.2.0",
         "mocha": "^6.2.0",
+        "mongodb-memory-server": "^5.2.3",
         "nyc": "^14.1.1",
         "supertest": "^4.0.2",
         "ts-node": "^8.3.0",

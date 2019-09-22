@@ -1,9 +1,4 @@
 import { MailJobType } from "../../infrastructure/jobs/mail_job";
-import { Movie } from "../model/movie";
-
-export interface ISearchService {
-    search(query: string): Promise<Movie[]>;
-}
 
 export interface IMailService {
     sendWelcomeEmail(

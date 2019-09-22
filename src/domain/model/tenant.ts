@@ -3,7 +3,7 @@ import { prop } from "@hasezoey/typegoose";
 import BaseEntity from "./base";
 
 export default class Tenant extends BaseEntity {
-    @prop({ required: true })
+    @prop({ required: true, uppercase: true, index: true, unique: true })
     readonly name!: string;
     @prop({ required: true })
     readonly description!: string;
@@ -17,7 +17,10 @@ export default class Tenant extends BaseEntity {
 
     static createInstance = (name: string, description: string) =>
         new Tenant(name, description);
+
     public static get model() {
-        return new Tenant().getModelForClass(Tenant);
+        return new Tenant().getModelForClass(Tenant, {
+            schemaOptions: { collection: "Tenants" }
+        });
     }
 }

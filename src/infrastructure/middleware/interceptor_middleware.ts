@@ -1,21 +1,30 @@
 import express from "express";
+import httpStatus from "http-status-codes";
 
 import { TYPES } from "../../domain/constants/types";
-import { container } from "../utils/ioc_container";
 import { ILoggerService } from "../../domain/interfaces/services";
+import { container } from "../utils/ioc_container";
 
 export function reqMiddleware(
-    _req: express.Request,
-    _res: express.Response,
+    req: express.Request,
+    res: express.Response,
     next: () => void
 ) {
-    // const log = container.get<ILoggerService>(TYPES.LoggerService);
-    // log.info(`
-    // ----------------------------------
-    // REQUEST MIDDLEWARE
-    // HTTP ${req.method} ${req.url}
-    // ----------------------------------
-    // `);
+    const log = container.get<ILoggerService>(TYPES.LoggerService);
+    req.tenant = req.headers["x-tenant-id"] as string;
+
+    if (!req.tenant)
+        return res
+            .status(httpStatus.BAD_REQUEST)
+            .end("x-tenant-id header is missing");
+
+    container.bind<string>("tenant").toConstantValue(req.tenant);
+    log.info(`
+    ----------------------------------
+    REQUEST MIDDLEWARE
+    HTTP ${req.method} ${req.url}
+    ----------------------------------
+    `);
     next();
 }
 

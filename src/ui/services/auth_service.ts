@@ -1,124 +1,136 @@
-// import jwt from "jsonwebtoken";
-// import { injectable, inject } from "inversify";
-// import bcrypt from "bcrypt";
-// import MailerService from "../../infrastructure/services/mail_service";
-// import events from "../subscribers/events";
-// import { IAuthService } from "../interfaces/auth_service";
-// import { User } from "../../domain/model/user";
-// import config from "../../config";
-// import { IUserRepository } from "../../domain/interfaces/repositories";
-// import { userRepository } from "../../domain/constants/decorators";
-// import loggerInstance from "./../loaders/logger";
-// import winston from "winston";
+import bcrypt from "bcrypt";
+import { EventDispatcher } from "event-dispatch";
+import { injectable } from "inversify";
+import jwt from "jsonwebtoken";
 
-// @injectable()
-// export default class AuthService implements IAuthService {
-//     @userRepository private _userRepo: IUserRepository;
-//     constructor(
-//         private mailer: MailerService
-//     ) // @inject("loggerInstance") private logger: winston.Logger,
-//     // @EventDispatcher() private eventDispatcher: EventDispatcherInterface
-//     {}
+import {
+    eventDispatcher,
+    loggerService,
+    tenantRepository,
+    userRepository
+} from "../../domain/constants/decorators";
+import {
+    ITenantRepository,
+    IUserRepository
+} from "../../domain/interfaces/repositories";
+import { ILoggerService } from "../../domain/interfaces/services";
+import { User } from "../../domain/model/user";
+import config from "../../infrastructure/config";
+import { container } from "../../infrastructure/utils/ioc_container";
+import { IAuthService } from "../interfaces/auth_service";
+import events from "../subscribers/events";
+import { SignUpInput, UserDto } from "./../models/user_dto";
 
-//     public async signUp(user: User): Promise<{ user: User; token: string }> {
-//         try {
-//             this.logger.silly("Hashing password");
-//             const hashedPassword = await bcrypt.hash(user.password, 10);
-//             this.logger.silly("Creating user db record");
-//             const userRecord = await this._userRepo.save({
-//                 ...user,
-//                 password: hashedPassword
-//             });
-//             this.logger.silly("Generating JWT");
-//             const token = this.generateToken(userRecord);
+@injectable()
+export default class AuthService implements IAuthService {
+    @userRepository private _userRepository: IUserRepository;
+    @tenantRepository private _tenantRepository: ITenantRepository;
+    @eventDispatcher private _eventDispatcher: EventDispatcher;
+    @loggerService private _logger: ILoggerService;
 
-//             if (!userRecord) {
-//                 throw new Error("User cannot be created");
-//             }
-//             this.logger.silly("Sending welcome email");
-//             await this.mailer.SendWelcomeEmail(userRecord);
+    public async signUp(
+        dto: SignUpInput
+    ): Promise<{ user: UserDto; token: string }> {
+        try {
+            const tenantId = container.get<string>("tenant");
+            const tenant = await this._tenantRepository.findById(tenantId);
+            if (!tenant) throw new Error("Tenant not found");
 
-//             this.eventDispatcher.dispatch(events.user.signUp, {
-//                 user: userRecord
-//             });
+            const hashedPassword = await bcrypt.hash(dto.password, 10);
+            const user = User.createInstance({
+                ...dto,
+                tenant: tenant.id,
+                password: hashedPassword
+            });
+            const userRecord = await this._userRepository.save(user);
 
-//             /**
-//              * @TODO This is not the best way to deal with this
-//              * There should exist a 'Mapper' layer
-//              * that transforms data from layer to layer
-//              * but that's too over-engineering for now
-//              */
-//             const user = userRecord.toObject();
-//             Reflect.deleteProperty(user, "password");
-//             Reflect.deleteProperty(user, "salt");
-//             return { user, token };
-//         } catch (e) {
-//             this.logger.error(e);
-//             throw e;
-//         }
-//     }
+            this._logger.silly("Generating JWT");
+            const token = await this.generateToken(userRecord);
 
-//     public async signIn(
-//         emailOrUsername: string,
-//         password: string
-//     ): Promise<{ user: User; token: string }> {
-//         const userRecords = await this._userRepo.findManyByQuery({
-//             email: emailOrUsername
-//         });
-//         if (!userRecords) {
-//             throw new Error("User not registered");
-//         }
+            if (!userRecord) {
+                throw new Error("User cannot be created");
+            }
+            this._logger.silly("Sending welcome email");
 
-//         /**
-//          * We use verify from argon2 to prevent 'timing based' attacks
-//          */
-//         this.logger.silly("Checking password");
-//         const userRecord = userRecords[0];
-//         const validPassword = await bcrypt.compare(
-//             userRecord.password,
-//             password
-//         );
-//         if (validPassword) {
-//             this.logger.silly("Password is valid!");
-//             this.logger.silly("Generating JWT");
-//             const token = await this.generateToken(userRecord);
+            this._eventDispatcher.dispatch(events.user.signUp, {
+                user: dto
+            });
 
-//             const user = userRecord.toObject();
-//             Reflect.deleteProperty(user, "password");
-//             Reflect.deleteProperty(user, "salt");
-//             /**
-//              * Easy as pie, you don't need passport.js anymore :)
-//              */
-//             return { user, token };
-//         } else {
-//             throw new Error("Invalid Password");
-//         }
-//     }
+            const userDto: UserDto = {
+                firstName: dto.firstName,
+                lastName: dto.lastName,
+                email: userRecord.email,
+                username: userRecord.username,
+                id: userRecord.id
+            };
+            return { user: userDto, token };
+        } catch (e) {
+            this._logger.error(e);
+            throw e;
+        }
+    }
 
-//     private async generateToken(user: User) {
-//         const today = new Date();
-//         const exp = new Date(today);
-//         exp.setDate(today.getDate() + 60);
+    public async signIn(
+        emailOrUsername: string,
+        password: string
+    ): Promise<{ token: string }> {
+        const userRecords = await this._userRepository.findManyByQuery({
+            email: emailOrUsername
+        });
+        if (!userRecords) {
+            throw new Error("User not registered");
+        }
 
-//         /**
-//          * A JWT means JSON Web Token, so basically it's a json that is _hashed_ into a string
-//          * The cool thing is that you can add custom properties a.k.a metadata
-//          * Here we are adding the userId, role and name
-//          * Beware that the metadata is public and can be decoded without _the secret_
-//          * but the client cannot craft a JWT to fake a userId
-//          * because it doesn't have _the secret_ to sign it
-//          * more information here: https://softwareontheroad.com/you-dont-need-passport
-//          */
-//         this.logger.silly(`Sign JWT for userId: ${user.id}`);
+        /**
+         * We use verify from argon2 to prevent 'timing based' attacks
+         */
+        this._logger.silly("Checking password");
+        const userRecord = userRecords[0];
+        const validPassword = await bcrypt.compare(
+            userRecord.password,
+            password
+        );
+        if (validPassword) {
+            this._logger.silly("Password is valid!");
+            this._logger.silly("Generating JWT");
+            const token = await this.generateToken(userRecord);
 
-//         return await jwt.sign(
-//             {
-//                 id: user.id, // We are gonna use this in the middleware 'isAuth'
-//                 roles: user.roles,
-//                 name: user.username,
-//                 exp: exp.getTime() / 1000
-//             },
-//             config.jwtSecret
-//         );
-//     }
-// }
+            // const user = userRecord.toObject();
+            //  Reflect.deleteProperty(user, "salt");
+            /**
+             * Easy as pie, you don't need passport.js anymore :)
+             */
+            return { token };
+        } else {
+            throw new Error("Invalid Password");
+        }
+    }
+
+    private async generateToken(user: User) {
+        const today = new Date();
+        const exp = new Date(today);
+        exp.setDate(today.getDate() + 60);
+
+        /**
+         * A JWT means JSON Web Token, so basically it's a json that is _hashed_ into a string
+         * The cool thing is that you can add custom properties a.k.a metadata
+         * Here we are adding the userId, role and name
+         * Beware that the metadata is public and can be decoded without _the secret_
+         * but the client cannot craft a JWT to fake a userId
+         * because it doesn't have _the secret_ to sign it
+         * more information here: https://softwareontheroad.com/you-dont-need-passport
+         */
+
+        return jwt.sign(
+            {
+                id: user.id, // We are gonna use this in the middleware 'isAuth'
+                roles: user.roles,
+                email: user.email,
+                username: user.username,
+                firstName: user.firstName,
+                exp: exp.getTime() / 1000
+            },
+            config.jwtSecret
+        );
+    }
+}

@@ -1,9 +1,9 @@
-import { User } from "../../domain/model/user";
+import { SignUpInput, UserDto } from "../models/user_dto";
 
 export interface IAuthService {
-    signUp(user: User): Promise<{ user: User; token: string }>;
+    signUp(user: SignUpInput): Promise<{ user: UserDto; token: string }>;
     signIn(
         emailOrUsername: string,
         password: string
-    ): Promise<{ user: User; token: string }>;
+    ): Promise<{ token: string }>;
 }

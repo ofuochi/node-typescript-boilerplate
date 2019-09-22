@@ -7,6 +7,7 @@ import { container } from "../../infrastructure/utils/ioc_container";
 import { TYPES } from "./../../domain/constants/types";
 import events from "./events";
 import { MailJobType } from "../../infrastructure/jobs/mail_job";
+import { UserDto } from "../models/user_dto";
 
 @EventSubscriber()
 export default class UserSubscriber {
@@ -27,8 +28,7 @@ export default class UserSubscriber {
      * then save the latest in Redis/Memcache or something similar
      */
     @On(events.user.signIn)
-    public onUserSignIn({ id }: Partial<User>) {
-        this._logger.debug(id);
+    public onUserSignIn({ id }: Partial<UserDto>) {
         try {
             const UserModel = container.get("UserModel") as mongoose.Model<
                 User & mongoose.Document

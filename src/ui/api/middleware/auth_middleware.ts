@@ -1,8 +1,9 @@
-import * as express from "express";
+import { Request, Response, NextFunction } from "express";
 import { Container } from "inversify";
 import { IUserRepository } from "../../../domain/interfaces/repositories";
 import { TYPES } from "../../../domain/constants/types";
 import { container } from "../../../infrastructure/utils/ioc_container";
+import httpStatus from "http-status-codes";
 
 async function getEmailFromToken(token: string) {
     // This is a fake implementation to simplify this example
@@ -19,11 +20,7 @@ async function getEmailFromToken(token: string) {
 
 function authMiddlewareFactory(container: Container) {
     return (config: { role: string }) => {
-        return (
-            req: express.Request,
-            res: express.Response,
-            next: express.NextFunction
-        ) => {
+        return (req: Request, res: Response, next: NextFunction) => {
             const accountRepository = container.get<IUserRepository>(
                 TYPES.UserRepository
             );
@@ -46,10 +43,10 @@ function authMiddlewareFactory(container: Container) {
                     ) {
                         next();
                     } else {
-                        res.status(403).end("Forbidden");
+                        res.status(httpStatus.FORBIDDEN).end("Forbidden");
                     }
                 } else {
-                    res.status(401).end("Unauthorized");
+                    res.status(httpStatus.UNAUTHORIZED).end("Unauthorized");
                 }
             })();
         };
