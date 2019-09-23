@@ -30,7 +30,7 @@ function authMiddlewareFactory(container: Container) {
                 const token = req.headers["x-auth-token"] as string;
                 const email = await getEmailFromToken(token);
 
-                if (email !== null) {
+                if (email) {
                     // find user with matching email
                     const matched = await accountRepository.findManyByQuery({
                         email: email

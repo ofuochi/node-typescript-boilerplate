@@ -79,6 +79,21 @@ export class BaseRepository<TEntity, TModel extends Document>
             });
         });
     }
+    public findOneByQuery(query: Query<TEntity>) {
+        return new Promise<TEntity>((resolve, reject) => {
+            this.Model.findOne(query as any, (err, res) => {
+                if (err) {
+                    reject(err);
+                }
+                if (res === null) {
+                    reject();
+                } else {
+                    const result = this._readMapper(res);
+                    resolve(result);
+                }
+            });
+        });
+    }
 
     private _readMapper(model: TModel) {
         const obj: any = model.toJSON();

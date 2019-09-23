@@ -6,24 +6,19 @@ import jwt from "jsonwebtoken";
 import {
     eventDispatcher,
     loggerService,
-    tenantRepository,
     userRepository
 } from "../../domain/constants/decorators";
-import {
-    ITenantRepository,
-    IUserRepository
-} from "../../domain/interfaces/repositories";
+import { IUserRepository } from "../../domain/interfaces/repositories";
 import { ILoggerService } from "../../domain/interfaces/services";
 import { User } from "../../domain/model/user";
 import config from "../../infrastructure/config";
 import { IAuthService } from "../interfaces/auth_service";
 import events from "../subscribers/events";
-import { SignUpInput, UserDto } from "./../models/user_dto";
+import { SignUpInput, UserDto, SignInInput } from "./../models/user_dto";
 
 @injectable()
 export default class AuthService implements IAuthService {
     @userRepository private _userRepository: IUserRepository;
-    @tenantRepository private _tenantRepository: ITenantRepository;
     @eventDispatcher private _eventDispatcher: EventDispatcher;
     @loggerService private _logger: ILoggerService;
 
@@ -37,16 +32,7 @@ export default class AuthService implements IAuthService {
                 password: hashedPassword
             });
             const userRecord = await this._userRepository.save(user);
-
-            this._logger.silly("Generating JWT");
             const token = await this.generateToken(userRecord);
-
-            if (!userRecord) {
-                throw new Error("User cannot be created");
-            }
-            this._logger.silly("Sending welcome email");
-
-            this._eventDispatcher.dispatch(events.user.signUp, { ...dto });
 
             const userDto: UserDto = {
                 firstName: dto.firstName,
@@ -55,6 +41,7 @@ export default class AuthService implements IAuthService {
                 username: userRecord.username,
                 id: userRecord.id
             };
+            this._eventDispatcher.dispatch(events.user.signUp, { ...dto });
             return { user: userDto, token };
         } catch (e) {
             this._logger.error(e);
@@ -62,40 +49,30 @@ export default class AuthService implements IAuthService {
         }
     }
 
-    public async signIn(
-        emailOrUsername: string,
-        password: string
-    ): Promise<{ token: string }> {
-        const userRecords = await this._userRepository.findManyByQuery({
-            email: emailOrUsername
-        });
-        if (!userRecords) {
-            throw new Error("User not registered");
-        }
+    public async signIn(dto: SignInInput): Promise<{ token: string }> {
+        const user = await this.getUserRecord(dto.emailOrUsername);
+        if (!user) throw new Error("Invalid login attempt!");
 
-        /**
-         * We use verify from argon2 to prevent 'timing based' attacks
-         */
-        this._logger.silly("Checking password");
-        const userRecord = userRecords[0];
-        const validPassword = await bcrypt.compare(
-            userRecord.password,
-            password
+        const isPasswordValid = await bcrypt.compare(
+            dto.password,
+            user.password
         );
-        if (validPassword) {
-            this._logger.silly("Password is valid!");
-            this._logger.silly("Generating JWT");
-            const token = await this.generateToken(userRecord);
 
-            // const user = userRecord.toObject();
-            //  Reflect.deleteProperty(user, "salt");
-            /**
-             * Easy as pie, you don't need passport.js anymore :)
-             */
-            return { token };
-        } else {
-            throw new Error("Invalid Password");
-        }
+        if (!isPasswordValid) throw new Error("Invalid login attempt!");
+
+        const token = await this.generateToken(user);
+        return { token };
+    }
+
+    private async getUserRecord(emailOrUsername: string): Promise<User> {
+        if (emailOrUsername.includes("@"))
+            return await this._userRepository.findOneByQuery({
+                email: emailOrUsername
+            });
+
+        return await this._userRepository.findOneByQuery({
+            username: emailOrUsername
+        });
     }
 
     private async generateToken(user: User) {

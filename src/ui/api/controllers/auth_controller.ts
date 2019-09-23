@@ -15,9 +15,6 @@ export class AuthController {
 
     @httpPost("/signIn")
     public async getById(@requestBody() input: SignInInput) {
-        return await this._authService.signIn(
-            input.emailOrUsername,
-            input.password
-        );
+        return await this._authService.signIn(input);
     }
 }

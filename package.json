@@ -2,24 +2,24 @@
     "name": "node-typescript-boilerplate",
     "version": "1.0.0",
     "description": "Enterprise NodeJs/Typescript API boilerplate",
-    "main": "index.ts",
     "keywords": [
+        "API",
         "node",
-        "typescript",
-        "API"
+        "typescript"
     ],
-    "author": "Fortune Ochi <fortuneochi@gmail.com>",
     "license": "MIT",
+    "author": "Fortune Ochi <fortuneochi@gmail.com>",
+    "main": "index.ts",
     "scripts": {
-        "rm-files": "rm -r -f coverage .nyc_output dist",
-        "nyc": "nyc -r=text -r=html -i ts-node/register -e .ts mocha",
-        "test-cover": "npm run rm-files && npm run nyc",
-        "test": "mocha",
-        "tsc": "tsc -p tsconfig.json",
         "no-build": "npx ts-node src/index.ts",
-        "start-node": "node dist/index.js",
         "non-build:start": "npx ts-code src/index.ts",
-        "start": "npm run rm-files && npm run tsc && npm run start-node"
+        "nyc": "nyc -r=text -r=html -i ts-node/register -e .ts mocha",
+        "rm-files": "rm -r -f coverage .nyc_output dist",
+        "start": "npm run rm-files && npm run tsc && npm run start-node",
+        "start-node": "node dist/index.js",
+        "test": "mocha",
+        "test-cover": "npm run rm-files && npm run nyc",
+        "tsc": "tsc -p tsconfig.json"
     },
     "dependencies": {
         "@hapi/joi": "^16.0.1",
