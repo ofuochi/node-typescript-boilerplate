@@ -13,7 +13,7 @@ describe("Integration Tests:", () => {
     it("should return tenant object when queried by tenant name", async () => {
         const res = await req
             .get(endpoint)
-            .query({ tenantName: tenant.name })
+            .query({ name: tenant.name })
             .expect(httpStatus.OK);
         expect(res.body).to.contain.keys("isActive", "id", "name");
     });

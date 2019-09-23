@@ -15,7 +15,7 @@ export class TenantController implements interfaces.Controller {
     @tenantRepository public _tenantRepository: ITenantRepository;
 
     @httpGet("/")
-    public async get(@queryParam("tenantName") tenantName?: string) {
+    public async get(@queryParam("name") tenantName?: string) {
         if (!tenantName) return await this._tenantRepository.findAll();
         return await this._tenantRepository.findOneByQuery({
             name: tenantName

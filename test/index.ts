@@ -29,9 +29,9 @@ before("Startup", async () => {
 
 after("Teardown", async () => {
     const collections = await mongoose.connection.db
-        .listCollections(null, { nameOnly: true })
+        .listCollections(undefined, { nameOnly: true })
         .toArray();
-    collections.forEach(async collection => {
+    collections.forEach(async (collection: any) => {
         await mongoose.connection.db.dropCollection(collection.name);
     });
     await server.close();

@@ -13,11 +13,12 @@
     "scripts": {
         "no-build": "npx ts-node src/index.ts",
         "non-build:start": "npx ts-code src/index.ts",
-        "nyc": "nyc -r=text -r=html -i ts-node/register -e .ts mocha",
+        "nyc": "nyc -r=text -r=html -i ts-node/register/transpile-only -e .ts mocha",
         "rm-files": "rm -r -f coverage .nyc_output dist",
         "start": "npm run rm-files && npm run tsc && npm run start-node",
         "start-node": "node dist/index.js",
         "test": "mocha",
+        "test-debug": "mocha -w",
         "test-cover": "npm run rm-files && npm run nyc",
         "tsc": "tsc -p tsconfig.json"
     },
