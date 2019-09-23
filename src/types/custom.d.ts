@@ -1,13 +1,13 @@
-import { CurrentTenant } from "../domain/utils/currentTenant";
+import { CurrentUser } from "../domain/utils/globals";
 declare global {
     namespace Express {
         export interface Request {
-            tenant?: string;
+            tenantId?: string;
         }
     }
     namespace NodeJS {
         interface Global {
-            currentTenant: CurrentTenant;
+            currentUser: CurrentUser;
         }
     }
 }

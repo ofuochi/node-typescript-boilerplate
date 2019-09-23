@@ -10,10 +10,10 @@ describe("Auth controller", () => {
     let signUpInput: SignUpInput;
     it("should register new user and return token and user DTO", async () => {
         signUpInput = {
-            username: "valid_username",
-            firstName: "valid_firstName",
-            lastName: "valid_lastName",
-            email: "valid@email.com",
+            username: "john",
+            firstName: "Doe",
+            lastName: "Doe",
+            email: "john@email.com",
             password: "valid_P@ssW1d"
         };
         const res = await req

@@ -31,15 +31,9 @@ export default class AuthService implements IAuthService {
         dto: SignUpInput
     ): Promise<{ user: UserDto; token: string }> {
         try {
-            const tenant = await this._tenantRepository.findById(
-                global.currentTenant.tenantId
-            );
-            if (!tenant) throw new Error("Tenant not found");
-
             const hashedPassword = await bcrypt.hash(dto.password, 10);
             const user = User.createInstance({
                 ...dto,
-                tenant: tenant.id,
                 password: hashedPassword
             });
             const userRecord = await this._userRepository.save(user);

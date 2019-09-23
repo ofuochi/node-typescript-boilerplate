@@ -69,15 +69,13 @@ export class User extends BaseEntity implements IMustHaveTenant {
         lastName,
         email,
         username,
-        password,
-        tenant
+        password
     }: {
         firstName: string;
         lastName: string;
         email: string;
         username: string;
         password: string;
-        tenant: Tenant;
     }) =>
         new User({
             firstName,
@@ -85,7 +83,7 @@ export class User extends BaseEntity implements IMustHaveTenant {
             email,
             username,
             password,
-            tenant
+            tenant: global.currentUser.tenant.id
         });
 
     public static get model() {

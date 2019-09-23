@@ -3,23 +3,25 @@ import httpStatus from "http-status-codes";
 
 import { TYPES } from "../../domain/constants/types";
 import { ILoggerService } from "../../domain/interfaces/services";
+import { CurrentUser } from "../../domain/utils/globals";
+import { getCurrentTenant } from "../helpers/tenant_helpers";
 import { container } from "../utils/ioc_container";
-import { CurrentTenant } from "../../domain/utils/currentTenant";
 
-export function reqMiddleware(
+export async function reqMiddleware(
     req: express.Request,
     res: express.Response,
     next: () => void
 ) {
     const log = container.get<ILoggerService>(TYPES.LoggerService);
-    req.tenant = req.headers["x-tenant-id"] as string;
+    req.tenantId = req.headers["x-tenant-id"] as string;
 
-    if (!req.tenant)
+    if (!req.tenantId)
         return res
             .status(httpStatus.BAD_REQUEST)
             .end("x-tenant-id header is missing");
 
-    global.currentTenant = new CurrentTenant(req.tenant);
+    const tenant = await getCurrentTenant(req.tenantId);
+    global.currentUser = CurrentUser.createInstance(tenant);
 
     log.info(`
     ----------------------------------
