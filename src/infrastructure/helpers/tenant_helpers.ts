@@ -7,7 +7,6 @@ export const getCurrentTenant = async (tenantId: string): Promise<Tenant> => {
     const tenantRepository = container.get<TenantRepository>(
         TYPES.TenantRepository
     );
-
     const tenant = await tenantRepository.findById(tenantId);
     if (!tenant) throw new Error("Tenant not found");
     return tenant;

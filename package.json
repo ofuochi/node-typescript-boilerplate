@@ -37,6 +37,7 @@
         "inversify-agenda": "^1.1.0",
         "inversify-express-utils": "^6.3.2",
         "inversify-logger-middleware": "^3.1.0",
+        "json2typescript": "^1.2.3",
         "jsonwebtoken": "^8.5.1",
         "mailgun-js": "^0.22.0",
         "method-override": "^3.0.0",

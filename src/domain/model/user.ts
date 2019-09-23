@@ -1,12 +1,13 @@
 import { arrayProp, prop, Ref } from "@hasezoey/typegoose";
 
 import BaseEntity from "./base";
-import { IMustHaveTenant } from "./interfaces/entity";
+import { IMustHaveTenant, IActiveStatus } from "./interfaces/entity";
 import Tenant from "./tenant";
+import { Writable } from "../utils/writable";
 
 export const MAX_NAME_LENGTH = 225;
 
-export class User extends BaseEntity implements IMustHaveTenant {
+export class User extends BaseEntity implements IMustHaveTenant, IActiveStatus {
     @prop({ required: true, ref: Tenant })
     readonly tenant!: Ref<Tenant>;
 
@@ -37,8 +38,16 @@ export class User extends BaseEntity implements IMustHaveTenant {
     @prop({ required: true, maxlength: MAX_NAME_LENGTH })
     readonly password!: string;
 
-    @arrayProp({ required: true, default: "User", items: String, index: true })
+    @arrayProp({
+        required: true,
+        default: "User",
+        items: String,
+        index: true
+    })
     readonly roles: string[] = ["User"];
+
+    @prop({ required: true, default: true })
+    readonly isActive: boolean = true;
 
     private constructor({});
     private constructor({
@@ -91,4 +100,7 @@ export class User extends BaseEntity implements IMustHaveTenant {
             schemaOptions: { collection: "Users" }
         });
     }
+    deactivate = (): void => {
+        (this as Writable<User>).isActive = false;
+    };
 }

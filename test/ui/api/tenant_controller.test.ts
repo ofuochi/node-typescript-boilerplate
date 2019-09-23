@@ -7,10 +7,14 @@ const endpoint = `${config.api.prefix}/tenants`;
 
 describe("Integration Tests:", () => {
     it("should return list of tenants", async () => {
+        const res = await req.get(endpoint).expect(httpStatus.OK);
+        expect(res.body).to.be.an("array");
+    });
+    it("should return tenant object when queried by tenant name", async () => {
         const res = await req
             .get(endpoint)
-            .set("x-tenant-id", tenant.id)
+            .query({ tenantName: tenant.name })
             .expect(httpStatus.OK);
-        expect(res.body).to.be.an("array");
+        expect(res.body).to.contain.keys("isActive", "id", "name");
     });
 });

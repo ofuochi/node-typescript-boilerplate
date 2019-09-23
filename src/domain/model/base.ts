@@ -22,13 +22,7 @@ export default abstract class BaseEntity extends Typegoose {
     @prop({ default: null })
     readonly deletionTime?: Date;
 
-    @prop({ required: true, default: true })
-    readonly isActive: boolean = true;
-
     delete = (): void => {
         (this as Writable<BaseEntity>).isDeleted = true;
-    };
-    deactivate = (): void => {
-        (this as Writable<BaseEntity>).isActive = false;
     };
 }

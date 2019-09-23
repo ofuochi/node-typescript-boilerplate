@@ -6,23 +6,34 @@ import { ILoggerService } from "../../domain/interfaces/services";
 import { CurrentUser } from "../../domain/utils/globals";
 import { getCurrentTenant } from "../helpers/tenant_helpers";
 import { container } from "../utils/ioc_container";
+import config from "../config";
 
 export async function reqMiddleware(
     req: express.Request,
     res: express.Response,
     next: () => void
 ) {
-    const log = container.get<ILoggerService>(TYPES.LoggerService);
-    req.tenantId = req.headers["x-tenant-id"] as string;
+    req.tenantId = req.header("X-Tenant-Id") as string;
 
-    if (!req.tenantId)
+    if (
+        !req.tenantId &&
+        !req.url
+            .toLowerCase()
+            .startsWith(`${config.api.prefix}/tenants`.toLocaleLowerCase())
+    ) {
         return res
             .status(httpStatus.BAD_REQUEST)
             .end("x-tenant-id header is missing");
+    } else if (
+        !req.url
+            .toLowerCase()
+            .startsWith(`${config.api.prefix}/tenants`.toLocaleLowerCase())
+    ) {
+        const tenant = await getCurrentTenant(req.tenantId);
+        global.currentUser = CurrentUser.createInstance(tenant);
+    }
 
-    const tenant = await getCurrentTenant(req.tenantId);
-    global.currentUser = CurrentUser.createInstance(tenant);
-
+    const log = container.get<ILoggerService>(TYPES.LoggerService);
     log.info(`
     ----------------------------------
     REQUEST MIDDLEWARE

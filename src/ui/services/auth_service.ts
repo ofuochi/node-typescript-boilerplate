@@ -97,6 +97,7 @@ export default class AuthService implements IAuthService {
                 email: user.email,
                 username: user.username,
                 firstName: user.firstName,
+                tenantId: user.tenant,
                 exp: exp.getTime() / 1000
             },
             config.jwtSecret
