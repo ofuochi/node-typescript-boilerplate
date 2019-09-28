@@ -11,5 +11,7 @@ export const TYPES = {
     AuthService: Symbol("AuthService"),
 
     EventDispatcher: Symbol("EventDispatcher"),
-    Agenda: Symbol("Agenda")
+    Agenda: Symbol("Agenda"),
+    TenantId: Symbol("TenantId"),
+    RequestMiddleware: Symbol("RequestMiddleware")
 };

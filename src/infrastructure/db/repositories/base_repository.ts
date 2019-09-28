@@ -5,9 +5,10 @@ import {
     IBaseRepository,
     Query
 } from "../../../domain/interfaces/repositories";
+import BaseEntity from "../../../domain/model/base";
 
 @injectable()
-export class BaseRepository<TEntity, TModel extends Document>
+export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
     implements IBaseRepository<TEntity> {
     protected Model: Model<TModel>;
 
@@ -20,11 +21,10 @@ export class BaseRepository<TEntity, TModel extends Document>
     public async findAll() {
         return new Promise<TEntity[]>((resolve, reject) => {
             this.Model.find((err, res) => {
-                if (err) {
-                    reject(err);
-                }
-                const result = res.map(r => this._readMapper(r));
-                resolve(result);
+                if (err) return reject(err);
+                let results = res.map(r => this._readMapper(r));
+                results = results.filter(r => !r.isDeleted);
+                resolve(results);
             });
         });
     }
@@ -32,15 +32,11 @@ export class BaseRepository<TEntity, TModel extends Document>
     public async findById(id: string) {
         return new Promise<TEntity>((resolve, reject) => {
             this.Model.findById(id, (err, res) => {
-                if (err) {
-                    reject(err);
-                }
-                if (res === null) {
-                    reject();
-                } else {
-                    const result = this._readMapper(res);
-                    resolve(result);
-                }
+                if (err) return reject(err);
+                if (!res) return reject();
+
+                const result = this._readMapper(res);
+                resolve(result.isDeleted ? undefined : result);
             });
         });
     }
@@ -49,9 +45,7 @@ export class BaseRepository<TEntity, TModel extends Document>
         return new Promise<TEntity>((resolve, reject) => {
             const instance = new this.Model(doc);
             instance.save((err, res) => {
-                if (err) {
-                    reject(err);
-                }
+                if (err) return reject(err);
                 resolve(this._readMapper(res));
             });
         });
@@ -61,10 +55,10 @@ export class BaseRepository<TEntity, TModel extends Document>
         return new Promise<TEntity[]>((resolve, reject) => {
             const query = { _id: { $in: ids } };
             this.Model.find(query, (err, res) => {
-                if (err) {
-                    reject(err);
-                }
-                resolve(res.map(r => this._readMapper(r)));
+                if (err) return reject(err);
+                let results = res.map(r => this._readMapper(r));
+                results = results.filter(r => !r.isDeleted);
+                resolve(results);
             });
         });
     }
@@ -72,30 +66,28 @@ export class BaseRepository<TEntity, TModel extends Document>
     public findManyByQuery(query: Query<TEntity>) {
         return new Promise<TEntity[]>((resolve, reject) => {
             this.Model.find(query as any, (err, res) => {
-                if (err) {
-                    reject(err);
-                }
-                resolve(res.map(r => this._readMapper(r)));
+                if (err) return reject(err);
+                if (!res) return resolve();
+                let result = res.map(r => this._readMapper(r));
+                result = result.filter(r => !r.isDeleted);
+                resolve(result);
             });
         });
     }
     public findOneByQuery(query: Query<TEntity>) {
         return new Promise<TEntity>((resolve, reject) => {
             this.Model.findOne(query as any, (err, res) => {
-                if (err) {
-                    reject(err);
-                }
-                if (res === null) {
-                    reject();
-                } else {
+                if (err) return reject(err);
+                if (!res) return resolve();
+                else {
                     const result = this._readMapper(res);
-                    resolve(result);
+                    resolve(result.isDeleted ? undefined : result);
                 }
             });
         });
     }
 
-    private _readMapper(model: TModel) {
+    private _readMapper(model: TModel): TEntity {
         const obj: any = model.toJSON();
         const propDesc = Object.getOwnPropertyDescriptor(
             obj,

@@ -30,26 +30,16 @@ import "../../ui/api/controllers/tenant_controller";
 
 export const referenceDataIoCModule = new ContainerModule(bind => {
     // Repositories
-    bind<ITenantRepository>(TYPES.TenantRepository)
-        .to(TenantRepository)
-        .inSingletonScope();
+    bind<ITenantRepository>(TYPES.TenantRepository).to(TenantRepository);
 
-    bind<IUserRepository>(TYPES.UserRepository)
-        .to(UserRepository)
-        .inSingletonScope();
+    bind<IUserRepository>(TYPES.UserRepository).to(UserRepository);
 
     // Services
+    bind<IMailService>(TYPES.MailService).to(MailService);
 
-    bind<IMailService>(TYPES.MailService)
-        .to(MailService)
-        .inSingletonScope();
-    bind<IAuthService>(TYPES.AuthService)
-        .to(AuthService)
-        .inSingletonScope();
+    bind<IAuthService>(TYPES.AuthService).to(AuthService);
 
-    bind<ILoggerService>(TYPES.LoggerService)
-        .to(LoggerService)
-        .inSingletonScope();
+    bind<ILoggerService>(TYPES.LoggerService).to(LoggerService);
 
     bind<EventDispatcher>(TYPES.EventDispatcher).toConstantValue(
         new EventDispatcher()

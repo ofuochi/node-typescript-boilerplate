@@ -6,7 +6,7 @@ import { InversifyExpressServer } from "inversify-express-utils";
 
 import { TYPES } from "../../domain/constants/types";
 import { DbClient, getDatabaseClient } from "../db/db_client";
-import { exceptionLoggerMiddleware } from "../middleware/interceptor_middleware";
+import { exceptionLoggerMiddleware } from "../../ui/api/middleware/interceptor_middleware";
 import expressLoader, { App } from "./loaders/express";
 import { Jobs } from "./loaders/jobs";
 import winstonLoggerInstance from "./loaders/logger";

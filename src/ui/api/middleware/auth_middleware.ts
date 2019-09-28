@@ -1,52 +1,96 @@
-import { Request, Response, NextFunction } from "express";
-import { Container } from "inversify";
-import { IUserRepository } from "../../../domain/interfaces/repositories";
-import { TYPES } from "../../../domain/constants/types";
-import { container } from "../../../infrastructure/utils/ioc_container";
+import { UserRole } from "./../../../domain/model/user";
+import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status-codes";
+import { Container } from "inversify";
+import jwt from "jsonwebtoken";
 
-async function getEmailFromToken(token: string) {
-    // This is a fake implementation to simplify this example
-    // in real life you want to use something like JWT
-    // https://github.com/auth0/node-jsonwebtoken
-    return new Promise<string | null>((resolve, reject) => {
-        if (token === "SOME_VALID_CREDENTIAL") {
-            resolve("test.test@test.com");
-        } else {
-            resolve(null);
-        }
-    });
+import { TYPES } from "../../../domain/constants/types";
+import { IUserRepository } from "../../../domain/interfaces/repositories";
+import env from "../../../infrastructure/config";
+import { container } from "../../../infrastructure/utils/ioc_container";
+import HttpError from "../../error";
+import { BaseMiddleware } from "inversify-express-utils";
+
+export class AuthMiddleware extends BaseMiddleware {
+    private config: { role: UserRole };
+    handler = (req: Request, res: Response, next: NextFunction): void => {
+        const accountRepository = container.get<IUserRepository>(
+            TYPES.UserRepository
+        );
+        (async () => {
+            console.log(this.config);
+            console.log("This is where I am now");
+            // get email using auth token
+            const token = req.header("X-AUTH-TOKEN") as string;
+            console.log(token);
+            const result = decodeJwt(token);
+            console.log(result);
+            let decodedJwt;
+            try {
+                decodedJwt = jwt.verify(token, env.jwtSecret) as any;
+            } catch (error) {
+                throw new HttpError(httpStatus.BAD_REQUEST, error);
+            }
+            const email = decodedJwt.email as string;
+            console.log(decodedJwt);
+            if (email) {
+                // find user with matching email
+                const userRec = await accountRepository.findOneByQuery({
+                    email
+                });
+
+                // Check user has required role
+                if (userRec && userRec.role) {
+                    next();
+                } else {
+                    res.status(httpStatus.FORBIDDEN).end("Forbidden");
+                }
+            } else {
+                res.status(httpStatus.UNAUTHORIZED).end("Unauthorized");
+            }
+        })();
+    };
+    authenticate = (config: { role: UserRole }) => {
+        this.config = config;
+        return this.handler;
+    };
+}
+
+function decodeJwt(token: string) {
+    try {
+        return jwt.verify(token, env.jwtSecret);
+    } catch (error) {
+        throw new HttpError(httpStatus.BAD_REQUEST, error);
+    }
 }
 
 function authMiddlewareFactory(container: Container) {
-    return (config: { role: string }) => {
+    return (config: { role: UserRole }) => {
         return (req: Request, res: Response, next: NextFunction) => {
             const accountRepository = container.get<IUserRepository>(
                 TYPES.UserRepository
             );
 
             (async () => {
-                // get email using auth token
-                const token = req.headers["x-auth-token"] as string;
-                const email = await getEmailFromToken(token);
+                const token = req.header("X-AUTH-TOKEN");
+                if (!token)
+                    return next(
+                        new HttpError(
+                            httpStatus.BAD_REQUEST,
+                            "Auth token is required!"
+                        )
+                    );
 
-                if (email) {
-                    // find user with matching email
-                    const matched = await accountRepository.findManyByQuery({
-                        email: email
+                try {
+                    const decodedJwt = jwt.verify(token, env.jwtSecret) as any;
+                    const userRecord = await accountRepository.findOneByQuery({
+                        email: decodedJwt.email
                     });
-
-                    // Check user has required role
-                    if (
-                        matched.length === 1 &&
-                        matched[0].roles.indexOf(config.role) !== -1
-                    ) {
-                        next();
-                    } else {
-                        res.status(httpStatus.FORBIDDEN).end("Forbidden");
-                    }
-                } else {
-                    res.status(httpStatus.UNAUTHORIZED).end("Unauthorized");
+                    return userRecord && userRecord.role === UserRole.ADMIN
+                        ? next()
+                        : res.status(httpStatus.FORBIDDEN).end("Forbidden");
+                } catch (error) {
+                    return next(new HttpError(httpStatus.BAD_REQUEST, error));
                 }
             })();
         };

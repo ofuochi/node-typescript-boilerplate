@@ -8,14 +8,15 @@ import { TYPES } from "./domain/constants/types";
 import config from "./infrastructure/config";
 import winstonLoggerInstance from "./infrastructure/bootstrapping/loaders/logger";
 
-export const startServer = async (): Promise<Server> => {
+let appServer: Server;
+export const startServer = async () => {
     try {
         const app = await bootstrap({
             container,
             connStr: config.mongoDbConnection,
             containerModules: [referenceDataIoCModule]
         });
-        return app.listen(config.port, error => {
+        appServer = app.listen(config.port, error => {
             if (error) exitProcess(error);
             container.bind<App>(TYPES.App).toConstantValue(app);
             winstonLoggerInstance.info(
@@ -37,3 +38,4 @@ function exitProcess(error: any): void {
 
 // Start server if it's not already running
 if (!module.parent) startServer();
+export { appServer };

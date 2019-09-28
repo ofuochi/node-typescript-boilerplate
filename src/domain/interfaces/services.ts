@@ -16,3 +16,9 @@ export interface ILoggerService {
     debug(message: string, meta?: any): void;
     warn(message: string, meta?: any): void;
 }
+export interface ITenantService {
+    create(
+        name: string,
+        description: string
+    ): Promise<{ id: string; name: string; isActive: boolean }>;
+}

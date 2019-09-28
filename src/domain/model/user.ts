@@ -1,12 +1,16 @@
-import { arrayProp, prop, Ref } from "@hasezoey/typegoose";
+import { prop, Ref } from "@hasezoey/typegoose";
+import { IsEnum } from "class-validator";
 
-import BaseEntity from "./base";
-import { IMustHaveTenant, IActiveStatus } from "./interfaces/entity";
-import Tenant from "./tenant";
 import { Writable } from "../utils/writable";
+import BaseEntity from "./base";
+import { IActiveStatus, IMustHaveTenant } from "./interfaces/entity";
+import Tenant from "./tenant";
 
 export const MAX_NAME_LENGTH = 225;
-
+export enum UserRole {
+    USER = "user",
+    ADMIN = "admin"
+}
 export class User extends BaseEntity implements IMustHaveTenant, IActiveStatus {
     @prop({ required: true, ref: Tenant })
     readonly tenant!: Ref<Tenant>;
@@ -38,16 +42,8 @@ export class User extends BaseEntity implements IMustHaveTenant, IActiveStatus {
     @prop({ required: true, maxlength: MAX_NAME_LENGTH })
     readonly password!: string;
 
-    @arrayProp({
-        required: true,
-        default: "User",
-        items: String,
-        index: true
-    })
-    readonly roles: string[] = ["User"];
-
-    @prop({ required: true, default: true })
-    readonly isActive: boolean = true;
+    @prop({ required: true, enum: UserRole, default: UserRole.USER })
+    readonly role: UserRole = UserRole.USER;
 
     private constructor({});
     private constructor({
@@ -78,29 +74,33 @@ export class User extends BaseEntity implements IMustHaveTenant, IActiveStatus {
         lastName,
         email,
         username,
-        password
+        password,
+        tenantId
     }: {
         firstName: string;
         lastName: string;
         email: string;
         username: string;
         password: string;
-    }) =>
-        new User({
+        tenantId: string;
+    }) => {
+        if (!tenantId) throw new Error("Tenant Id is required");
+        return new User({
             firstName,
             lastName,
             email,
             username,
             password,
-            tenant: global.currentUser.tenant.id
+            tenant: tenantId
         });
-
+    };
     public static get model() {
         return new User({}).getModelForClass(User, {
             schemaOptions: { collection: "Users" }
         });
     }
-    deactivate = (): void => {
-        (this as Writable<User>).isActive = false;
+
+    setRole = (role: UserRole) => {
+        (this as Writable<User>).role = role;
     };
 }

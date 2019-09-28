@@ -1,12 +1,15 @@
 -r ts-node/register/transpile-only
 -r reflect-metadata/Reflect
 -r source-map-support/register
---file test/index.ts 
+
 --full-trace
---timeout 60000
---bail
---reporter dot
+--reporter spec
+--color true
+
 --extension ts
 --recursive
---color true
+
+--timeout 60000
+--bail
 --exit
+

@@ -1,6 +1,5 @@
 import { prop } from "@hasezoey/typegoose";
 
-import { Writable } from "../utils/writable";
 import BaseEntity from "./base";
 import { IActiveStatus } from "./interfaces/entity";
 
@@ -14,8 +13,6 @@ export default class Tenant extends BaseEntity implements IActiveStatus {
     readonly name!: string;
     @prop({ required: true })
     readonly description!: string;
-    @prop({ required: true, default: true })
-    readonly isActive: boolean = true;
 
     private constructor(name?: any, description?: any);
     private constructor(name: string, description: string) {
@@ -25,10 +22,8 @@ export default class Tenant extends BaseEntity implements IActiveStatus {
     }
 
     static createInstance = (name: string, description: string) =>
-        new Tenant(name, description);
-    deactivate = (): void => {
-        (this as Writable<Tenant>).isActive = false;
-    };
+        new Tenant(name.replace(/\s/g, "").toUpperCase(), description);
+
     public static get model() {
         return new Tenant().getModelForClass(Tenant, {
             schemaOptions: { collection: "Tenants" }

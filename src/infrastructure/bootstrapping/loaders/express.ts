@@ -1,10 +1,10 @@
-import express from "express";
+import bodyParser from "body-parser";
 import cors from "cors";
+import express from "express";
+import helmet from "helmet";
 import methodOverride from "method-override";
 
-import bodyParser from "body-parser";
-import helmet from "helmet";
-import { reqMiddleware } from "../../middleware/interceptor_middleware";
+import { RequestMiddleware } from "../../../ui/api/middleware/interceptor_middleware";
 
 export type App = express.Application;
 
@@ -41,5 +41,5 @@ export default (app: express.Application) => {
     app.use(helmet());
 
     // Log all requests that hit the server
-    app.use(reqMiddleware);
+    app.use(new RequestMiddleware().handler);
 };

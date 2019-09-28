@@ -1,8 +1,28 @@
 {
     "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
         "**/.classpath": true,
         "**/.project": true,
         "**/.settings": true,
-        "**/.factorypath": true
-    }
+        "**/.factorypath": true,
+        "**/node_modules": true,
+        "node_modules": true,
+        "**/LICENSE": true,
+        "LICENSE": true,
+        ".env": true,
+        ".editorconfig": true,
+        ".eslintignore": true,
+        ".eslintrc.json": true,
+        "**/.gitignore": true,
+        "**/env.sample": true,
+        "**/package-lock.json": true,
+        "**/README.md": true,
+        "**/tsconfig.json": true,
+        "**/.history": true
+    },
+    "explorerExclude.backup": null
 }
