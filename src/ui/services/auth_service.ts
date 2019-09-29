@@ -1,24 +1,20 @@
-import bcrypt from "bcrypt";
-import { EventDispatcher } from "event-dispatch";
-import httpStatus from "http-status-codes";
-import { injectable, inject } from "inversify";
-import jwt from "jsonwebtoken";
+import bcrypt from 'bcrypt'
+import httpStatus from 'http-status-codes'
+import jwt from 'jsonwebtoken'
+import { EventDispatcher } from 'event-dispatch'
+import { injectable } from 'inversify'
 
-import {
-    eventDispatcher,
-    loggerService,
-    userRepository
-} from "../../domain/constants/decorators";
-import { TYPES } from "../../domain/constants/types";
-import { IUserRepository } from "../../domain/interfaces/repositories";
-import { ILoggerService } from "../../domain/interfaces/services";
-import { User } from "../../domain/model/user";
-import config from "../../infrastructure/config";
-import { container } from "../../infrastructure/utils/ioc_container";
-import { IAuthService } from "../interfaces/auth_service";
-import events from "../subscribers/events";
-import { HttpError } from "./../error";
-import { SignInInput, SignUpInput, UserDto } from "./../models/user_dto";
+import config from '../../infrastructure/config'
+import events from '../subscribers/events'
+import { eventDispatcher, loggerService, userRepository } from '../../domain/constants/decorators'
+import { TYPES } from '../../domain/constants/types'
+import { IUserRepository } from '../../domain/interfaces/repositories'
+import { ILoggerService } from '../../domain/interfaces/services'
+import { User } from '../../domain/model/user'
+import { container } from '../../infrastructure/utils/ioc_container'
+import { IAuthService } from '../interfaces/auth_service'
+import { HttpError } from './../error'
+import { UserDto, UserSignInInput, UserSignUpInput } from './../models/user_dto'
 
 @injectable()
 export default class AuthService implements IAuthService {
@@ -27,7 +23,7 @@ export default class AuthService implements IAuthService {
     @loggerService private _logger: ILoggerService;
 
     public async signUp(
-        dto: SignUpInput
+        dto: UserSignUpInput
     ): Promise<{ user: UserDto; token: string }> {
         try {
             const hashedPassword = await bcrypt.hash(dto.password, 10);
@@ -59,7 +55,7 @@ export default class AuthService implements IAuthService {
         }
     }
 
-    public async signIn(dto: SignInInput): Promise<{ token: string }> {
+    public async signIn(dto: UserSignInInput): Promise<{ token: string }> {
         const user = await this.getUserRecord(dto.emailOrUsername);
 
         if (!user)

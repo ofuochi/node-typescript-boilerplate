@@ -1,15 +1,15 @@
-import { UserRole } from "./../../../domain/model/user";
-import { NextFunction, Request, Response } from "express";
-import httpStatus from "http-status-codes";
-import { Container } from "inversify";
-import jwt from "jsonwebtoken";
+import httpStatus from 'http-status-codes'
+import jwt from 'jsonwebtoken'
+import { NextFunction, Request, Response } from 'express'
+import { Container } from 'inversify'
+import { BaseMiddleware } from 'inversify-express-utils'
 
-import { TYPES } from "../../../domain/constants/types";
-import { IUserRepository } from "../../../domain/interfaces/repositories";
-import env from "../../../infrastructure/config";
-import { container } from "../../../infrastructure/utils/ioc_container";
-import HttpError from "../../error";
-import { BaseMiddleware } from "inversify-express-utils";
+import env from '../../../infrastructure/config'
+import HttpError from '../../error'
+import { UserRole } from './../../../domain/model/user'
+import { TYPES } from '../../../domain/constants/types'
+import { IUserRepository } from '../../../domain/interfaces/repositories'
+import { container } from '../../../infrastructure/utils/ioc_container'
 
 export class AuthMiddleware extends BaseMiddleware {
     private config: { role: UserRole };
@@ -86,7 +86,7 @@ function authMiddlewareFactory(container: Container) {
                     const userRecord = await accountRepository.findOneByQuery({
                         email: decodedJwt.email
                     });
-                    return userRecord && userRecord.role === UserRole.ADMIN
+                    return userRecord && userRecord.role === config.role
                         ? next()
                         : res.status(httpStatus.FORBIDDEN).end("Forbidden");
                 } catch (error) {

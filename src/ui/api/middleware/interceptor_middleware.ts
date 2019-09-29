@@ -1,18 +1,22 @@
-import { NextFunction, Request, Response } from "express";
-import httpStatus from "http-status-codes";
-import { injectable } from "inversify";
-import { BaseMiddleware } from "inversify-express-utils";
+import httpStatus from 'http-status-codes'
+import { NextFunction, Request, Response } from 'express'
+import { injectable } from 'inversify'
+import { BaseMiddleware } from 'inversify-express-utils'
 
-import { TYPES } from "../../../domain/constants/types";
-import { ILoggerService } from "../../../domain/interfaces/services";
-import HttpError from "../../error";
-import config from "../../../infrastructure/config";
-import { getCurrentTenant } from "../../../infrastructure/helpers/tenant_helpers";
-import { container } from "../../../infrastructure/utils/ioc_container";
+import config from '../../../infrastructure/config'
+import HttpError from '../../error'
+import { TYPES } from '../../../domain/constants/types'
+import { ILoggerService } from '../../../domain/interfaces/services'
+import { getCurrentTenant } from '../../../infrastructure/helpers/tenant_helpers'
+import { container } from '../../../infrastructure/utils/ioc_container'
 
 @injectable()
 export class RequestMiddleware extends BaseMiddleware {
-    handler(req: Request, res: Response, next: NextFunction): void {
+    async handler(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         req.tenantId = req.header("X-Tenant-Id");
         const isTenantUrl = req.url
             .toLowerCase()
@@ -31,12 +35,11 @@ export class RequestMiddleware extends BaseMiddleware {
         // ----------------------------------
         // `);
         if (isTenantUrl) return next();
-        (async () => {
-            const tenant = await getCurrentTenant(req.tenantId as string);
+        const tenant = await getCurrentTenant(req.tenantId as string);
+        if (!container.isBound(TYPES.TenantId))
             container.bind<string>(TYPES.TenantId).toConstantValue(tenant.id);
 
-            next();
-        })();
+        next();
     }
 }
 
