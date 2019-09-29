@@ -57,12 +57,11 @@ describe("Auth controller", () => {
             };
         });
         it("should return conflict if user already exists", async () => {
-            const res = await req
+            await req
                 .post(`${endpoint}/signUp`)
                 .set(tenantHeaderProp, tenant.id)
                 .send(signUpInput)
                 .expect(httpStatus.CONFLICT);
-            expect(res.body).to.contain.keys("token", "user");
         });
     });
 

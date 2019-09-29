@@ -25,7 +25,6 @@ export default class AuthService implements IAuthService {
     @userRepository private _userRepository: IUserRepository;
     @eventDispatcher private _eventDispatcher: EventDispatcher;
     @loggerService private _logger: ILoggerService;
-    constructor(@inject(TYPES.TenantId) private readonly tenantId: string) {}
 
     public async signUp(
         dto: SignUpInput
@@ -40,7 +39,7 @@ export default class AuthService implements IAuthService {
 
             const userInstance = User.createInstance({
                 ...dto,
-                tenantId: this.tenantId,
+                tenantId: container.get<string>(TYPES.TenantId),
                 password: hashedPassword
             });
             userRecord = await this._userRepository.save(userInstance);
