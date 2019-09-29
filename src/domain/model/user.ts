@@ -1,10 +1,12 @@
-import { prop, Ref } from "@hasezoey/typegoose";
-import { IsEnum } from "class-validator";
+import { prop, Ref } from '@hasezoey/typegoose'
+import { IsEnum } from 'class-validator'
 
-import { Writable } from "../utils/writable";
-import BaseEntity from "./base";
-import { IActiveStatus, IMustHaveTenant } from "./interfaces/entity";
-import Tenant from "./tenant";
+import BaseEntity from './base'
+import Tenant from './tenant'
+import { Writable } from '../utils/writable'
+import { IActiveStatus, IMustHaveTenant } from './interfaces/entity'
+import { container } from '../../infrastructure/utils/ioc_container'
+import { TYPES } from '../constants/types'
 
 export const MAX_NAME_LENGTH = 225;
 export enum UserRole {
@@ -12,7 +14,7 @@ export enum UserRole {
     ADMIN = "admin"
 }
 export class User extends BaseEntity implements IMustHaveTenant, IActiveStatus {
-    @prop({ required: true, ref: Tenant })
+    @prop({ required: true, ref: Tenant, index: true })
     readonly tenant!: Ref<Tenant>;
 
     @prop({ required: true, maxlength: MAX_NAME_LENGTH, trim: true })
@@ -25,8 +27,8 @@ export class User extends BaseEntity implements IMustHaveTenant, IActiveStatus {
         maxlength: MAX_NAME_LENGTH,
         trim: true,
         lowercase: true,
-        unique: true,
-        index: true
+        index: true,
+        unique: true
     })
     readonly username!: string;
 
@@ -35,8 +37,8 @@ export class User extends BaseEntity implements IMustHaveTenant, IActiveStatus {
         maxlength: MAX_NAME_LENGTH,
         trim: true,
         lowercase: true,
-        unique: true,
-        index: true
+        index: true,
+        unique: true
     })
     readonly email!: string;
     @prop({ required: true, maxlength: MAX_NAME_LENGTH })
@@ -74,16 +76,15 @@ export class User extends BaseEntity implements IMustHaveTenant, IActiveStatus {
         lastName,
         email,
         username,
-        password,
-        tenantId
+        password
     }: {
         firstName: string;
         lastName: string;
         email: string;
         username: string;
         password: string;
-        tenantId: string;
     }) => {
+        const tenantId = container.get<string>(TYPES.TenantId);
         if (!tenantId) throw new Error("Tenant Id is required");
         return new User({
             firstName,

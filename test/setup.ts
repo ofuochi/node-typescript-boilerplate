@@ -1,12 +1,12 @@
-import { CurrentUser } from "./../src/domain/utils/globals";
-import { cleanUpMetadata } from "inversify-express-utils";
 import mongoose from "mongoose";
+import { cleanUpMetadata } from "inversify-express-utils";
 
-import app = require("../src");
+import Tenant from "../src/domain/model/tenant";
 import { TYPES } from "../src/domain/constants/types";
 import { ITenantRepository } from "../src/domain/interfaces/repositories";
-import Tenant from "../src/domain/model/tenant";
 import { container } from "../src/infrastructure/utils/ioc_container";
+
+import app = require("../src");
 
 before("Setup", async () => {
     await app.startServer();

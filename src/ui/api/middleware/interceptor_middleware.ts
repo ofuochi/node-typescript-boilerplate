@@ -1,14 +1,14 @@
-import httpStatus from 'http-status-codes'
-import { NextFunction, Request, Response } from 'express'
-import { injectable } from 'inversify'
-import { BaseMiddleware } from 'inversify-express-utils'
+import httpStatus from "http-status-codes";
+import { NextFunction, Request, Response } from "express";
+import { injectable } from "inversify";
+import { BaseMiddleware } from "inversify-express-utils";
 
-import config from '../../../infrastructure/config'
-import HttpError from '../../error'
-import { TYPES } from '../../../domain/constants/types'
-import { ILoggerService } from '../../../domain/interfaces/services'
-import { getCurrentTenant } from '../../../infrastructure/helpers/tenant_helpers'
-import { container } from '../../../infrastructure/utils/ioc_container'
+import config from "../../../infrastructure/config";
+import HttpError from "../../error";
+import { TYPES } from "../../../domain/constants/types";
+import { ILoggerService } from "../../../domain/interfaces/services";
+import { getCurrentTenant } from "../../../infrastructure/helpers/tenant_helpers";
+import { container } from "../../../infrastructure/utils/ioc_container";
 
 @injectable()
 export class RequestMiddleware extends BaseMiddleware {
@@ -51,7 +51,6 @@ export function exceptionLoggerMiddleware(
 ) {
     const log = container.get<ILoggerService>(TYPES.LoggerService);
 
-    // Log exception
     log.error(`
     ----------------------------------
     EXCEPTION MIDDLEWARE

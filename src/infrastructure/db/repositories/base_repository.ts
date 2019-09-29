@@ -1,11 +1,8 @@
-import { injectable, unmanaged } from "inversify";
-import { Document, Model } from "mongoose";
+import { injectable, unmanaged } from 'inversify'
+import { Document, Model } from 'mongoose'
 
-import {
-    IBaseRepository,
-    Query
-} from "../../../domain/interfaces/repositories";
-import BaseEntity from "../../../domain/model/base";
+import BaseEntity from '../../../domain/model/base'
+import { IBaseRepository, Query } from '../../../domain/interfaces/repositories'
 
 @injectable()
 export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>

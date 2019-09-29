@@ -18,8 +18,6 @@ export class AuthController extends BaseController {
         input = plainToClass(UserSignUpInput, input);
         const badRequest = await this.checkBadRequest(input);
         if (badRequest) return badRequest;
-        console.log(badRequest);
-        if (badRequest) return badRequest;
         const result = await this._authService.signUp(input);
         const userDto = classToClass<UserDto>(result.user);
         const signUpDto: UserSignUpDto = {

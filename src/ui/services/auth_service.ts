@@ -1,32 +1,40 @@
-import bcrypt from 'bcrypt'
-import httpStatus from 'http-status-codes'
-import jwt from 'jsonwebtoken'
-import { EventDispatcher } from 'event-dispatch'
-import { injectable } from 'inversify'
+import bcrypt from "bcrypt";
+import httpStatus from "http-status-codes";
+import jwt from "jsonwebtoken";
+import { EventDispatcher } from "event-dispatch";
+import { injectable } from "inversify";
 
-import config from '../../infrastructure/config'
-import events from '../subscribers/events'
-import { eventDispatcher, loggerService, userRepository } from '../../domain/constants/decorators'
-import { TYPES } from '../../domain/constants/types'
-import { IUserRepository } from '../../domain/interfaces/repositories'
-import { ILoggerService } from '../../domain/interfaces/services'
-import { User } from '../../domain/model/user'
-import { container } from '../../infrastructure/utils/ioc_container'
-import { IAuthService } from '../interfaces/auth_service'
-import { HttpError } from './../error'
-import { UserDto, UserSignInInput, UserSignUpInput } from './../models/user_dto'
+import config from "../../infrastructure/config";
+import events from "../subscribers/events";
+import {
+    eventDispatcher,
+    userRepository
+} from "../../domain/constants/decorators";
+import { TYPES } from "../../domain/constants/types";
+import { IUserRepository } from "../../domain/interfaces/repositories";
+import { User } from "../../domain/model/user";
+import { IAuthService } from "../interfaces/auth_service";
+import { HttpError } from "./../error";
+import {
+    UserDto,
+    UserSignInInput,
+    UserSignUpInput
+} from "./../models/user_dto";
 
 @injectable()
 export default class AuthService implements IAuthService {
     @userRepository private _userRepository: IUserRepository;
     @eventDispatcher private _eventDispatcher: EventDispatcher;
-    @loggerService private _logger: ILoggerService;
 
     public async signUp(
         dto: UserSignUpInput
     ): Promise<{ user: UserDto; token: string }> {
         try {
-            const hashedPassword = await bcrypt.hash(dto.password, 10);
+            // Use less salt round for faster hashing on test or development but stronger hashing on production
+            const hashedPassword =
+                config.env === "development" || "test"
+                    ? await bcrypt.hash(dto.password, 1)
+                    : await bcrypt.hash(dto.password, 12);
 
             let userRecord = await this._userRepository.findOneByQuery({
                 email: dto.email
@@ -35,7 +43,6 @@ export default class AuthService implements IAuthService {
 
             const userInstance = User.createInstance({
                 ...dto,
-                tenantId: container.get<string>(TYPES.TenantId),
                 password: hashedPassword
             });
             userRecord = await this._userRepository.save(userInstance);
@@ -50,7 +57,6 @@ export default class AuthService implements IAuthService {
             const token = await this.generateToken(userRecord);
             return { user: userDto, token };
         } catch (e) {
-            this._logger.error(e);
             throw e;
         }
     }
