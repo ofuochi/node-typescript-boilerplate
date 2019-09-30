@@ -1,19 +1,18 @@
 import bcrypt from "bcrypt";
-import httpStatus from "http-status-codes";
-import jwt from "jsonwebtoken";
 import { EventDispatcher } from "event-dispatch";
+import httpStatus from "http-status-codes";
 import { injectable } from "inversify";
+import jwt from "jsonwebtoken";
 
-import config from "../../infrastructure/config";
-import events from "../subscribers/events";
 import {
     eventDispatcher,
     userRepository
 } from "../../domain/constants/decorators";
-import { TYPES } from "../../domain/constants/types";
 import { IUserRepository } from "../../domain/interfaces/repositories";
 import { User } from "../../domain/model/user";
+import config from "../../infrastructure/config";
 import { IAuthService } from "../interfaces/auth_service";
+import events from "../subscribers/events";
 import { HttpError } from "./../error";
 import {
     UserDto,
@@ -29,36 +28,33 @@ export default class AuthService implements IAuthService {
     public async signUp(
         dto: UserSignUpInput
     ): Promise<{ user: UserDto; token: string }> {
-        try {
-            // Use less salt round for faster hashing on test or development but stronger hashing on production
-            const hashedPassword =
-                config.env === "development" || "test"
-                    ? await bcrypt.hash(dto.password, 1)
-                    : await bcrypt.hash(dto.password, 12);
+        // Use less salt round for faster hashing on test and development but stronger hashing on production
+        const hashedPassword =
+            config.env === "development" || "test"
+                ? await bcrypt.hash(dto.password, 1)
+                : await bcrypt.hash(dto.password, 12);
 
-            let userRecord = await this._userRepository.findOneByQuery({
-                email: dto.email
-            });
-            if (userRecord) throw new HttpError(httpStatus.CONFLICT);
+        let userRecord = await this._userRepository.findOneByQuery({
+            email: dto.email,
+            tenant: global.currentUser.tenant.id
+        });
+        if (userRecord) throw new HttpError(httpStatus.CONFLICT);
 
-            const userInstance = User.createInstance({
-                ...dto,
-                password: hashedPassword
-            });
-            userRecord = await this._userRepository.save(userInstance);
-            const userDto: UserDto = {
-                firstName: dto.firstName,
-                lastName: dto.lastName,
-                email: userRecord.email,
-                username: userRecord.username,
-                id: userRecord.id
-            };
-            this._eventDispatcher.dispatch(events.user.signUp, { ...dto });
-            const token = await this.generateToken(userRecord);
-            return { user: userDto, token };
-        } catch (e) {
-            throw e;
-        }
+        const userInstance = User.createInstance({
+            ...dto,
+            password: hashedPassword
+        });
+        userRecord = await this._userRepository.save(userInstance);
+        const userDto: UserDto = {
+            firstName: dto.firstName,
+            lastName: dto.lastName,
+            email: userRecord.email,
+            username: userRecord.username,
+            id: userRecord.id
+        };
+        this._eventDispatcher.dispatch(events.user.signUp, { ...dto });
+        const token = await this.generateToken(userRecord);
+        return { user: userDto, token };
     }
 
     public async signIn(dto: UserSignInInput): Promise<{ token: string }> {

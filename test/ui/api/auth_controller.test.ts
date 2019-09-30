@@ -39,9 +39,8 @@ describe("Auth controller", () => {
             Tenant.createInstance("Tenant2", "Second tenant")
         );
     });
-    let signUpInput: UserSignUpInput;
-    let signInInput: UserSignInInput;
 
+    let signUpInput: UserSignUpInput;
     describe("Sign up user", () => {
         after(() => {
             tenant = tenant1;
@@ -98,7 +97,7 @@ describe("Auth controller", () => {
         });
         describe("2nd tenant", () => {
             before(() => {
-                //tenant = tenant2;
+                tenant = tenant2;
             });
             it("should sign-up a new user and return token and user DTO", async () => {
                 const res = await req
@@ -141,8 +140,12 @@ describe("Auth controller", () => {
     });
 
     describe("User sign-in", () => {
+        let signInInput: UserSignInInput = {
+            password: signUpInput.password,
+            emailOrUsername: signUpInput.email
+        };
+
         it("should sign user in with email and return token", async () => {
-            signInInput.emailOrUsername = signUpInput.email;
             const res = await req
                 .post(`${endpoint}/signIn`)
                 .set(tenantHeaderProp, tenant.id)

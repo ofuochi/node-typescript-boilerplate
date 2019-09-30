@@ -1,34 +1,31 @@
-import { prop, Ref } from '@hasezoey/typegoose'
-import { IsEnum } from 'class-validator'
+import { index, prop, Ref } from "@hasezoey/typegoose";
 
-import BaseEntity from './base'
-import Tenant from './tenant'
-import { Writable } from '../utils/writable'
-import { IActiveStatus, IMustHaveTenant } from './interfaces/entity'
-import { container } from '../../infrastructure/utils/ioc_container'
-import { TYPES } from '../constants/types'
+import { Writable } from "../utils/writable";
+import BaseEntity from "./base";
+import { IActiveStatus, IMustHaveTenant } from "./interfaces/entity";
+import Tenant from "./tenant";
 
 export const MAX_NAME_LENGTH = 225;
 export enum UserRole {
     USER = "user",
     ADMIN = "admin"
 }
+@index({ email: 1, tenant: 1 }, { unique: true })
+@index({ username: 1, tenant: 1 }, { unique: true })
 export class User extends BaseEntity implements IMustHaveTenant, IActiveStatus {
-    @prop({ required: true, ref: Tenant, index: true })
-    readonly tenant!: Ref<Tenant>;
-
     @prop({ required: true, maxlength: MAX_NAME_LENGTH, trim: true })
     readonly firstName!: string;
     @prop({ required: true, maxlength: MAX_NAME_LENGTH, trim: true })
     readonly lastName!: string;
 
+    @prop({ required: true, ref: Tenant, unique: false })
+    readonly tenant!: Ref<Tenant>;
     @prop({
         required: true,
         maxlength: MAX_NAME_LENGTH,
         trim: true,
         lowercase: true,
-        index: true,
-        unique: true
+        unique: false
     })
     readonly username!: string;
 
@@ -37,10 +34,10 @@ export class User extends BaseEntity implements IMustHaveTenant, IActiveStatus {
         maxlength: MAX_NAME_LENGTH,
         trim: true,
         lowercase: true,
-        index: true,
-        unique: true
+        unique: false
     })
     readonly email!: string;
+
     @prop({ required: true, maxlength: MAX_NAME_LENGTH })
     readonly password!: string;
 
@@ -84,7 +81,7 @@ export class User extends BaseEntity implements IMustHaveTenant, IActiveStatus {
         username: string;
         password: string;
     }) => {
-        const tenantId = container.get<string>(TYPES.TenantId);
+        const tenantId = global.currentUser.tenant.id;
         if (!tenantId) throw new Error("Tenant Id is required");
         return new User({
             firstName,

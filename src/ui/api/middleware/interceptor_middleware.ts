@@ -1,14 +1,12 @@
-import httpStatus from "http-status-codes";
 import { NextFunction, Request, Response } from "express";
+import httpStatus from "http-status-codes";
 import { injectable } from "inversify";
 import { BaseMiddleware } from "inversify-express-utils";
 
+import { CurrentUser } from "../../../domain/utils/globals";
 import config from "../../../infrastructure/config";
-import HttpError from "../../error";
-import { TYPES } from "../../../domain/constants/types";
-import { ILoggerService } from "../../../domain/interfaces/services";
 import { getCurrentTenant } from "../../../infrastructure/helpers/tenant_helpers";
-import { container } from "../../../infrastructure/utils/ioc_container";
+import HttpError from "../../error";
 
 @injectable()
 export class RequestMiddleware extends BaseMiddleware {
@@ -26,7 +24,6 @@ export class RequestMiddleware extends BaseMiddleware {
             return res
                 .status(httpStatus.BAD_REQUEST)
                 .end("x-tenant-id header is missing");
-
         // const log = container.get<ILoggerService>(TYPES.LoggerService);
         // log.info(`
         // ----------------------------------
@@ -36,8 +33,7 @@ export class RequestMiddleware extends BaseMiddleware {
         // `);
         if (isTenantUrl) return next();
         const tenant = await getCurrentTenant(req.tenantId as string);
-        if (!container.isBound(TYPES.TenantId))
-            container.bind<string>(TYPES.TenantId).toConstantValue(tenant.id);
+        global.currentUser = CurrentUser.createInstance(tenant);
 
         next();
     }
@@ -49,15 +45,15 @@ export function exceptionLoggerMiddleware(
     res: Response,
     _next: NextFunction
 ) {
-    const log = container.get<ILoggerService>(TYPES.LoggerService);
+    // const log = container.get<ILoggerService>(TYPES.LoggerService);
 
-    log.error(`
-    ----------------------------------
-    EXCEPTION MIDDLEWARE
-    HTTP ${req.method} ${req.url}
-    ${error.message}
-    ----------------------------------
-    `);
+    // log.error(`
+    // ----------------------------------
+    // EXCEPTION MIDDLEWARE
+    // HTTP ${req.method} ${req.url}
+    // ${error.message}
+    // ----------------------------------
+    // `);
 
     //if (typeof error === "number") error = new HttpError(error); // next(404)
 

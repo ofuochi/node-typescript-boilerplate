@@ -20,6 +20,7 @@ const endpoint = `${config.api.prefix}/tenants`;
 let authService: IAuthService;
 let userRepository: IUserRepository;
 let tenantRepository: ITenantRepository;
+
 describe("Tenant controller", async () => {
     const password = "dadf_jad63A";
     let user: User;
@@ -27,6 +28,7 @@ describe("Tenant controller", async () => {
 
     let req: supertest.SuperTest<supertest.Test>;
     let tenant: Tenant;
+
     before(async () => {
         userRepository = container.get<IUserRepository>(TYPES.UserRepository);
         authService = container.get<IAuthService>(TYPES.AuthService);
@@ -40,8 +42,7 @@ describe("Tenant controller", async () => {
             lastName: "Admin",
             email: "admin@gmail.com",
             password: hashedPw,
-            username: "admin",
-            tenantId: tenant.id
+            username: "admin"
         });
         user.setRole(UserRole.ADMIN);
         await userRepository.save(user);
@@ -66,6 +67,7 @@ describe("Tenant controller", async () => {
 
         expect(res.body).to.contain.keys("name", "id", "description");
     });
+
     it("should return list of tenants", async () => {
         const res = await req.get(endpoint).expect(httpStatus.OK);
         expect(res.body).to.be.an("array");

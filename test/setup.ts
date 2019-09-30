@@ -20,11 +20,14 @@ before("Setup", async () => {
     );
 });
 after("Teardown", async () => {
+    app.appServer.close();
+     await cleanupDb();
+});
+async function cleanupDb() {
     const collections = await mongoose.connection.db
         .listCollections(undefined, { nameOnly: true })
         .toArray();
     collections.forEach(async (collection: any) => {
         await mongoose.connection.db.dropCollection(collection.name);
     });
-    app.appServer.close();
-});
+}
