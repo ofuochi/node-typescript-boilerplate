@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status-codes";
 import { injectable } from "inversify";
 import { BaseMiddleware } from "inversify-express-utils";
+import mongoose from "mongoose";
 
 import { CurrentUser } from "../../../domain/utils/globals";
 import config from "../../../infrastructure/config";
@@ -32,6 +33,14 @@ export class RequestMiddleware extends BaseMiddleware {
         // ----------------------------------
         // `);
         if (isTenantUrl) return next();
+        if (!mongoose.Types.ObjectId.isValid(req.tenantId as string))
+            return next(
+                new HttpError(
+                    httpStatus.BAD_REQUEST,
+                    "Invalid header X-Tenant_Id value"
+                )
+            );
+
         const tenant = await getCurrentTenant(req.tenantId as string);
         global.currentUser = CurrentUser.createInstance(tenant);
 

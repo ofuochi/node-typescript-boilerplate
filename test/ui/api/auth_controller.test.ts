@@ -38,13 +38,15 @@ describe("Auth controller", () => {
         tenant2 = await tenantRepository.save(
             Tenant.createInstance("Tenant2", "Second tenant")
         );
+        tenant = tenant1;
+    });
+    afterEach(() => {
+        tenant = tenant1;
     });
 
     let signUpInput: UserSignUpInput;
+
     describe("Sign up user", () => {
-        after(() => {
-            tenant = tenant1;
-        });
         signUpInput = {
             username: "john",
             firstName: "Doe",
@@ -53,89 +55,61 @@ describe("Auth controller", () => {
             password: "valid_P@ssW1d"
         };
 
-        describe("1st tenant", () => {
-            before(() => {
-                tenant = tenant1;
-            });
-            it("should sign-up a new user and return token and user DTO", async () => {
-                const res = await req
-                    .post(`${endpoint}/signUp`)
-                    .set(tenantHeaderProp, tenant.id)
-                    .send(signUpInput)
-                    .expect(httpStatus.OK);
-                expect(res.body).to.contain.keys("userDto", "token");
-            });
-
-            it("should return conflict if email already exists on the same tenant", async () => {
-                const input = { ...signUpInput };
-                // input.username = `$1{input.username}`;
-                await req
-                    .post(`${endpoint}/signUp`)
-                    .set(tenantHeaderProp, tenant.id)
-                    .send(input)
-                    .expect(httpStatus.CONFLICT);
-            });
-            it("should return conflict if username already exists on the same tenant", async () => {
-                const input = { ...signUpInput };
-                input.email = `1${input.email}`;
-                await req
-                    .post(`${endpoint}/signUp`)
-                    .set(tenantHeaderProp, tenant.id)
-                    .send(signUpInput)
-                    .expect(httpStatus.CONFLICT);
-            });
-            it("should return bad request for invalid inputs", async () => {
-                const input = { ...signUpInput };
-                input.email = "invalid_email";
-                input.username = `${input.username}2`;
-                await req
-                    .post(`${endpoint}/signUp`)
-                    .set(tenantHeaderProp, tenant.id)
-                    .send(input)
-                    .expect(httpStatus.BAD_REQUEST);
-            });
+        it("should sign-up a new user and return token and user DTO", async () => {
+            const res = await req
+                .post(`${endpoint}/signUp`)
+                .set(tenantHeaderProp, tenant.id)
+                .send(signUpInput)
+                .expect(httpStatus.OK);
+            expect(res.body).to.contain.keys("userDto", "token");
         });
-        describe("2nd tenant", () => {
-            before(() => {
-                tenant = tenant2;
-            });
-            it("should sign-up a new user and return token and user DTO", async () => {
-                const res = await req
-                    .post(`${endpoint}/signUp`)
-                    .set(tenantHeaderProp, tenant.id)
-                    .send(signUpInput)
-                    .expect(httpStatus.OK);
-                expect(res.body).to.contain.keys("userDto", "token");
-            });
 
-            it("should return conflict if email already exists on the same tenant", async () => {
-                const input = { ...signUpInput };
-                input.username = `${input.username}1`;
-                await req
-                    .post(`${endpoint}/signUp`)
-                    .set(tenantHeaderProp, tenant.id)
-                    .send(signUpInput)
-                    .expect(httpStatus.CONFLICT);
-            });
-            it("should return conflict if username already exists on the same tenant", async () => {
-                const input = { ...signUpInput };
-                input.email = `1${input.email}`;
-                await req
-                    .post(`${endpoint}/signUp`)
-                    .set(tenantHeaderProp, tenant.id)
-                    .send(signUpInput)
-                    .expect(httpStatus.CONFLICT);
-            });
-            it("should return bad request for invalid inputs", async () => {
-                const input = { ...signUpInput };
-                input.email = "invalid_email";
-                input.username = `${input.username}2`;
-                await req
-                    .post(`${endpoint}/signUp`)
-                    .set(tenantHeaderProp, tenant.id)
-                    .send(input)
-                    .expect(httpStatus.BAD_REQUEST);
-            });
+        it("should return conflict if email already exists on the same tenant", async () => {
+            const input = { ...signUpInput };
+            input.username = `1${input.username}`;
+            await req
+                .post(`${endpoint}/signUp`)
+                .set(tenantHeaderProp, tenant.id)
+                .send(input)
+                .expect(httpStatus.CONFLICT);
+        });
+        it("should return conflict if username already exists on the same tenant", async () => {
+            const input = { ...signUpInput };
+            input.email = `1${input.email}`;
+            await req
+                .post(`${endpoint}/signUp`)
+                .set(tenantHeaderProp, tenant.id)
+                .send(signUpInput)
+                .expect(httpStatus.CONFLICT);
+        });
+        it("should return bad request for invalid inputs", async () => {
+            const input = { ...signUpInput };
+            input.email = "invalid_email";
+            input.username = `${input.username}2`;
+            await req
+                .post(`${endpoint}/signUp`)
+                .set(tenantHeaderProp, tenant.id)
+                .send(input)
+                .expect(httpStatus.BAD_REQUEST);
+        });
+        it("should return bad request for invalid tenant id", async () => {
+            const input = { ...signUpInput };
+
+            input.username = `${input.username}2`;
+            await req
+                .post(`${endpoint}/signUp`)
+                .set(tenantHeaderProp, "invalid_tenatId")
+                .send(input)
+                .expect(httpStatus.BAD_REQUEST);
+        });
+        it("should successfully sign-up a new user on a different tenant with the same details as another tenant", async () => {
+            tenant = tenant2;
+            const res = await req
+                .post(`${endpoint}/signUp`)
+                .set(tenantHeaderProp, tenant.id)
+                .send(signUpInput)
+                .expect(httpStatus.OK);
+            expect(res.body).to.contain.keys("userDto", "token");
         });
     });
 
@@ -155,6 +129,26 @@ describe("Auth controller", () => {
         });
         it("should sign user in with username and return token", async () => {
             signInInput.emailOrUsername = signUpInput.username;
+            const res = await req
+                .post(`${endpoint}/signIn`)
+                .set(tenantHeaderProp, tenant.id)
+                .send(signInInput)
+                .expect(httpStatus.OK);
+            expect(res.body).to.contain.keys("token");
+        });
+        it("should sign user with a another tenantId with username and return token", async () => {
+            tenant = tenant2;
+            signInInput.emailOrUsername = signUpInput.username;
+            const res = await req
+                .post(`${endpoint}/signIn`)
+                .set(tenantHeaderProp, tenant.id)
+                .send(signInInput)
+                .expect(httpStatus.OK);
+            expect(res.body).to.contain.keys("token");
+        });
+        it("should sign user with a another tenantId with email and return token", async () => {
+            tenant = tenant2;
+            signInInput.emailOrUsername = signUpInput.email;
             const res = await req
                 .post(`${endpoint}/signIn`)
                 .set(tenantHeaderProp, tenant.id)
