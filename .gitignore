@@ -72,4 +72,4 @@ build
 .history
 
 # Local settings
-.vscode\settings.json
+.vscode/settings.json

@@ -1,5 +1,30 @@
 {
     "files.exclude": {
+        "**/.git": false,
+        "**/.svn": false,
+        "**/.hg": false,
+        "**/CVS": false,
+        "**/.DS_Store": false,
+        "**/.classpath": false,
+        "**/.project": false,
+        "**/.settings": false,
+        "**/.factorypath": false,
+        "**/node_modules": false,
+        "node_modules": false,
+        "**/LICENSE": false,
+        "LICENSE": false,
+        ".env": false,
+        ".editorconfig": false,
+        ".eslintignore": false,
+        ".eslintrc.json": false,
+        "**/.gitignore": false,
+        "**/env.sample": false,
+        "**/package-lock.json": false,
+        "**/README.md": false,
+        "**/tsconfig.json": false,
+        "**/.history": false
+    },
+    "explorerExclude.backup": {
         "**/.git": true,
         "**/.svn": true,
         "**/.hg": true,
@@ -23,6 +48,5 @@
         "**/README.md": true,
         "**/tsconfig.json": true,
         "**/.history": true
-    },
-    "explorerExclude.backup": null
+    }
 }
