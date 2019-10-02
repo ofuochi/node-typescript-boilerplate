@@ -1,12 +1,14 @@
-import mongoose from "mongoose";
 import { cleanUpMetadata } from "inversify-express-utils";
-
-import Tenant from "../src/domain/model/tenant";
-import { TYPES } from "../src/domain/constants/types";
-import { ITenantRepository } from "../src/domain/interfaces/repositories";
-import { container } from "../src/infrastructure/utils/ioc_container";
+import { MongoMemoryServer } from "mongodb-memory-server";
+import mongoose from "mongoose";
 
 import app = require("../src");
+import { TYPES } from "../src/domain/constants/types";
+import { ITenantRepository } from "../src/domain/interfaces/repositories";
+import Tenant from "../src/domain/model/tenant";
+import { container } from "../src/infrastructure/utils/ioc_container";
+
+const mongoDb = new MongoMemoryServer();
 
 before("Setup", async () => {
     await app.startServer();
@@ -20,9 +22,17 @@ before("Setup", async () => {
     );
 });
 after("Teardown", async () => {
-    app.appServer.close();
     await cleanupDb();
+    app.appServer.close();
 });
+async function setupMongoInMemoryServer() {
+    const uri = await mongoDb.getConnectionString();
+    const port = await mongoDb.getPort();
+    process.env.MONGODB_URI = uri;
+    process.env.NODE_ENV = "test";
+    process.env.PORT = port.toString();
+}
+
 async function cleanupDb() {
     const collections = await mongoose.connection.db
         .listCollections(undefined, { nameOnly: true })
