@@ -67,4 +67,9 @@ typings/
 # builds
 dist
 build
+
+# history
 .history
+
+# Local settings
+.vscode\settings.json

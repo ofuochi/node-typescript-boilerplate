@@ -22,7 +22,7 @@
         "**/package-lock.json": true,
         "**/README.md": true,
         "**/tsconfig.json": true,
-        "**/.history": false
+        "**/.history": true
     },
     "explorerExclude.backup": null
 }
