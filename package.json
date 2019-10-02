@@ -16,10 +16,10 @@
         "nyc": "nyc -r=text -r=html -i ts-node/register/transpile-only -e .ts mocha",
         "rm-files": "rm -r -f coverage .nyc_output dist",
         "start": "npm run rm-files && npm run tsc && npm run start-node",
-        "debug": "nodemon -e ts --exec \"npx ts-node -T --pretty --project tsconfig.json src/index.ts\"",
+        "debug": "nodemon -e ts --exec \"npx ts-node -r tsconfig-paths/register -T --pretty --project tsconfig.json src/index.ts\"",
         "start-node": "node dist/index.js",
-        "test": "mocha",
-        "test-debug": "mocha -w",
+        "test": "ts-mocha --paths",
+        "test-debug": "ts-mocha --paths -w",
         "test-cover": "npm run rm-files && npm run nyc",
         "tsc": "tsc -p tsconfig.json"
     },
@@ -46,6 +46,7 @@
         "method-override": "^3.0.0",
         "mongoose": "^5.7.1",
         "reflect-metadata": "^0.1.13",
+        "tsconfig-paths": "^3.9.0",
         "winston": "^3.2.1",
         "winston-transport": "^4.3.0"
     },
@@ -73,6 +74,7 @@
         "nodemon": "^1.19.2",
         "nyc": "^14.1.1",
         "supertest": "^4.0.2",
+        "ts-mocha": "^6.0.0",
         "ts-node": "^8.4.1",
         "typescript": "^3.6.3"
     }

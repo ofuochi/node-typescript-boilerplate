@@ -15,6 +15,7 @@ import config from "../../../src/infrastructure/config";
 import { container } from "../../../src/infrastructure/utils/ioc_container";
 import { IAuthService } from "../../../src/ui/interfaces/auth_service";
 import { CreateTenantInput } from "../../../src/ui/models/tenant_dto";
+import BaseEntity from "../../../src/domain/model/base";
 
 const endpoint = `${config.api.prefix}/tenants`;
 let authService: IAuthService;
@@ -45,9 +46,11 @@ describe("Tenant controller", async () => {
             username: "admin"
         });
         user.setRole(UserRole.ADMIN);
-        await userRepository.save(user);
+        const result = (await userRepository.save(user)) as User;
+        user.id = result.id;
+
         const { token } = await authService.signIn({
-            password: password,
+            password,
             emailOrUsername: user.username
         });
         jwtToken = token;
@@ -57,15 +60,35 @@ describe("Tenant controller", async () => {
         name: "NewTenant",
         description: "New tenant"
     };
-
-    it("should create new tenant and return tenant DTO object", async () => {
+    const authTokenHeader = "X-Auth-Token";
+    it("should create new tenant and return tenant DTO object if user is an admin", async () => {
         const res = await req
             .post(endpoint)
-            .set("X-AUTH-TOKEN", jwtToken)
+            .set(authTokenHeader, jwtToken)
             .send(createTenantInput)
             .expect(httpStatus.OK);
 
         expect(res.body).to.contain.keys("name", "id", "description");
+    });
+    it("should return bad request if jwt token is not set", async () => {
+        await req
+            .post(endpoint)
+            .send(createTenantInput)
+            .expect(httpStatus.BAD_REQUEST);
+    });
+    it("should return forbidden for non admin user that attempts to create tenant", async () => {
+        user.setRole(UserRole.USER);
+        await userRepository.save(user);
+        const { token } = await authService.signIn({
+            password,
+            emailOrUsername: user.username
+        });
+
+        await req
+            .post(endpoint)
+            .set(authTokenHeader, token)
+            .send(createTenantInput)
+            .expect(httpStatus.FORBIDDEN);
     });
 
     it("should return list of tenants", async () => {

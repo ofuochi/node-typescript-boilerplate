@@ -7,13 +7,14 @@ import {
     requestBody
 } from "inversify-express-utils";
 
-import { tenantRepository } from "../../../domain/constants/decorators";
-import { ITenantRepository } from "../../../domain/interfaces/repositories";
-import Tenant from "../../../domain/model/tenant";
 import { CreateTenantInput, TenantDto } from "../../models/tenant_dto";
-import { BaseController } from "./base_controller";
 import { authMiddleware } from "../middleware/auth_middleware";
-import { UserRole } from "../../../domain/model/user";
+import { BaseController } from "./base_controller";
+
+import { tenantRepository } from "@domain/constants/decorators";
+import { ITenantRepository } from "@domain/interfaces/repositories";
+import Tenant from "@domain/model/tenant";
+import { UserRole } from "@domain/model/user";
 
 @controller("/tenants")
 export class TenantController extends BaseController {

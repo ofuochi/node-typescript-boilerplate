@@ -1,11 +1,15 @@
-import { controller, httpPost, requestBody } from 'inversify-express-utils'
-import { classToClass, plainToClass } from 'class-transformer'
+import { classToClass, plainToClass } from "class-transformer";
+import { controller, httpPost, requestBody } from "inversify-express-utils";
 
-import { authService } from '../../../domain/constants/decorators'
-import { IAuthService } from '../../interfaces/auth_service'
-import { UserSignInInput, UserSignUpDto, UserSignUpInput } from '../../models/user_dto'
-import { BaseController } from './base_controller'
-import { UserDto } from '../../models/user_dto'
+import { IAuthService } from "../../interfaces/auth_service";
+import {
+    UserDto,
+    UserSignInInput,
+    UserSignUpDto,
+    UserSignUpInput
+} from "../../models/user_dto";
+import { BaseController } from "./base_controller";
+import { authService } from "@domain/constants/decorators";
 
 @controller("/auth")
 export class AuthController extends BaseController {

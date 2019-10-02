@@ -1,19 +1,22 @@
+import { expect } from "chai";
 import httpStatus from "http-status-codes";
 import supertest from "supertest";
-import { expect } from "chai";
 
+import app = require("../../../src");
+import {
+    ITenantRepository,
+    IUserRepository
+} from "../../../src/domain/interfaces/repositories";
 import Tenant from "../../../src/domain/model/tenant";
 import config from "../../../src/infrastructure/config";
-import { ITenantRepository } from "../../../src/domain/interfaces/repositories";
 import { container } from "../../../src/infrastructure/utils/ioc_container";
 import {
-    UserDto,
     UserSignInInput,
+    UserSignUpDto,
     UserSignUpInput
 } from "../../../src/ui/models/user_dto";
 import { TYPES } from "./../../../src/domain/constants/types";
 
-import app = require("../../../src");
 const endpoint = `${config.api.prefix}/auth`;
 const tenantHeaderProp = "x-tenant-id";
 
@@ -55,13 +58,24 @@ describe("Auth controller", () => {
             password: "valid_P@ssW1d"
         };
 
-        it("should sign-up a new user and return token and user DTO", async () => {
+        it("should sign-up a new user and return token and user DTO. Creator should be the signed up user", async () => {
             const res = await req
                 .post(`${endpoint}/signUp`)
                 .set(tenantHeaderProp, tenant.id)
                 .send(signUpInput)
                 .expect(httpStatus.OK);
-            expect(res.body).to.contain.keys("userDto", "token");
+
+            const userRepository = container.get<IUserRepository>(
+                TYPES.UserRepository
+            );
+            const result = res.body as UserSignUpDto;
+            expect(result).to.contain.keys("userDto", "token");
+
+            const userRecord = await userRepository.findById(result.userDto.id);
+
+            expect(result.userDto.id.toString()).to.equal(
+                userRecord.createdBy.toString()
+            );
         });
 
         it("should return conflict if email already exists on the same tenant", async () => {

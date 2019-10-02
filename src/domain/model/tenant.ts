@@ -1,9 +1,8 @@
 import { prop } from "@hasezoey/typegoose";
 
 import BaseEntity from "./base";
-import { IActiveStatus } from "./interfaces/entity";
 
-export default class Tenant extends BaseEntity implements IActiveStatus {
+export default class Tenant extends BaseEntity<Tenant> {
     @prop({
         required: true,
         uppercase: true,
@@ -26,7 +25,7 @@ export default class Tenant extends BaseEntity implements IActiveStatus {
 
     public static get model() {
         return new Tenant().getModelForClass(Tenant, {
-            schemaOptions: { collection: "Tenants" }
+            schemaOptions: { collection: "Tenants", timestamps: true }
         });
     }
 }

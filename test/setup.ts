@@ -21,7 +21,7 @@ before("Setup", async () => {
 });
 after("Teardown", async () => {
     app.appServer.close();
-     await cleanupDb();
+    await cleanupDb();
 });
 async function cleanupDb() {
     const collections = await mongoose.connection.db

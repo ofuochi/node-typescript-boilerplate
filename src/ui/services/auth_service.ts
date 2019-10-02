@@ -9,7 +9,7 @@ import {
     userRepository
 } from "../../domain/constants/decorators";
 import { IUserRepository } from "../../domain/interfaces/repositories";
-import { User } from "../../domain/model/user";
+import { User, UserRole } from "../../domain/model/user";
 import config from "../../infrastructure/config";
 import { IAuthService } from "../interfaces/auth_service";
 import events from "../subscribers/events";
@@ -20,6 +20,14 @@ import {
     UserSignUpInput
 } from "./../models/user_dto";
 
+export interface DecodedJwt {
+    userId: string;
+    role: UserRole;
+    email: string;
+    username: string;
+    firstName: string;
+    tenantId: any;
+}
 @injectable()
 export default class AuthService implements IAuthService {
     @userRepository private _userRepository: IUserRepository;
@@ -44,7 +52,13 @@ export default class AuthService implements IAuthService {
             ...dto,
             password: hashedPassword
         });
+
         userRecord = await this._userRepository.save(userInstance);
+        userInstance.id = userRecord.id;
+        userInstance.setCreator(userRecord);
+        await this._userRepository.save(userInstance);
+        global.currentUser.setUser(userInstance);
+
         const userDto: UserDto = {
             firstName: dto.firstName,
             lastName: dto.lastName,
@@ -84,11 +98,13 @@ export default class AuthService implements IAuthService {
     private async getUserRecord(emailOrUsername: string): Promise<User> {
         if (emailOrUsername.includes("@"))
             return await this._userRepository.findOneByQuery({
-                email: emailOrUsername
+                email: emailOrUsername,
+                tenant: global.currentUser.tenant.id
             });
 
         return await this._userRepository.findOneByQuery({
-            username: emailOrUsername
+            username: emailOrUsername,
+            tenant: global.currentUser.tenant.id
         });
     }
 
@@ -96,17 +112,15 @@ export default class AuthService implements IAuthService {
         const today = new Date();
         const exp = new Date(today);
         exp.setDate(today.getDate() + 60);
-        return jwt.sign(
-            {
-                id: user.id,
-                role: user.role,
-                email: user.email,
-                username: user.username,
-                firstName: user.firstName,
-                tenantId: user.tenant,
-                exp: exp.getTime() / 1000
-            },
-            config.jwtSecret
-        );
+
+        const payload: DecodedJwt = {
+            userId: user.id,
+            role: user.role,
+            email: user.email,
+            username: user.username,
+            firstName: user.firstName,
+            tenantId: user.tenant
+        };
+        return jwt.sign(payload, config.jwtSecret, { expiresIn: "2 days" });
     }
 }

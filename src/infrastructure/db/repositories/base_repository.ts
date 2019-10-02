@@ -1,8 +1,11 @@
-import { injectable, unmanaged } from 'inversify'
-import { Document, Model } from 'mongoose'
+import { injectable, unmanaged } from "inversify";
+import { Document, Model } from "mongoose";
 
-import BaseEntity from '../../../domain/model/base'
-import { IBaseRepository, Query } from '../../../domain/interfaces/repositories'
+import {
+    IBaseRepository,
+    Query
+} from "../../../domain/interfaces/repositories";
+import BaseEntity from "../../../domain/model/base";
 
 @injectable()
 export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
@@ -19,7 +22,7 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
         return new Promise<TEntity[]>((resolve, reject) => {
             this.Model.find((err, res) => {
                 if (err) return reject(err);
-                let results = res.map(r => this._readMapper(r));
+                let results = res.map(r => this.readMapper(r));
                 results = results.filter(r => !r.isDeleted);
                 resolve(results);
             });
@@ -32,19 +35,31 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
                 if (err) return reject(err);
                 if (!res) return reject();
 
-                const result = this._readMapper(res);
+                const result = this.readMapper(res);
                 resolve(result.isDeleted ? undefined : result);
             });
         });
     }
 
-    public async save(doc: TEntity) {
+    public async save(doc: TEntity): Promise<TEntity> {
         return new Promise<TEntity>((resolve, reject) => {
-            const instance = new this.Model(doc);
-            instance.save((err, res) => {
-                if (err) return reject(err);
-                resolve(this._readMapper(res));
-            });
+            if (doc.id) {
+                this.Model.findByIdAndUpdate(
+                    doc.id,
+                    doc,
+                    { new: true },
+                    (err, res) => {
+                        if (err) return reject(err);
+                        resolve(this.readMapper(res as TModel));
+                    }
+                );
+            } else {
+                const instance = new this.Model(doc);
+                instance.save((err, res) => {
+                    if (err) return reject(err);
+                    resolve(this.readMapper(res));
+                });
+            }
         });
     }
 
@@ -53,7 +68,7 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
             const query = { _id: { $in: ids } };
             this.Model.find(query, (err, res) => {
                 if (err) return reject(err);
-                let results = res.map(r => this._readMapper(r));
+                let results = res.map(r => this.readMapper(r));
                 results = results.filter(r => !r.isDeleted);
                 resolve(results);
             });
@@ -65,7 +80,7 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
             this.Model.find(query as any, (err, res) => {
                 if (err) return reject(err);
                 if (!res) return resolve();
-                let result = res.map(r => this._readMapper(r));
+                let result = res.map(r => this.readMapper(r));
                 result = result.filter(r => !r.isDeleted);
                 resolve(result);
             });
@@ -77,14 +92,22 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
                 if (err) return reject(err);
                 if (!res) return resolve();
                 else {
-                    const result = this._readMapper(res);
+                    const result = this.readMapper(res);
                     resolve(result.isDeleted ? undefined : result);
                 }
             });
         });
     }
 
-    private _readMapper(model: TModel): TEntity {
+    /**
+     * Maps '_id' from mongodb to 'id' of TEntity
+     *
+     * @private
+     * @param {TModel} model
+     * @returns {TEntity}
+     * @memberof BaseRepository
+     */
+    private readMapper(model: TModel): TEntity {
         const obj: any = model.toJSON();
         const propDesc = Object.getOwnPropertyDescriptor(
             obj,
@@ -92,6 +115,16 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
         ) as PropertyDescriptor;
         Object.defineProperty(obj, "id", propDesc);
         delete obj["_id"];
+        return obj as TEntity;
+    }
+    private writeMapper(doc: TEntity): TEntity {
+        const obj: any = JSON.parse(JSON.stringify(doc));
+        const propDesc = Object.getOwnPropertyDescriptor(
+            obj,
+            "id"
+        ) as PropertyDescriptor;
+        Object.defineProperty(obj, "_id", propDesc);
+        delete obj["id"];
         return obj as TEntity;
     }
 }

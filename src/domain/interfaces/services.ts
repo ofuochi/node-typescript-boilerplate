@@ -1,4 +1,4 @@
-import { MailJobType } from "../../infrastructure/jobs/mail_job";
+import { MailJobType } from "@infrastructure/jobs/mail_job";
 
 export interface IMailService {
     sendWelcomeEmail(

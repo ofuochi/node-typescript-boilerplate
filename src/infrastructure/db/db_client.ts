@@ -8,7 +8,8 @@ export async function getDatabaseClient(connStr: string) {
         mongoose.connect(connStr, {
             useUnifiedTopology: true,
             useNewUrlParser: true,
-            useCreateIndex: true
+            useCreateIndex: true,
+            useFindAndModify: false
         });
         const db = mongoose.connection;
         db.on("error", (e: Error) => {

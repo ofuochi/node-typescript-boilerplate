@@ -2,7 +2,7 @@ import { index, prop, Ref } from "@hasezoey/typegoose";
 
 import { Writable } from "../utils/writable";
 import BaseEntity from "./base";
-import { IActiveStatus, IMustHaveTenant } from "./interfaces/entity";
+import { IMustHaveTenant } from "./interfaces/entity";
 import Tenant from "./tenant";
 
 export const MAX_NAME_LENGTH = 225;
@@ -10,9 +10,10 @@ export enum UserRole {
     USER = "user",
     ADMIN = "admin"
 }
+
 @index({ email: 1, tenant: 1 }, { unique: true })
 @index({ username: 1, tenant: 1 }, { unique: true })
-export class User extends BaseEntity implements IMustHaveTenant, IActiveStatus {
+export class User extends BaseEntity<User> implements IMustHaveTenant {
     @prop({ required: true, maxlength: MAX_NAME_LENGTH, trim: true })
     readonly firstName!: string;
     @prop({ required: true, maxlength: MAX_NAME_LENGTH, trim: true })
@@ -41,7 +42,11 @@ export class User extends BaseEntity implements IMustHaveTenant, IActiveStatus {
     @prop({ required: true, maxlength: MAX_NAME_LENGTH })
     readonly password!: string;
 
-    @prop({ required: true, enum: UserRole, default: UserRole.USER })
+    @prop({
+        enum: UserRole,
+        required: true,
+        default: UserRole.USER
+    })
     readonly role: UserRole = UserRole.USER;
 
     private constructor({});
@@ -94,10 +99,12 @@ export class User extends BaseEntity implements IMustHaveTenant, IActiveStatus {
     };
     public static get model() {
         return new User({}).getModelForClass(User, {
-            schemaOptions: { collection: "Users" }
+            schemaOptions: { collection: "Users", timestamps: true }
         });
     }
-
+    setCreator = (creator: User) => {
+        (this as Writable<User>).createdBy = creator.id;
+    };
     setRole = (role: UserRole) => {
         (this as Writable<User>).role = role;
     };
