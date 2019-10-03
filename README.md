@@ -1,40 +1,49 @@
-# Enterprise NodeJs/Typescript API boilerplate
+# NodeJs/Typescript API Boilerplate
+### For Enterprise
 
 ## Running the app
 
-> NOTE: These instructions require [MongoDB](https://docs.mongodb.com/manual/installation/) and [Node.js](https://nodejs.org/en/download/) to be installed on your environment.
+> **NOTE**: These instructions require [MongoDB](https://docs.mongodb.com/manual/installation/) and [Node.js](https://nodejs.org/en/download/) to be installed on your environment.
 
-Clone the repository:
+### Clone the Repository:
 
 ```sh
 git clone https://github.com/ofuochi/node-typescript-boilerplate.git
+cd node-typescript-boilerplate
 ```
 
-Copy the sample env file into a .env file:
+### Create Your Branch
 
 ```sh
-cp env.sample .env
+git checkout -b <INSERT-BRANCH-NAME>
 ```
 
-Install dependencies:
+### Install Dependencies:
 
 ```sh
-npm i
+npm install
 ```
 
-Run the tests:
-
-```sh
-npm run test
-```
-
-Run the app:
+### Run the App:
 
 ```sh
 npm run start
 ```
 
-Open:
+### Copy Files
+#### Sample `env` File into a `.env` File:
+
+```sh
+cp env.sample .env
+```
+
+### Run Tests:
+
+```sh
+npm run test
+```
+
+### Open:
 
 ```sh
 open http://localhost:3000/api/v1/tenants
@@ -44,10 +53,10 @@ open http://localhost:3000/api/v1/tenants
 
 The application exposes a few REST endpoints:
 
--   HTTP GET `/api/v1/users`
--   HTTP GET `/api/v1/users/:id`
--   HTTP GET `/api/v1/tenats/:query`
--   HTTP GET `/api/v1/secured` (Requires a valid `x-auth-token` header)
+-   `HTTP` `GET` `/api/v1/users`
+-   `HTTP` `GET` `/api/v1/users/:id`
+-   `HTTP` `GET` `/api/v1/tenats/:query`
+-   `HTTP` `GET` `/api/v1/secured` (Requires a valid `x-auth-token` header)
 
 You can use the following code snippet to call the secured endpoint:
 
