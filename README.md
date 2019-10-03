@@ -46,7 +46,7 @@ npm run test
 ### Open:
 
 ```sh
-open http://localhost:3000/api/v1/tenants
+http://localhost:3000/api/v1/tenants
 ```
 
 ## REST Services
