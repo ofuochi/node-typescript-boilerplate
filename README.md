@@ -51,10 +51,9 @@ npm run test
 
 ## REST Services
 
-The application exposes a few REST endpoints:
+The application exposes a few REST endpoints which requires you to pass `x-tenant-id` header. First call the tenant endpoint `/api/v1/tenant` to get all the available tenants. Use any of the tenant IDs as the value for `x-tenant-id`
 
--   `HTTP` `GET` `/api/v1/users`
--   `HTTP` `GET` `/api/v1/users/:id`
+-   `HTTP` `GET` `/api/v1/tenats`
 -   `HTTP` `GET` `/api/v1/tenats/:query`
 -   `HTTP` `GET` `/api/v1/secured` (Requires a valid `x-auth-token` header)
 
@@ -65,6 +64,7 @@ fetch("http://localhost:3000/api/v1/secure", {
     method: "GET",
     headers: {
         "Content-Type": "application/json",
+        "x-tenant-id": "TENANT_ID",
         "x-auth-token": "SOME_VALID_CREDENTIAL"
     }
 })
@@ -85,6 +85,7 @@ fetch("http://localhost:3000/api/v1/secure", {
     method: "GET",
     headers: {
         "Content-Type": "application/json",
+        "x-tenant-id": "TENANT_ID",
         "x-auth-token": "SOME_WRONG_CREDENTIAL"
     }
 })
