@@ -14,8 +14,8 @@
         "esModuleInterop": true,
         "allowUnreachableCode": false,
         "noImplicitThis": true,
-        "outDir": "dist"
-        // "baseUrl": "src"
+        "outDir": "dist",
+        "baseUrl": "src"
         // "paths": {
         //     "@ui/*": ["ui/*"],
         //     "@domain/*": ["domain/*"],

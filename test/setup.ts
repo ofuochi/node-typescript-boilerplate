@@ -25,13 +25,13 @@ after("Teardown", async () => {
     await cleanupDb();
     app.appServer.close();
 });
-async function setupMongoInMemoryServer() {
-    const uri = await mongoDb.getConnectionString();
-    const port = await mongoDb.getPort();
-    process.env.MONGODB_URI = uri;
-    process.env.NODE_ENV = "test";
-    process.env.PORT = port.toString();
-}
+// async function setupMongoInMemoryServer() {
+//     const uri = await mongoDb.getConnectionString();
+//     const port = await mongoDb.getPort();
+//     process.env.MONGODB_URI = uri;
+//     process.env.NODE_ENV = "test";
+//     process.env.PORT = port.toString();
+// }
 
 async function cleanupDb() {
     const collections = await mongoose.connection.db
