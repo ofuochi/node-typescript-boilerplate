@@ -24,7 +24,7 @@ export class TenantController extends BaseController {
         if (!tenantName) return await this._tenantRepository.findAll();
         return await this._tenantRepository.findOneByQuery({
             name: tenantName
-        });
+        }) || [];
     }
     @httpPost("/", authMiddleware({ role: UserRole.ADMIN }))
     public async post(@requestBody() input: CreateTenantInput) {
