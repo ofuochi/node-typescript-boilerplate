@@ -100,6 +100,6 @@ describe("Tenant controller", async () => {
             .get(endpoint)
             .query({ name: tenant.name })
             .expect(httpStatus.OK);
-        expect(res.body).to.contain.keys("isActive", "id", "name");
+        expect(res.body[0]).to.contain.keys("isActive", "id", "name");
     });
 });

@@ -8,8 +8,6 @@ import { ITenantRepository } from "../src/domain/interfaces/repositories";
 import Tenant from "../src/domain/model/tenant";
 import { container } from "../src/infrastructure/utils/ioc_container";
 
-const mongoDb = new MongoMemoryServer();
-
 before("Setup", async () => {
     await app.startServer();
     cleanUpMetadata();
@@ -17,15 +15,18 @@ before("Setup", async () => {
     const tenantRepository = container.get<ITenantRepository>(
         TYPES.TenantRepository
     );
-    await tenantRepository.save(
-        Tenant.createInstance("Default", "Default tenant")
-    );
+    const tenant = await tenantRepository.findOneByQuery({ name: "Default" });
+    if (!tenant)
+        await tenantRepository.save(
+            Tenant.createInstance("Default", "Default tenant")
+        );
 });
 after("Teardown", async () => {
     await cleanupDb();
     app.appServer.close();
 });
 // async function setupMongoInMemoryServer() {
+//     const mongoDb = new MongoMemoryServer();
 //     const uri = await mongoDb.getConnectionString();
 //     const port = await mongoDb.getPort();
 //     process.env.MONGODB_URI = uri;

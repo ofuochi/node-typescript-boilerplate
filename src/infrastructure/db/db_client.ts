@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 
+import Tenant from "../../domain/model/tenant";
 import winstonLoggerInstance from "../bootstrapping/loaders/logger";
 
 export type DbClient = mongoose.Mongoose;
@@ -16,9 +17,18 @@ export async function getDatabaseClient(connStr: string) {
             winstonLoggerInstance.error("❌ Db connection error:", e);
             reject(e);
         });
-        db.once("open", () => {
+        db.once("open", async () => {
             winstonLoggerInstance.info(`✔️  Db connection successful`);
+            await seedDefaultTenant();
             resolve(mongoose);
         });
     });
+}
+async function seedDefaultTenant() {
+    const tenantInstance = Tenant.createInstance("Default", "Default tenant");
+    const tenantModel = tenantInstance.getModelForClass(Tenant, {
+        schemaOptions: { collection: "Tenants", timestamps: true }
+    });
+    const defaultTenant = await tenantModel.findOne({ name: "Default" });
+    if (!defaultTenant) await tenantModel.create(tenantInstance);
 }

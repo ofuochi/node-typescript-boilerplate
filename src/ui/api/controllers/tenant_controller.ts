@@ -7,24 +7,44 @@ import {
     requestBody
 } from "inversify-express-utils";
 
+import { tenantRepository } from "../../../domain/constants/decorators";
+import { ITenantRepository } from "../../../domain/interfaces/repositories";
+import Tenant from "../../../domain/model/tenant";
+import { UserRole } from "../../../domain/model/user";
 import { CreateTenantInput, TenantDto } from "../../models/tenant_dto";
 import { authMiddleware } from "../middleware/auth_middleware";
 import { BaseController } from "./base_controller";
-import { tenantRepository } from "../../../domain/constants/decorators";
-import { ITenantRepository } from "../../../domain/interfaces/repositories";
-import { UserRole } from "../../../domain/model/user";
-import Tenant from "../../../domain/model/tenant";
 
 @controller("/tenants")
 export class TenantController extends BaseController {
     @tenantRepository public _tenantRepository: ITenantRepository;
 
+    /**
+     * Returns a list of TenantDto
+     *
+     * @param {string} [tenantName]
+     * @returns {Promise<TenantDto[]>}
+     * @memberof TenantController
+     */
     @httpGet("/")
-    public async get(@queryParam("name") tenantName?: string) {
-        if (!tenantName) return await this._tenantRepository.findAll();
-        return await this._tenantRepository.findOneByQuery({
-            name: tenantName
-        }) || [];
+    public async get(
+        @queryParam("name") tenantName?: string
+    ): Promise<TenantDto[]> {
+        const tenants = tenantName
+            ? await this._tenantRepository.findManyByQuery({
+                  name: tenantName
+              })
+            : await this._tenantRepository.findAll();
+
+        return tenants.map(t => {
+            let tenantDto: TenantDto = {
+                name: t.name,
+                description: t.description,
+                isActive: t.isActive,
+                id: t.id
+            };
+            return tenantDto;
+        });
     }
     @httpPost("/", authMiddleware({ role: UserRole.ADMIN }))
     public async post(@requestBody() input: CreateTenantInput) {
