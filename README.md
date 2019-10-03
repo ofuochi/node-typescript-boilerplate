@@ -37,26 +37,22 @@ npm run start
 Open:
 
 ```sh
-open http://localhost:3000/api/movies
+open http://localhost:3000/api/v1/tenants
 ```
 
 ## REST Services
 
 The application exposes a few REST endpoints:
 
--   HTTP GET `/api/actors`
--   HTTP GET `/api/actors:id`
--   HTTP GET `/api/directors`
--   HTTP GET `/api/directors/:id`
--   HTTP GET `/api/movies`
--   HTTP GET `/api/movies/:id`
--   HTTP GET `/api/search/:query`
--   HTTP GET `/api/secured` (Requires a valid `x-auth-token` header)
+-   HTTP GET `/api/v1/users`
+-   HTTP GET `/api/v1/users/:id`
+-   HTTP GET `/api/v1/tenats/:query`
+-   HTTP GET `/api/v1/secured` (Requires a valid `x-auth-token` header)
 
 You can use the following code snippet to call the secured endpoint:
 
 ```js
-fetch("http://localhost:3000/api/secure", {
+fetch("http://localhost:3000/api/v1/secure", {
     method: "GET",
     headers: {
         "Content-Type": "application/json",
@@ -76,7 +72,7 @@ fetch("http://localhost:3000/api/secure", {
 You can use the following code snippet to call the secured endpoint with an invalid `x-auth-token` header:
 
 ```js
-fetch("http://localhost:3000/api/secure", {
+fetch("http://localhost:3000/api/v1/secure", {
     method: "GET",
     headers: {
         "Content-Type": "application/json",
