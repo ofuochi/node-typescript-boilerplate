@@ -8,9 +8,6 @@ import { CurrentUser } from "../../../domain/utils/globals";
 import config from "../../../infrastructure/config";
 import { getCurrentTenant } from "../../../infrastructure/helpers/tenant_helpers";
 import HttpError from "../../error";
-import { container } from "@infrastructure/utils/ioc_container";
-import { ILoggerService } from "@domain/interfaces/services";
-import { TYPES } from "@domain/constants/types";
 
 @injectable()
 export class RequestMiddleware extends BaseMiddleware {

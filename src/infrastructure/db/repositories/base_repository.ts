@@ -8,8 +8,10 @@ import {
 import BaseEntity from "../../../domain/model/base";
 
 @injectable()
-export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
-    implements IBaseRepository<TEntity> {
+export class BaseRepository<
+    TEntity extends BaseEntity<TEntity>,
+    TModel extends Document
+> implements IBaseRepository<TEntity> {
     protected Model: Model<TModel>;
 
     public constructor(@unmanaged() model: Model<TModel>) {
@@ -117,14 +119,14 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
         delete obj["_id"];
         return obj as TEntity;
     }
-    private writeMapper(doc: TEntity): TEntity {
-        const obj: any = JSON.parse(JSON.stringify(doc));
-        const propDesc = Object.getOwnPropertyDescriptor(
-            obj,
-            "id"
-        ) as PropertyDescriptor;
-        Object.defineProperty(obj, "_id", propDesc);
-        delete obj["id"];
-        return obj as TEntity;
-    }
+    // private writeMapper(doc: TEntity): TEntity {
+    //     const obj: any = JSON.parse(JSON.stringify(doc));
+    //     const propDesc = Object.getOwnPropertyDescriptor(
+    //         obj,
+    //         "id"
+    //     ) as PropertyDescriptor;
+    //     Object.defineProperty(obj, "_id", propDesc);
+    //     delete obj["id"];
+    //     return obj as TEntity;
+    // }
 }

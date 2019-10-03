@@ -1,7 +1,7 @@
 import { controller, httpGet } from "inversify-express-utils";
 
 import { authMiddleware } from "../middleware/auth_middleware";
-import { UserRole } from "@domain/model/user";
+import { UserRole } from "../../../domain/model/user";
 
 // This is an example of a controller protected by the auth middleware
 

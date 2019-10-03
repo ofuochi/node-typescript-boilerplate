@@ -9,7 +9,7 @@ import {
     UserSignUpInput
 } from "../../models/user_dto";
 import { BaseController } from "./base_controller";
-import { authService } from "@domain/constants/decorators";
+import { authService } from "../../../domain/constants/decorators";
 
 @controller("/auth")
 export class AuthController extends BaseController {

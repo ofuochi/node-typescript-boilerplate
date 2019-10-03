@@ -29,10 +29,10 @@ abstract class BaseEntity<T> extends Typegoose {
         (this as Writable<BaseEntity<T>>).isDeleted = false;
     };
     deactivate = (): void => {
-        (this as Writable<BaseEntity>).isActive = false;
+        (this as Writable<BaseEntity<T>>).isActive = false;
     };
     activate = (): void => {
-        (this as Writable<BaseEntity>).isActive = true;
+        (this as Writable<BaseEntity<T>>).isActive = true;
     };
 }
 export default BaseEntity;
