@@ -24,12 +24,6 @@ git checkout -b <INSERT-BRANCH-NAME>
 npm install
 ```
 
-### Run the App:
-
-```sh
-npm run start
-```
-
 ### Copy Files
 #### Sample `env` File into a `.env` File:
 
@@ -37,16 +31,22 @@ npm run start
 cp env.sample .env
 ```
 
-### Run Tests:
+### Run the App:
 
 ```sh
-npm run test
+npm run start
 ```
 
 ### Open:
 
 ```sh
 http://localhost:3000/api/v1/tenants
+```
+
+### Run Tests:
+
+```sh
+npm run test
 ```
 
 ## REST Services
