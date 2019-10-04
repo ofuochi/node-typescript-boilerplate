@@ -51,7 +51,7 @@
         "winston-transport": "^4.3.0"
     },
     "devDependencies": {
-        "@types/agenda": "^2.0.5",
+        "@types/agenda": "^2.0.6",
         "@types/bcrypt": "^3.0.0",
         "@types/body-parser": "^1.17.1",
         "@types/chai": "^4.2.3",
@@ -65,12 +65,11 @@
         "@types/mailgun-js": "^0.22.3",
         "@types/method-override": "0.0.31",
         "@types/mocha": "^5.2.7",
-        "@types/mongoose": "^5.5.18",
+        "@types/mongoose": "^5.5.19",
         "@types/supertest": "^2.0.8",
         "@types/winston": "^2.4.4",
         "chai": "^4.2.0",
         "mocha": "^6.2.1",
-        "mongodb-memory-server": "^5.2.6",
         "nodemon": "^1.19.3",
         "nyc": "^14.1.1",
         "supertest": "^4.0.2",

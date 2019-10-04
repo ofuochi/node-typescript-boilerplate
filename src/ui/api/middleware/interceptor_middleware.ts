@@ -37,7 +37,7 @@ export class RequestMiddleware extends BaseMiddleware {
             return next(
                 new HttpError(
                     httpStatus.BAD_REQUEST,
-                    "Invalid header X-Tenant_Id value"
+                    "Invalid header X-Tenant-Id value"
                 )
             );
 
@@ -63,7 +63,6 @@ export function exceptionLoggerMiddleware(
     // ${error.message}
     // ----------------------------------
     // `);
-
     if (error instanceof HttpError) return res.status(error.status).send(error);
     error =
         config.env === "development" || config.env === "test"

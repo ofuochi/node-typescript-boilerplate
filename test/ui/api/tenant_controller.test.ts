@@ -15,7 +15,6 @@ import config from "../../../src/infrastructure/config";
 import { container } from "../../../src/infrastructure/utils/ioc_container";
 import { IAuthService } from "../../../src/ui/interfaces/auth_service";
 import { CreateTenantInput } from "../../../src/ui/models/tenant_dto";
-import BaseEntity from "../../../src/domain/model/base";
 
 const endpoint = `${config.api.prefix}/tenants`;
 let authService: IAuthService;
