@@ -7,17 +7,16 @@ import {
     requestBody
 } from "inversify-express-utils";
 
-import { tenantRepository } from "../../../domain/constants/decorators";
-import { ITenantRepository } from "../../../domain/interfaces/repositories";
-import Tenant from "../../../domain/model/tenant";
+import { tenantService } from "../../../domain/constants/decorators";
 import { UserRole } from "../../../domain/model/user";
 import { CreateTenantInput, TenantDto } from "../../models/tenant_dto";
 import { authMiddleware } from "../middleware/auth_middleware";
 import { BaseController } from "./base_controller";
+import { ITenantService } from "domain/interfaces/services";
 
 @controller("/tenants")
 export class TenantController extends BaseController {
-    @tenantRepository public _tenantRepository: ITenantRepository;
+    @tenantService public _tenantService: ITenantService;
 
     /**
      * Returns a list of TenantDto
@@ -30,21 +29,8 @@ export class TenantController extends BaseController {
     public async get(
         @queryParam("name") tenantName?: string
     ): Promise<TenantDto[]> {
-        const tenants = tenantName
-            ? await this._tenantRepository.findManyByQuery({
-                  name: tenantName
-              })
-            : await this._tenantRepository.findAll();
-
-        return tenants.map(t => {
-            let tenantDto: TenantDto = {
-                name: t.name,
-                description: t.description,
-                isActive: t.isActive,
-                id: t.id
-            };
-            return tenantDto;
-        });
+        const tenants = await this._tenantService.search(tenantName);
+        return tenants;
     }
     @httpPost("/", authMiddleware({ role: UserRole.ADMIN }))
     public async post(@requestBody() input: CreateTenantInput) {
@@ -52,23 +38,10 @@ export class TenantController extends BaseController {
          * Calling the method plainToClass does the trick 🙂*/
         input = plainToClass(CreateTenantInput, input);
         const badRequest = await this.checkBadRequest(input);
-
         if (badRequest) return badRequest;
-
-        let tenant = await this._tenantRepository.findOneByQuery({
-            name: input.name
-        });
-        if (tenant) return this.conflict();
-        tenant = await this._tenantRepository.save(
-            Tenant.createInstance(input.name, input.description)
-        );
-
-        const tenantDto: TenantDto = {
-            name: tenant.name,
-            description: tenant.description,
-            isActive: tenant.isActive,
-            id: tenant.id
-        };
-        return tenantDto;
+        const existing = await this._tenantService.get(name);
+        if (existing != undefined) return this.conflict();
+        const tenant = await this._tenantService.create(input.name, input.description);
+        return tenant;
     }
 }
