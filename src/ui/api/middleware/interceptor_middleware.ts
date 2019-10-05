@@ -4,7 +4,7 @@ import { injectable } from "inversify";
 import { BaseMiddleware } from "inversify-express-utils";
 import mongoose from "mongoose";
 
-import { CurrentUser } from "../../../domain/utils/globals";
+import CurrentUser from "../../../domain/utils/globals";
 import config from "../../../infrastructure/config";
 import { getCurrentTenant } from "../../../infrastructure/helpers/tenant_helpers";
 import HttpError from "../../error";

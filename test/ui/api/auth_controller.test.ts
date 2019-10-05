@@ -1,8 +1,6 @@
 import { expect } from "chai";
 import httpStatus from "http-status-codes";
-import supertest from "supertest";
 
-import app = require("../../../src");
 import {
     ITenantRepository,
     IUserRepository
@@ -16,18 +14,17 @@ import {
     UserSignUpInput
 } from "../../../src/ui/models/user_dto";
 import { TYPES } from "./../../../src/domain/constants/types";
+import { req } from "../../setup";
 
 const endpoint = `${config.api.prefix}/auth`;
 const tenantHeaderProp = "x-tenant-id";
 
 describe("Auth controller", () => {
-    let req: supertest.SuperTest<supertest.Test>;
     let tenantRepository: ITenantRepository;
     let tenant: Tenant;
     let tenant1: Tenant;
     let tenant2: Tenant;
     before(async () => {
-        req = supertest(app.appServer);
         tenantRepository = container.get<ITenantRepository>(
             TYPES.TenantRepository
         );

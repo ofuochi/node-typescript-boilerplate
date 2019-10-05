@@ -1,8 +1,9 @@
-import { ILoggerService } from "../interfaces/services";
+import { injectable } from "inversify";
+
 import winstonLoggerInstance, {
     IWinstonLogger
 } from "../../infrastructure/bootstrapping/loaders/logger";
-import { injectable } from "inversify";
+import { ILoggerService } from "../interfaces/services";
 
 @injectable()
 export default class LoggerService implements ILoggerService {

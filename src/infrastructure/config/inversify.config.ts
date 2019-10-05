@@ -1,4 +1,3 @@
-import Agenda from "agenda";
 import { EventDispatcher } from "event-dispatch";
 import { ContainerModule } from "inversify";
 
@@ -19,9 +18,6 @@ import AuthService from "../../ui/services/auth_service";
 // Repositories implementations
 import { UserRepository } from "../../infrastructure/db/repositories/user_repository";
 import { TenantRepository } from "../db/repositories/tenant_repository";
-
-// Loaders
-import agendaInstance from "../bootstrapping/loaders/agenda";
 
 // Controllers
 import "../../ui/api/controllers/auth_controller";
@@ -44,6 +40,4 @@ export const referenceDataIoCModule = new ContainerModule(bind => {
     bind<EventDispatcher>(TYPES.EventDispatcher).toConstantValue(
         new EventDispatcher()
     );
-
-    bind<Agenda>(TYPES.Agenda).toConstantValue(agendaInstance);
 });
