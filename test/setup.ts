@@ -45,14 +45,6 @@ after("Teardown", async () => {
     await cleanupDb();
     if (mongoServer) await mongoServer.stop();
 });
-// async function setupMongoInMemoryServer() {
-//     const mongoDb = new MongoMemoryServer();
-//     const uri = await mongoDb.getConnectionString();
-//     const port = await mongoDb.getPort();
-//     process.env.MONGODB_URI = uri;
-//     process.env.NODE_ENV = "test";
-//     process.env.PORT = port.toString();
-// }
 
 async function cleanupDb() {
     const collections = await mongoose.connection.db
