@@ -36,7 +36,6 @@
     },
     "scripts": {
         "no-build": "npx ts-node src/index.ts",
-        "postinstall": "npm run build",
         "non-build:start": "npx ts-code src/index.ts",
         "nyc": "nyc -r=text -r=html -i ts-node/register/transpile-only -e .ts mocha",
         "rm-files": "rm -r -f coverage .nyc_output dist",
@@ -48,7 +47,7 @@
         "test-cover": "npm run rm-files && npm run nyc",
         "tsc": "tsc -p tsconfig.json",
         "lint": "eslint \"**/*.ts\"",
-        "build": "npm run lint && npm run ts"
+        "build": "npm run lint && npm run tsc"
     },
     "dependencies": {
         "@hapi/joi": "^16.1.7",
