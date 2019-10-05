@@ -8,7 +8,7 @@ import {
 import BaseEntity from "../../../domain/model/base";
 
 @injectable()
-export class BaseRepository<
+export default class BaseRepository<
     TEntity extends BaseEntity<TEntity>,
     TModel extends Document
 > implements IBaseRepository<TEntity> {
@@ -26,7 +26,7 @@ export class BaseRepository<
                 if (err) return reject(err);
                 let results = res.map(r => this.readMapper(r));
                 results = results.filter(r => !r.isDeleted);
-                resolve(results);
+                return resolve(results);
             });
         });
     }
@@ -38,7 +38,7 @@ export class BaseRepository<
                 if (!res) return reject();
 
                 const result = this.readMapper(res);
-                resolve(result.isDeleted ? undefined : result);
+                return resolve(result.isDeleted ? undefined : result);
             });
         });
     }
@@ -93,10 +93,8 @@ export class BaseRepository<
             this.Model.findOne(query as any, (err, res) => {
                 if (err) return reject(err);
                 if (!res) return resolve();
-                else {
-                    const result = this.readMapper(res);
-                    resolve(result.isDeleted ? undefined : result);
-                }
+                const result = this.readMapper(res);
+                resolve(result.isDeleted ? undefined : result);
             });
         });
     }
@@ -116,7 +114,7 @@ export class BaseRepository<
             "_id"
         ) as PropertyDescriptor;
         Object.defineProperty(obj, "id", propDesc);
-        delete obj["_id"];
+        delete obj._id;
         return obj as TEntity;
     }
     // private writeMapper(doc: TEntity): TEntity {

@@ -3,6 +3,25 @@ import { NextFunction, Request } from "express";
 import { HttpError } from ".";
 
 /**
+ *
+ * @param error Error
+ * @returns {string} HTML response or empty string
+ * @description generates HTML for response
+ */
+const generateHTML: Function = (error: HttpError): string => {
+    if (error) {
+        return (
+            "<div style='text-align: center;'>" +
+            `<p>Status: ${error.status}</p>` +
+            `<p>Name: ${error.name}</p>` +
+            `<p>${error}</p>` +
+            "</div>"
+        );
+    }
+
+    return "";
+};
+/**
  * @exports
  * @param {Request} req
  * @param {*} res
@@ -26,7 +45,7 @@ import { HttpError } from ".";
  *          description: Error description
  *          example: User created
  */
-export function sendHttpErrorModule(
+export default function sendHttpErrorModule(
     req: Request,
     res: any,
     next: NextFunction
@@ -60,23 +79,3 @@ export function sendHttpErrorModule(
 
     next();
 }
-
-/**
- *
- * @param error Error
- * @returns {string} HTML response or empty string
- * @description generates HTML for response
- */
-const generateHTML: Function = (error: HttpError): string => {
-    if (error) {
-        return (
-            "<div style='text-align: center;'>" +
-            `<p>Status: ${error.status}</p>` +
-            `<p>Name: ${error.name}</p>` +
-            `<p>${error}</p>` +
-            `</div>`
-        );
-    }
-
-    return "";
-};

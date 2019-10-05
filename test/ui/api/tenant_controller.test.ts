@@ -10,7 +10,7 @@ import {
 import Tenant from "../../../src/domain/model/tenant";
 import { User, UserRole } from "../../../src/domain/model/user";
 import config from "../../../src/infrastructure/config";
-import { container } from "../../../src/infrastructure/utils/ioc_container";
+import container from "../../../src/infrastructure/utils/ioc_container";
 import { IAuthService } from "../../../src/ui/interfaces/auth_service";
 import { CreateTenantInput } from "../../../src/ui/models/tenant_dto";
 import { req } from "../../setup";

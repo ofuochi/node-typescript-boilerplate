@@ -9,9 +9,9 @@ async function sendWelcomeEmail(agenda: Agenda): Promise<void> {
     agenda.define(
         jobType,
         { priority: "high", concurrency: config.agenda.concurrency },
-        await emailJob.sendWelcomeEmail
+        emailJob.sendWelcomeEmail
     );
     await agenda.start();
 }
 
-export const Jobs = [sendWelcomeEmail];
+export default [sendWelcomeEmail];

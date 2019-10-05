@@ -10,12 +10,12 @@ import {
 import { tenantService } from "../../../domain/constants/decorators";
 import { UserRole } from "../../../domain/model/user";
 import { CreateTenantInput, TenantDto } from "../../models/tenant_dto";
-import { authMiddleware } from "../middleware/auth_middleware";
-import { BaseController } from "./base_controller";
+import authMiddleware from "../middleware/auth_middleware";
+import BaseController from "./base_controller";
 import { ITenantService } from "../../../domain/interfaces/services";
 
 @controller("/tenants")
-export class TenantController extends BaseController {
+export default class TenantController extends BaseController {
     @tenantService private _tenantService: ITenantService;
 
     /**
@@ -34,8 +34,8 @@ export class TenantController extends BaseController {
     }
     @httpPost("/", authMiddleware({ role: UserRole.ADMIN }))
     public async post(@requestBody() input: CreateTenantInput) {
-        /** For some strange reason, "input" is not not a real instance of CreateTenantInput.
-         * Calling the method plainToClass does the trick 🙂*/
+        /* For some strange reason, "input" is not not a real instance of CreateTenantInput.
+          Calling the method plainToClass does the trick 🙂 */
         input = plainToClass(CreateTenantInput, input);
         const badRequest = await this.checkBadRequest(input);
         if (badRequest) return badRequest;

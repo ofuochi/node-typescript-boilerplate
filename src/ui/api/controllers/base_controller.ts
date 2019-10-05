@@ -3,7 +3,7 @@ import { BaseHttpController } from "inversify-express-utils";
 
 import { BaseInputDto } from "../../models/base_dto";
 
-export abstract class BaseController extends BaseHttpController {
+export default abstract class BaseController extends BaseHttpController {
     protected async checkBadRequest(input: BaseInputDto) {
         const errors = await validate(input);
         if (errors.length > 0) {

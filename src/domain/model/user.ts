@@ -13,7 +13,8 @@ export enum UserRole {
 
 @index({ email: 1, tenant: 1 }, { unique: true })
 @index({ username: 1, tenant: 1 }, { unique: true })
-@pre<User>('save', function(next) {
+// eslint-disable-next-line
+@pre<User>("save", function(next) {
     if (global.currentUser.user) {
         this.setCreator(global.currentUser.user);
     }

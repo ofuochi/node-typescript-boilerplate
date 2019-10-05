@@ -1,4 +1,3 @@
-import "./loaders/events";
 import "reflect-metadata";
 
 import Agenda from "agenda";
@@ -8,13 +7,14 @@ import { InversifyExpressServer } from "inversify-express-utils";
 import { TYPES } from "../../domain/constants/types";
 import { exceptionLoggerMiddleware } from "../../ui/api/middleware/interceptor_middleware";
 import config from "../config";
-import { DbClient, getDatabaseClient } from "../db/db_client";
+import getDatabaseClient, { DbClient } from "../db/db_client";
 import getAgendaInstance from "./loaders/agenda_loader";
 import expressLoader, { App } from "./loaders/express";
-import { Jobs } from "./loaders/jobs";
+import Jobs from "./loaders/jobs";
 import winstonLoggerInstance from "./loaders/logger";
+import "./loaders/events";
 
-export async function bootstrap({
+export default async function bootstrap({
     container,
     connStr,
     containerModules = []
@@ -36,7 +36,7 @@ export async function bootstrap({
     container.load(...containerModules);
     winstonLoggerInstance.info("✔️  Dependency Injector loaded");
 
-    Jobs.forEach(async job => await job(container.get<Agenda>(TYPES.Agenda)));
+    Jobs.forEach(async job => job(container.get<Agenda>(TYPES.Agenda)));
     winstonLoggerInstance.info("✔️  Jobs loaded");
 
     // Configure express server using inversify IoC
