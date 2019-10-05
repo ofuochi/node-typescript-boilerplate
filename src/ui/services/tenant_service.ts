@@ -10,7 +10,7 @@ import Tenant from "domain/model/tenant";
 export default class TenantService implements ITenantService {
     @tenantRepository private _tenantRepository: ITenantRepository;
 
-    private to_dto(tenant: Tenant): TenantDto {
+    private toDto(tenant: Tenant): TenantDto {
         const tenantDto: TenantDto = {
             name: tenant.name,
             description: tenant.description,
@@ -22,14 +22,14 @@ export default class TenantService implements ITenantService {
     
     async create(name: string, description: string): Promise<TenantDto> {
         const tenant = await this._tenantRepository.save(Tenant.createInstance(name, description));
-        return this.to_dto(tenant);
+        return this.toDto(tenant);
     }
     
     async get(name: string): Promise<TenantDto | undefined> {
         const tenant = await this._tenantRepository.findOneByQuery({ name });
         return tenant == undefined
             ? undefined
-            : this.to_dto(tenant);
+            : this.toDto(tenant);
     }
     
     async search(name?: string): Promise<TenantDto[]> {
@@ -37,6 +37,6 @@ export default class TenantService implements ITenantService {
             !!name
                 ? await this._tenantRepository.findManyByQuery({ name })
                 : await this._tenantRepository.findAll();
-        return tenants.map(tenant => this.to_dto(tenant));
+        return tenants.map(tenant => this.toDto(tenant));
     }
 }
