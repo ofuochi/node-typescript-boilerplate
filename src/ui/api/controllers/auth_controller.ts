@@ -33,6 +33,6 @@ export default class AuthController extends BaseController {
 
     @httpPost("/signIn")
     public async getById(@requestBody() input: UserSignInInput) {
-        return await this._authService.signIn(input);
+        return this._authService.signIn(input);
     }
 }
