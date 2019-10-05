@@ -28,7 +28,8 @@
             "html"
         ],
         "all": true,
-        "check-coverage": true,
+        "check-coverage": false,
+        "skip-full": true,
         "statements": 50,
         "functions": 50,
         "branches": 50,
