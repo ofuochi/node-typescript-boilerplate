@@ -1,4 +1,4 @@
-import { index, prop, Ref } from "@hasezoey/typegoose";
+import { index, prop, Ref, pre } from "@hasezoey/typegoose";
 
 import { Writable } from "../utils/writable";
 import BaseEntity from "./base";
@@ -13,6 +13,12 @@ export enum UserRole {
 
 @index({ email: 1, tenant: 1 }, { unique: true })
 @index({ username: 1, tenant: 1 }, { unique: true })
+@pre<User>('save', function(next) {
+    if (global.currentUser.user) {
+        this.setCreator(global.currentUser.user);
+    }
+    next();
+})
 export class User extends BaseEntity<User> implements IMustHaveTenant {
     @prop({ required: true, maxlength: MAX_NAME_LENGTH, trim: true })
     readonly firstName!: string;
@@ -107,5 +113,23 @@ export class User extends BaseEntity<User> implements IMustHaveTenant {
     };
     setRole = (role: UserRole) => {
         (this as Writable<User>).role = role;
+    };
+    setEmail = (email: string) => {
+        (this as Writable<User>).email = email;
+    };
+    setUsername = (username: string) => {
+        (this as Writable<User>).username = username;
+    };
+    setTenant = (tenant: Tenant) => {
+        (this as Writable<User>).tenant = tenant.id;
+    };
+    setFirstName = (firstName: string) => {
+        (this as Writable<User>).firstName = firstName;
+    };
+    setLastName = (lastName: string) => {
+        (this as Writable<User>).lastName = lastName;
+    };
+    setPassword = (password: string) => {
+        (this as Writable<User>).password = password;
     };
 }
