@@ -1,4 +1,4 @@
-import { index, prop, Ref } from "@hasezoey/typegoose";
+import { index, prop, Ref, pre } from "@hasezoey/typegoose";
 
 import { Writable } from "../utils/writable";
 import BaseEntity from "./base";
@@ -13,6 +13,12 @@ export enum UserRole {
 
 @index({ email: 1, tenant: 1 }, { unique: true })
 @index({ username: 1, tenant: 1 }, { unique: true })
+@pre<User>('save', function(next) {
+    if (global.currentUser.user) {
+        this.setCreator(global.currentUser.user);
+    }
+    next();
+})
 export class User extends BaseEntity<User> implements IMustHaveTenant {
     @prop({ required: true, maxlength: MAX_NAME_LENGTH, trim: true })
     readonly firstName!: string;
