@@ -2,6 +2,7 @@ import { prop } from "@hasezoey/typegoose";
 
 import BaseEntity from "./base";
 import { Writable } from "../utils/writable";
+import { Expose } from "class-transformer";
 
 export default class Tenant extends BaseEntity<Tenant> {
     @prop({
@@ -10,12 +11,14 @@ export default class Tenant extends BaseEntity<Tenant> {
         index: true,
         unique: true
     })
+    @Expose()
     readonly name!: string;
     @prop({ required: true })
+    @Expose()
     readonly description!: string;
 
-    private constructor(name?: any, description?: any);
-    private constructor(name: string, description: string) {
+    public constructor(name?: any, description?: any);
+    public constructor(name: string, description: string) {
         super();
         this.name = name;
         this.description = description;
