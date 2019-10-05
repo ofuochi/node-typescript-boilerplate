@@ -51,7 +51,7 @@
         "build": "npm run lint && npm run ts"
     },
     "dependencies": {
-        "@hapi/joi": "^16.1.5",
+        "@hapi/joi": "^16.1.7",
         "@hasezoey/typegoose": "^5.9.2",
         "agenda": "^2.1.0",
         "bcrypt": "^3.0.6",
