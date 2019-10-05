@@ -1,12 +1,12 @@
+import Agenda from "agenda";
 import { injectable } from "inversify";
-
-import { IMailService } from "../../domain/interfaces/services";
 import Mailgun from "mailgun-js";
+
+import { TYPES } from "../../domain/constants/types";
+import { IMailService } from "../../domain/interfaces/services";
 import config from "../config";
 import { MailJobType } from "../jobs/mail_job";
-import { container } from "../utils/ioc_container";
-import Agenda from "agenda";
-import { TYPES } from "../../domain/constants/types";
+import container from "../utils/ioc_container";
 
 @injectable()
 export default class MailService implements IMailService {

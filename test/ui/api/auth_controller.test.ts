@@ -7,13 +7,13 @@ import {
 } from "../../../src/domain/interfaces/repositories";
 import Tenant from "../../../src/domain/model/tenant";
 import config from "../../../src/infrastructure/config";
-import { container } from "../../../src/infrastructure/utils/ioc_container";
+import container from "../../../src/infrastructure/utils/ioc_container";
 import {
     UserSignInInput,
     UserSignUpDto,
     UserSignUpInput
 } from "../../../src/ui/models/user_dto";
-import { TYPES } from "./../../../src/domain/constants/types";
+import { TYPES } from "../../../src/domain/constants/types";
 import { req } from "../../setup";
 
 const endpoint = `${config.api.prefix}/auth`;
@@ -125,7 +125,7 @@ describe("Auth controller", () => {
     });
 
     describe("User sign-in", () => {
-        let signInInput: UserSignInInput = {
+        const signInInput: UserSignInInput = {
             password: signUpInput.password,
             emailOrUsername: signUpInput.email
         };

@@ -4,7 +4,16 @@ import Tenant from "../../domain/model/tenant";
 import winstonLoggerInstance from "../bootstrapping/loaders/logger";
 
 export type DbClient = Mongoose;
-export async function getDatabaseClient(connStr: string) {
+async function seedDefaultTenant() {
+    const tenantInstance = Tenant.createInstance("Default", "Default tenant");
+    const tenantModel = tenantInstance.getModelForClass(Tenant, {
+        schemaOptions: { collection: "Tenants", timestamps: true }
+    });
+    const defaultTenant = await tenantModel.findOne({ name: "Default" });
+    if (!defaultTenant) await tenantModel.create(tenantInstance);
+}
+
+export default async function getDatabaseClient(connStr: string) {
     return new Promise<DbClient>((resolve, reject) => {
         mongoose.connect(connStr, {
             useUnifiedTopology: true,
@@ -18,17 +27,9 @@ export async function getDatabaseClient(connStr: string) {
             reject(e);
         });
         db.once("open", async () => {
-            winstonLoggerInstance.info(`✔️  Db connection successful`);
+            winstonLoggerInstance.info("✔️  Db connection successful");
             await seedDefaultTenant();
             resolve(mongoose);
         });
     });
-}
-async function seedDefaultTenant() {
-    const tenantInstance = Tenant.createInstance("Default", "Default tenant");
-    const tenantModel = tenantInstance.getModelForClass(Tenant, {
-        schemaOptions: { collection: "Tenants", timestamps: true }
-    });
-    const defaultTenant = await tenantModel.findOne({ name: "Default" });
-    if (!defaultTenant) await tenantModel.create(tenantInstance);
 }
