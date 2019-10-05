@@ -1,4 +1,5 @@
-export const TYPES = {
+
+export const TYPES = { // eslint-disable-line
     App: Symbol("App"),
     DbClient: Symbol("DbClient"),
     Typegoose: Symbol("Typegoose"),

@@ -13,7 +13,7 @@ import { authService } from "../../../domain/constants/decorators";
 
 @controller("/auth")
 export class AuthController extends BaseController {
-    @authService public _authService: IAuthService;
+    @authService private _authService: IAuthService;
 
     @httpPost("/signUp")
     public async post(@requestBody() input: UserSignUpInput) {
