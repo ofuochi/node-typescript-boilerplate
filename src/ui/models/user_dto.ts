@@ -1,6 +1,12 @@
-import { IsEmail, IsNotEmpty, IsString, IsUUID, MaxLength } from 'class-validator'
+import {
+    IsEmail,
+    IsNotEmpty,
+    IsString,
+    IsUUID,
+    MaxLength
+} from "class-validator";
 
-import { MAX_NAME_LENGTH } from '../../domain/model/user'
+import { MAX_NAME_LENGTH } from "../../domain/model/user";
 
 export class UserSignUpInput {
     @MaxLength(MAX_NAME_LENGTH)

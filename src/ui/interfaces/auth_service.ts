@@ -1,4 +1,4 @@
-import { UserDto, UserSignInInput, UserSignUpInput } from '../models/user_dto'
+import { UserDto, UserSignInInput, UserSignUpInput } from "../models/user_dto";
 
 export interface IAuthService {
     signUp(

@@ -29,11 +29,11 @@ export default class TenantService implements ITenantService {
 
     async get(name: string): Promise<TenantDto | undefined> {
         const tenant = await this._tenantRepository.findOneByQuery({ name });
-        return tenant == undefined ? undefined : this.toDto(tenant);
+        return tenant && this.toDto(tenant);
     }
 
     async search(name?: string): Promise<TenantDto[]> {
-        const tenants = !!name
+        const tenants = name
             ? await this._tenantRepository.findManyByQuery({ name })
             : await this._tenantRepository.findAll();
         return tenants.map(tenant => this.toDto(tenant));
