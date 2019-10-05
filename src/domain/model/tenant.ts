@@ -1,6 +1,7 @@
 import { prop } from "@hasezoey/typegoose";
 
 import BaseEntity from "./base";
+import { Writable } from "../utils/writable";
 
 export default class Tenant extends BaseEntity<Tenant> {
     @prop({
@@ -28,4 +29,11 @@ export default class Tenant extends BaseEntity<Tenant> {
             schemaOptions: { collection: "Tenants", timestamps: true }
         });
     }
+
+    setName = (name: string) => {
+        (this as Writable<Tenant>).name = name;
+    };
+    setDescription = (desc: string) => {
+        (this as Writable<Tenant>).description = desc;
+    };
 }

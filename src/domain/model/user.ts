@@ -108,4 +108,22 @@ export class User extends BaseEntity<User> implements IMustHaveTenant {
     setRole = (role: UserRole) => {
         (this as Writable<User>).role = role;
     };
+    setEmail = (email: string) => {
+        (this as Writable<User>).email = email;
+    };
+    setUsername = (username: string) => {
+        (this as Writable<User>).username = username;
+    };
+    setTenant = (tenant: Tenant) => {
+        (this as Writable<User>).tenant = tenant.id;
+    };
+    setFirstName = (firstName: string) => {
+        (this as Writable<User>).firstName = firstName;
+    };
+    setLastName = (lastName: string) => {
+        (this as Writable<User>).lastName = lastName;
+    };
+    setPassword = (password: string) => {
+        (this as Writable<User>).password = password;
+    };
 }
