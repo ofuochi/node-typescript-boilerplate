@@ -1,9 +1,7 @@
 import bcrypt from "bcrypt";
 import { expect } from "chai";
 import httpStatus from "http-status-codes";
-import supertest from "supertest";
 
-import app = require("../../../src");
 import { TYPES } from "../../../src/domain/constants/types";
 import {
     ITenantRepository,

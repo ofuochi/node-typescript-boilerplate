@@ -12,11 +12,11 @@ import { UserRole } from "../../../domain/model/user";
 import { CreateTenantInput, TenantDto } from "../../models/tenant_dto";
 import { authMiddleware } from "../middleware/auth_middleware";
 import { BaseController } from "./base_controller";
-import { ITenantService } from "domain/interfaces/services";
+import { ITenantService } from "../../../domain/interfaces/services";
 
 @controller("/tenants")
 export class TenantController extends BaseController {
-    @tenantService public _tenantService: ITenantService;
+    @tenantService private _tenantService: ITenantService;
 
     /**
      * Returns a list of TenantDto
@@ -39,9 +39,12 @@ export class TenantController extends BaseController {
         input = plainToClass(CreateTenantInput, input);
         const badRequest = await this.checkBadRequest(input);
         if (badRequest) return badRequest;
-        const existing = await this._tenantService.get(name);
-        if (existing != undefined) return this.conflict();
-        const tenant = await this._tenantService.create(input.name, input.description);
+        const existing = await this._tenantService.get(input.name);
+        if (existing) return this.conflict();
+        const tenant = await this._tenantService.create(
+            input.name,
+            input.description
+        );
         return tenant;
     }
 }

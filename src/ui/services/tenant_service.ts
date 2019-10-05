@@ -16,14 +16,14 @@ export default class TenantService implements ITenantService {
         const tenant = await this._tenantRepository.save(Tenant.createInstance(name, description));
         return this._mapper.map(tenant, TenantDto);
     }
-    
+
     async get(name: string): Promise<TenantDto | undefined> {
         const tenant = await this._tenantRepository.findOneByQuery({ name });
         return tenant == undefined
             ? undefined
             : this._mapper.map(tenant, TenantDto);
     }
-    
+
     async search(name?: string): Promise<TenantDto[]> {
         const tenants =
             !!name
