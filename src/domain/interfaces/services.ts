@@ -1,4 +1,5 @@
 import { MailJobType } from "../../infrastructure/jobs/mail_job";
+import { TenantDto } from "ui/models/tenant_dto";
 
 export interface IMailService {
     sendWelcomeEmail(
@@ -17,8 +18,7 @@ export interface ILoggerService {
     warn(message: string, meta?: any): void;
 }
 export interface ITenantService {
-    create(
-        name: string,
-        description: string
-    ): Promise<{ id: string; name: string; isActive: boolean }>;
+    create(name: string, description: string): Promise<TenantDto>;
+    get(name: string): Promise<TenantDto | undefined>;
+    search(name?: string): Promise<TenantDto[]>;
 }
