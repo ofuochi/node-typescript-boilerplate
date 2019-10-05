@@ -15,4 +15,7 @@ export class CurrentUser {
     setUser = (user: User) => {
         (this as Writable<CurrentUser>).user = user;
     };
+    setTenant = (tenant: Tenant) => {
+        (this as Writable<CurrentUser>).tenant = tenant;
+    };
 }
