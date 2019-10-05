@@ -8,7 +8,7 @@ import Tenant from "domain/model/tenant";
 
 @injectable()
 export default class TenantService implements ITenantService {
-    @tenantRepository private _tenantRepository: ITenantRepository;
+    @tenantRepository public _tenantRepository: ITenantRepository;
 
     private toDto(tenant: Tenant): TenantDto {
         const tenantDto: TenantDto = {
