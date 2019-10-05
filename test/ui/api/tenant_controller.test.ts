@@ -15,6 +15,7 @@ import config from "../../../src/infrastructure/config";
 import { container } from "../../../src/infrastructure/utils/ioc_container";
 import { IAuthService } from "../../../src/ui/interfaces/auth_service";
 import { CreateTenantInput } from "../../../src/ui/models/tenant_dto";
+import { req } from "../../setup";
 
 const endpoint = `${config.api.prefix}/tenants`;
 let authService: IAuthService;
@@ -25,8 +26,6 @@ describe("Tenant controller", async () => {
     const password = "dadf_jad63A";
     let user: User;
     let jwtToken: string;
-
-    let req: supertest.SuperTest<supertest.Test>;
     let tenant: Tenant;
 
     before(async () => {
@@ -53,7 +52,6 @@ describe("Tenant controller", async () => {
             emailOrUsername: user.username
         });
         jwtToken = token;
-        req = supertest(app.appServer);
     });
     const createTenantInput: CreateTenantInput = {
         name: "NewTenant",

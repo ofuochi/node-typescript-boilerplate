@@ -1,18 +1,18 @@
+import "./loaders/events";
 import "reflect-metadata";
 
-import Agenda = require("agenda");
+import Agenda from "agenda";
 import { Container, ContainerModule } from "inversify";
 import { InversifyExpressServer } from "inversify-express-utils";
 
 import { TYPES } from "../../domain/constants/types";
-import { DbClient, getDatabaseClient } from "../db/db_client";
 import { exceptionLoggerMiddleware } from "../../ui/api/middleware/interceptor_middleware";
+import config from "../config";
+import { DbClient, getDatabaseClient } from "../db/db_client";
+import getAgendaInstance from "./loaders/agenda_loader";
 import expressLoader, { App } from "./loaders/express";
 import { Jobs } from "./loaders/jobs";
 import winstonLoggerInstance from "./loaders/logger";
-import config from "../config";
-
-import "./loaders/events";
 
 export async function bootstrap({
     container,
@@ -28,8 +28,11 @@ export async function bootstrap({
 
     // container.applyMiddleware(makeLoggerMiddleware());
     const dbClient = await getDatabaseClient(connStr);
-
     container.bind<DbClient>(TYPES.DbClient).toConstantValue(dbClient);
+    container
+        .bind<Agenda>(TYPES.Agenda)
+        .toConstantValue(getAgendaInstance(connStr));
+
     container.load(...containerModules);
     winstonLoggerInstance.info("✔️  Dependency Injector loaded");
 
@@ -48,6 +51,7 @@ export async function bootstrap({
         // Catch and log all exceptions
         app.use(exceptionLoggerMiddleware);
     });
+    winstonLoggerInstance.info(`✔️  Environment: ${process.env.NODE_ENV}`);
 
     return server.build();
 }

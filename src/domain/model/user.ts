@@ -49,7 +49,7 @@ export class User extends BaseEntity<User> implements IMustHaveTenant {
     })
     readonly role: UserRole = UserRole.USER;
 
-    private constructor({});
+    private constructor({}); // eslint-disable-line
     private constructor({
         firstName,
         lastName,

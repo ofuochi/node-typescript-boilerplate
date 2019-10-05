@@ -1,9 +1,9 @@
-import mongoose from "mongoose";
+import mongoose, { Mongoose } from "mongoose";
 
 import Tenant from "../../domain/model/tenant";
 import winstonLoggerInstance from "../bootstrapping/loaders/logger";
 
-export type DbClient = mongoose.Mongoose;
+export type DbClient = Mongoose;
 export async function getDatabaseClient(connStr: string) {
     return new Promise<DbClient>((resolve, reject) => {
         mongoose.connect(connStr, {

@@ -10,7 +10,7 @@
 --recursive
 --file test/mocha.env.ts
 
---timeout 60000
+--timeout 600000
 --bail
 --exit
 
