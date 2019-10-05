@@ -21,7 +21,7 @@
             "**/*.d.ts"
         ],
         "require": [
-            "ts-node/register"
+            "ts-node/register/transpile-only"
         ],
         "reporter": [
             "text",
@@ -37,7 +37,7 @@
     "scripts": {
         "no-build": "npx ts-node src/index.ts",
         "non-build:start": "npx ts-code src/index.ts",
-        "nyc": "nyc -r=text -r=html -i ts-node/register/transpile-only -e .ts mocha",
+        "nyc": "nyc npm run test",
         "rm-files": "rm -r -f coverage .nyc_output dist",
         "start": "npm run rm-files && npm run tsc && npm run start-node",
         "debug": "nodemon -e ts --exec \"npx ts-node -r tsconfig-paths/register -T --pretty --project tsconfig.json src/index.ts\"",
