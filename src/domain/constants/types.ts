@@ -9,6 +9,7 @@ export const TYPES = {
     LoggerService: Symbol("LoggerService"),
     MailService: Symbol("MailService"),
     AuthService: Symbol("AuthService"),
+    TenantService: Symbol("TenantService"),
 
     EventDispatcher: Symbol("EventDispatcher"),
     Agenda: Symbol("Agenda"),
