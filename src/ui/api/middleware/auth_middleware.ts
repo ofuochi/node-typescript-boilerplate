@@ -5,9 +5,9 @@ import jwt from "jsonwebtoken";
 
 import { TYPES } from "../../../domain/constants/types";
 import { IUserRepository } from "../../../domain/interfaces/repositories";
-import env from "../../../infrastructure/config";
-import container from "../../../infrastructure/utils/ioc_container";
-import HttpError from "../../error";
+import { config as env } from "../../../infrastructure/config";
+import { container } from "../../../infrastructure/utils/ioc_container";
+import { HttpError } from "../../error";
 import { UserRole } from "../../../domain/model/user";
 import { DecodedJwt } from "../../services/auth_service";
 
@@ -49,4 +49,4 @@ function authMiddlewareFactory(container: Container) {
     };
 }
 
-export default authMiddlewareFactory(container);
+export const authMiddleware = authMiddlewareFactory(container);

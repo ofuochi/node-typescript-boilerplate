@@ -10,12 +10,12 @@ import {
 import { tenantService } from "../../../domain/constants/decorators";
 import { UserRole } from "../../../domain/model/user";
 import { CreateTenantInput, TenantDto } from "../../models/tenant_dto";
-import authMiddleware from "../middleware/auth_middleware";
-import BaseController from "./base_controller";
+import { authMiddleware } from "../middleware/auth_middleware";
+import { BaseController } from "./base_controller";
 import { ITenantService } from "../../interfaces/tenant_service";
 
 @controller("/tenants")
-export default class TenantController extends BaseController {
+export class TenantController extends BaseController {
     @tenantService private _tenantService: ITenantService;
 
     /**

@@ -1,7 +1,7 @@
 import Agenda from "agenda";
 
-import config from "../../config";
-import MailJob, { MailJobType } from "../../jobs/mail_job";
+import { config } from "../../config";
+import { MailJob, MailJobType } from "../../jobs/mail_job";
 
 async function sendWelcomeEmail(agenda: Agenda): Promise<void> {
     const emailJob = new MailJob();
@@ -14,4 +14,4 @@ async function sendWelcomeEmail(agenda: Agenda): Promise<void> {
     await agenda.start();
 }
 
-export default [sendWelcomeEmail];
+export const Jobs = [sendWelcomeEmail];

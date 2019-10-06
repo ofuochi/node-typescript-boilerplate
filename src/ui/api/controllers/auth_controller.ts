@@ -8,11 +8,11 @@ import {
     UserSignUpDto,
     UserSignUpInput
 } from "../../models/user_dto";
-import BaseController from "./base_controller";
+import { BaseController } from "./base_controller";
 import { authService } from "../../../domain/constants/decorators";
 
 @controller("/auth")
-export default class AuthController extends BaseController {
+export class AuthController extends BaseController {
     @authService private _authService: IAuthService;
 
     @httpPost("/signUp")

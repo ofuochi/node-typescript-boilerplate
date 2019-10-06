@@ -1,4 +1,4 @@
-import CurrentUser from "../domain/utils/globals";
+import { CurrentUser } from "../domain/utils/globals";
 declare global {
     namespace Express {
         export interface Request {

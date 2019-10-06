@@ -3,14 +3,14 @@ import mongoose from "mongoose";
 
 import { ILoggerService, IMailService } from "../../domain/interfaces/services";
 import { User } from "../../domain/model/user";
-import container from "../../infrastructure/utils/ioc_container";
+import { container } from "../../infrastructure/utils/ioc_container";
 import { TYPES } from "../../domain/constants/types";
-import events from "./events";
+import { events } from "./events";
 import { MailJobType } from "../../infrastructure/jobs/mail_job";
 import { UserDto } from "../models/user_dto";
 
 @EventSubscriber()
-export default class UserSubscriber {
+export class UserSubscriber {
     private readonly _logger = container.get<ILoggerService>(
         TYPES.LoggerService
     );

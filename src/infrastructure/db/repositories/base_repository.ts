@@ -5,10 +5,10 @@ import {
     IBaseRepository,
     Query
 } from "../../../domain/interfaces/repositories";
-import BaseEntity from "../../../domain/model/base";
+import { BaseEntity } from "../../../domain/model/base";
 
 @injectable()
-export default class BaseRepository<
+export class BaseRepository<
     TEntity extends BaseEntity<TEntity>,
     TModel extends Document
 > implements IBaseRepository<TEntity> {

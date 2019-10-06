@@ -8,7 +8,7 @@ import { RequestMiddleware } from "../../../ui/api/middleware/interceptor_middle
 
 export type App = express.Application;
 
-export default (app: express.Application) => {
+export const expressLoader = (app: express.Application) => {
     app.get("/status", (_req, res) => {
         res.status(200).end();
     });
