@@ -10,10 +10,35 @@
     "license": "MIT",
     "author": "Fortune Ochi <fortuneochi@gmail.com>",
     "main": "index.ts",
+    "nyc": {
+        "include": [
+            "src/**/*.ts"
+        ],
+        "extension": [
+            ".ts"
+        ],
+        "exclude": [
+            "**/*.d.ts"
+        ],
+        "require": [
+            "ts-node/register/transpile-only"
+        ],
+        "reporter": [
+            "text",
+            "html"
+        ],
+        "all": true,
+        "check-coverage": false,
+        "skip-full": true,
+        "statements": 50,
+        "functions": 50,
+        "branches": 50,
+        "lines": 50
+    },
     "scripts": {
         "no-build": "npx ts-node src/index.ts",
         "non-build:start": "npx ts-code src/index.ts",
-        "nyc": "nyc -r=text -r=html -i ts-node/register/transpile-only -e .ts mocha",
+        "nyc": "nyc npm run test",
         "rm-files": "rm -r -f coverage .nyc_output dist",
         "start": "npm run rm-files && npm run tsc && npm run start-node",
         "debug": "nodemon -e ts --exec \"npx ts-node -r tsconfig-paths/register -T --pretty --project tsconfig.json src/index.ts\"",
@@ -22,10 +47,11 @@
         "test-debug": "ts-mocha --paths -w",
         "test-cover": "npm run rm-files && npm run nyc",
         "tsc": "tsc -p tsconfig.json",
-        "lint": "eslint \"**/*.ts\""
+        "lint": "eslint \"**/*.ts\"",
+        "build": "npm run lint && npm run tsc"
     },
     "dependencies": {
-        "@hapi/joi": "^16.1.5",
+        "@hapi/joi": "^16.1.7",
         "@hasezoey/typegoose": "^5.9.2",
         "agenda": "^2.1.0",
         "automapper-nartc": "^3.0.21",
@@ -75,9 +101,10 @@
         "chai": "^4.2.0",
         "eslint": "^6.5.1",
         "eslint-config-airbnb-base": "^14.0.0",
-        "eslint-config-prettier": "^6.3.0",
+        "eslint-config-prettier": "^6.4.0",
         "eslint-plugin-chai-friendly": "^0.4.1",
         "eslint-plugin-import": "^2.18.2",
+        "ghooks": "^2.0.4",
         "mocha": "^6.2.1",
         "mongodb-memory-server": "^5.2.6",
         "nodemon": "^1.19.3",
@@ -87,5 +114,11 @@
         "ts-mocha": "^6.0.0",
         "ts-node": "^8.4.1",
         "typescript": "^3.6.3"
+    },
+    "config": {
+        "ghooks": {
+            "pre-commit": "npm run lint",
+            "pre-push": "npm run nyc"
+        }
     }
 }

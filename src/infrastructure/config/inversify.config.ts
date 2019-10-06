@@ -20,20 +20,20 @@ import { TenantProfile } from "ui/profiles/tenant_profile";
 
 // Service implementations
 import LoggerService from "../../domain/services/logger_service";
-import MailService from "../../infrastructure/services/mail_service";
+import MailService from "../services/mail_service";
 import AuthService from "../../ui/services/auth_service";
 import TenantService from "ui/services/tenant_service";
 
 // Repositories implementations
-import { UserRepository } from "../../infrastructure/db/repositories/user_repository";
-import { TenantRepository } from "../db/repositories/tenant_repository";
+import UserRepository from "../db/repositories/user_repository";
+import TenantRepository from "../db/repositories/tenant_repository";
 
 // Controllers
 import "../../ui/api/controllers/auth_controller";
 import "../../ui/api/controllers/secure_controller";
 import "../../ui/api/controllers/tenant_controller";
 
-export const referenceDataIoCModule = new ContainerModule(bind => {
+export default new ContainerModule(bind => {
     // Repositories
     bind<ITenantRepository>(TYPES.TenantRepository)
         .to(TenantRepository)

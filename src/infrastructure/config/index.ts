@@ -34,6 +34,7 @@ const { error, value: envConfig } = envConfigSchema.validate(process.env);
 if (error) throw new Error(`Config validation error: ${error.message}`);
 
 export default {
+    // eslint-disable-next-line
     port: parseInt(envConfig.PORT as string),
     host: envConfig.HOST as string,
     env: envConfig.NODE_ENV as string,
