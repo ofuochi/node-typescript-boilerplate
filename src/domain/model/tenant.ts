@@ -1,10 +1,10 @@
 import { prop, instanceMethod } from "@hasezoey/typegoose";
 import { Expose } from "class-transformer";
 
-import BaseEntity from "./base";
+import { BaseEntity } from "./base";
 import { Writable } from "../utils/writable";
 
-export default class Tenant extends BaseEntity {
+export class Tenant extends BaseEntity {
     @prop({
         required: true,
         uppercase: true,

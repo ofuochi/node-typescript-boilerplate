@@ -4,7 +4,7 @@ import { Writable } from "../utils/writable";
 import { User } from "./user";
 
 
-abstract class BaseEntity extends Typegoose {
+export abstract class BaseEntity extends Typegoose {
 
     @Expose()
     id?: any;
@@ -54,4 +54,3 @@ abstract class BaseEntity extends Typegoose {
         (this as Writable<BaseEntity>).isActive = true;
     };
 }
-export default BaseEntity;

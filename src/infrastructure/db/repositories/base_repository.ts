@@ -1,15 +1,15 @@
 import { injectable, unmanaged } from "inversify";
 import { Document, Model } from "mongoose";
+import { plainToClassFromExist } from "class-transformer";
 
 import {
     IBaseRepository,
     Query
 } from "../../../domain/interfaces/repositories";
-import BaseEntity from "../../../domain/model/base";
-import { plainToClassFromExist } from "class-transformer";
+import { BaseEntity } from "../../../domain/model/base";
 
 @injectable()
-export default class BaseRepository<
+export class BaseRepository<
     TEntity extends BaseEntity,
     TModel extends Document
 > implements IBaseRepository<TEntity> {
@@ -112,12 +112,7 @@ export default class BaseRepository<
     private readMapper(model: TModel): TEntity {
         const obj: any = model.toJSON();
         const entity = this._constructor();
-        const propDesc = Object.getOwnPropertyDescriptor(
-            obj,
-            "_id"
-        ) as PropertyDescriptor;
-        Object.defineProperty(obj, "id", propDesc);
-        delete obj._id;
+        entity.id = obj["_id"];
         return plainToClassFromExist(entity, obj);
     }
 }

@@ -45,7 +45,7 @@ const generateHTML: Function = (error: HttpError): string => {
  *          description: Error description
  *          example: User created
  */
-export default function sendHttpErrorModule(
+export function sendHttpErrorModule(
     req: Request,
     res: any,
     next: NextFunction

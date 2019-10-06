@@ -1,13 +1,13 @@
 import { TYPES } from "../../domain/constants/types";
 import { ILoggerService } from "../../domain/interfaces/services";
 import { User } from "../../domain/model/user";
-import container from "../utils/ioc_container";
+import { container } from "../utils/ioc_container";
 
 export enum MailJobType {
     SEND_WELCOME_MAIL
 }
 
-export default class MailJob {
+export class MailJob {
     public async sendWelcomeEmail(job: any, done: Function): Promise<void> {
         const logger = container.get<ILoggerService>(TYPES.LoggerService);
         // const mailService = container.get<IMailService>(TYPES.MailService);

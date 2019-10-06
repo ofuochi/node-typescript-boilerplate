@@ -10,9 +10,9 @@ import {
 } from "../../domain/constants/decorators";
 import { IUserRepository } from "../../domain/interfaces/repositories";
 import { User, UserRole } from "../../domain/model/user";
-import config from "../../infrastructure/config";
+import { config } from "../../infrastructure/config";
 import { IAuthService } from "../interfaces/auth_service";
-import events from "../subscribers/events";
+import { events } from "../subscribers/events";
 import { HttpError } from "../error";
 import { UserDto, UserSignInInput, UserSignUpInput } from "../models/user_dto";
 
@@ -25,7 +25,7 @@ export interface DecodedJwt {
     tenantId: any;
 }
 @injectable()
-export default class AuthService implements IAuthService {
+export class AuthService implements IAuthService {
     @userRepository private _userRepository: IUserRepository;
     @eventDispatcher private _eventDispatcher: EventDispatcher;
 
