@@ -106,7 +106,7 @@ export class User extends BaseEntity implements IMustHaveTenant {
         });
     };
     public static get model() {
-        return new User({}).getModelForClass(User, {
+        return new User().getModelForClass(User, {
             schemaOptions: { collection: "Users", timestamps: true }
         });
     }
