@@ -1,9 +1,9 @@
 import { index, prop, Ref, pre } from "@hasezoey/typegoose";
 
 import { Writable } from "../utils/writable";
-import BaseEntity from "./base";
+import { BaseEntity } from "./base";
 import { IMustHaveTenant } from "./interfaces/entity";
-import Tenant from "./tenant";
+import { Tenant } from "./tenant";
 
 export const MAX_NAME_LENGTH = 225;
 export enum UserRole {

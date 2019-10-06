@@ -1,4 +1,4 @@
-import Tenant from "../model/tenant";
+import { Tenant } from "../model/tenant";
 import { User } from "../model/user";
 
 export type Query<T> = {

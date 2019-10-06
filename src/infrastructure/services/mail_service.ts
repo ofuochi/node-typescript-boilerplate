@@ -4,12 +4,12 @@ import Mailgun from "mailgun-js";
 
 import { TYPES } from "../../domain/constants/types";
 import { IMailService } from "../../domain/interfaces/services";
-import config from "../config";
+import { config } from "../config";
 import { MailJobType } from "../jobs/mail_job";
-import container from "../utils/ioc_container";
+import { container } from "../utils/ioc_container";
 
 @injectable()
-export default class MailService implements IMailService {
+export class MailService implements IMailService {
     private readonly _mailgun: Mailgun.Mailgun = Mailgun({
         apiKey: config.emails.apiKey,
         domain: config.emails.domain

@@ -1,8 +1,8 @@
-import Tenant from "../model/tenant";
+import { Tenant } from "../model/tenant";
 import { User } from "../model/user";
 import { Writable } from "./writable";
 
-export default class CurrentUser {
+export class CurrentUser {
     readonly tenant: Tenant;
     readonly user?: User;
     private constructor(tenant: Tenant, user?: User) {

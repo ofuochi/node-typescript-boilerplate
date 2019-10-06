@@ -26,5 +26,3 @@ export class HttpError extends Error {
         this.message = message || http.STATUS_CODES[this.status] || "Error";
     }
 }
-
-export default HttpError;

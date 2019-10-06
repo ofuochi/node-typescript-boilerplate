@@ -5,9 +5,9 @@ import {
     ITenantRepository,
     IUserRepository
 } from "../../../src/domain/interfaces/repositories";
-import Tenant from "../../../src/domain/model/tenant";
-import config from "../../../src/infrastructure/config";
-import container from "../../../src/infrastructure/utils/ioc_container";
+import { Tenant } from "../../../src/domain/model/tenant";
+import { config } from "../../../src/infrastructure/config";
+import { container } from "../../../src/infrastructure/utils/ioc_container";
 import {
     UserSignInInput,
     UserSignUpDto,

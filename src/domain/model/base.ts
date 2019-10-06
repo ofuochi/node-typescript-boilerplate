@@ -3,7 +3,7 @@ import { Expose } from "class-transformer";
 
 import { Writable } from "../utils/writable";
 
-abstract class BaseEntity<T> extends Typegoose {
+export abstract class BaseEntity<T> extends Typegoose {
     @Expose()
     id?: any;
 
@@ -45,4 +45,3 @@ abstract class BaseEntity<T> extends Typegoose {
         (this as Writable<BaseEntity<T>>).isActive = true;
     };
 }
-export default BaseEntity;

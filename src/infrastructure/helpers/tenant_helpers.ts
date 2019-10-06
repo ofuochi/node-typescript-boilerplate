@@ -1,9 +1,9 @@
 import { TYPES } from "../../domain/constants/types";
-import Tenant from "../../domain/model/tenant";
-import TenantRepository from "../db/repositories/tenant_repository";
-import container from "../utils/ioc_container";
+import { Tenant } from "../../domain/model/tenant";
+import { TenantRepository } from "../db/repositories/tenant_repository";
+import { container } from "../utils/ioc_container";
 
-export default async function getCurrentTenant(
+export async function getCurrentTenant(
     tenantId: string
 ): Promise<Tenant> {
     const tenantRepository = container.get<TenantRepository>(
