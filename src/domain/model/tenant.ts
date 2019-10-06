@@ -1,10 +1,10 @@
-import { prop } from "@hasezoey/typegoose";
+import { prop, instanceMethod } from "@hasezoey/typegoose";
 import { Expose } from "class-transformer";
 
 import BaseEntity from "./base";
 import { Writable } from "../utils/writable";
 
-export default class Tenant extends BaseEntity<Tenant> {
+export default class Tenant extends BaseEntity {
     @prop({
         required: true,
         uppercase: true,
@@ -17,11 +17,10 @@ export default class Tenant extends BaseEntity<Tenant> {
     @Expose()
     readonly description!: string;
 
-    public constructor(name?: any, description?: any);
-    public constructor(name: string, description: string) {
+    constructor(name?: string, description?: string) {
         super();
-        this.name = name;
-        this.description = description;
+        this.name = name || '';
+        this.description = description || '';
     }
 
     static createInstance = (name: string, description: string) =>
@@ -33,10 +32,13 @@ export default class Tenant extends BaseEntity<Tenant> {
         });
     }
 
-    setName = (name: string) => {
+    @instanceMethod
+    setName(name: string) {
         (this as Writable<Tenant>).name = name;
     };
-    setDescription = (desc: string) => {
-        (this as Writable<Tenant>).description = desc;
+    
+    @instanceMethod
+    setDescription(description: string) {
+        (this as Writable<Tenant>).description = description;
     };
 }

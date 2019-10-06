@@ -1,9 +1,11 @@
-import { prop, Typegoose, Ref } from "@hasezoey/typegoose";
+import { prop, Typegoose, Ref, instanceMethod } from "@hasezoey/typegoose";
 import { Expose } from "class-transformer";
-
 import { Writable } from "../utils/writable";
+import { User } from "./user";
 
-abstract class BaseEntity<T> extends Typegoose {
+
+abstract class BaseEntity extends Typegoose {
+
     @Expose()
     id?: any;
 
@@ -12,7 +14,7 @@ abstract class BaseEntity<T> extends Typegoose {
     readonly createdAt: Date = new Date();
     @prop({ default: null })
     @Expose()
-    readonly createdBy?: Ref<T>;
+    readonly createdBy?: Ref<User>;
     @prop({ default: null })
     @Expose()
     readonly updatedAt?: Date;
@@ -32,17 +34,24 @@ abstract class BaseEntity<T> extends Typegoose {
     @Expose()
     readonly deletionTime?: Date;
 
-    delete = (): void => {
-        (this as Writable<BaseEntity<T>>).isDeleted = true;
+    @instanceMethod
+    delete(): void {
+        (this as Writable<BaseEntity>).isDeleted = true;
     };
-    restore = (): void => {
-        (this as Writable<BaseEntity<T>>).isDeleted = false;
+
+    @instanceMethod
+    restore(): void {
+        (this as Writable<BaseEntity>).isDeleted = false;
     };
-    deactivate = (): void => {
-        (this as Writable<BaseEntity<T>>).isActive = false;
+
+    @instanceMethod
+    deactivate(): void {
+        (this as Writable<BaseEntity>).isActive = false;
     };
-    activate = (): void => {
-        (this as Writable<BaseEntity<T>>).isActive = true;
+
+    @instanceMethod
+    activate(): void {
+        (this as Writable<BaseEntity>).isActive = true;
     };
 }
 export default BaseEntity;
