@@ -6,15 +6,15 @@ import { InversifyExpressServer } from "inversify-express-utils";
 
 import { TYPES } from "../../domain/constants/types";
 import { exceptionLoggerMiddleware } from "../../ui/api/middleware/interceptor_middleware";
-import config from "../config";
-import getDatabaseClient, { DbClient } from "../db/db_client";
-import getAgendaInstance from "./loaders/agenda_loader";
-import expressLoader, { App } from "./loaders/express";
-import Jobs from "./loaders/jobs";
-import winstonLoggerInstance from "./loaders/logger";
+import { config } from "../config";
+import { DbClient, getDatabaseClient } from "../db/db_client";
+import { getAgendaInstance } from "./loaders/agenda_loader";
+import { expressLoader, App } from "./loaders/express";
+import { Jobs } from "./loaders/jobs";
+import { winstonLoggerInstance } from "./loaders/logger";
 import "./loaders/events";
 
-export default async function bootstrap({
+export async function bootstrap({
     container,
     connStr,
     containerModules = []

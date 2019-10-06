@@ -5,10 +5,10 @@ import { tenantRepository, autoMapper } from "../../domain/constants/decorators"
 import { ITenantRepository } from "../../domain/interfaces/repositories";
 import { TenantDto } from "../models/tenant_dto";
 import { ITenantService } from "../interfaces/tenant_service";
-import Tenant from "../../domain/model/tenant";
+import { Tenant } from "../../domain/model/tenant";
 
 @injectable()
-export default class TenantService implements ITenantService {
+export class TenantService implements ITenantService {
     @autoMapper public _mapper: AutoMapper;
     @tenantRepository public _tenantRepository: ITenantRepository;
     

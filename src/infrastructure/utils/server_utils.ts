@@ -2,9 +2,9 @@ import { Server } from "http";
 
 import { TYPES } from "../../domain/constants/types";
 import { App } from "../bootstrapping/loaders/express";
-import winstonLoggerInstance from "../bootstrapping/loaders/logger";
-import container from "./ioc_container";
-import config from "../config";
+import { winstonLoggerInstance } from "../bootstrapping/loaders/logger";
+import { container } from "./ioc_container";
+import { config } from "../config";
 
 export function exitProcess(error: any): void {
     winstonLoggerInstance.error(`❌  ${error}`);

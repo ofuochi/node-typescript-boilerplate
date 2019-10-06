@@ -6,10 +6,10 @@ import supertest from "supertest";
 
 import { TYPES } from "../src/domain/constants/types";
 import { ITenantRepository } from "../src/domain/interfaces/repositories";
-import Tenant from "../src/domain/model/tenant";
-import bootstrap from "../src/infrastructure/bootstrapping";
-import referenceDataIoCModule from "../src/infrastructure/config/inversify.config";
-import container from "../src/infrastructure/utils/ioc_container";
+import { Tenant } from "../src/domain/model/tenant";
+import { bootstrap } from "../src/infrastructure/bootstrapping";
+import { referenceDataIoCModule } from "../src/infrastructure/config/inversify.config";
+import { container } from "../src/infrastructure/utils/ioc_container";
 import { startAppServer } from "../src/infrastructure/utils/server_utils";
 
 let server: Server; // eslint-disable-line
