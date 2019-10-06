@@ -14,7 +14,8 @@
         "esModuleInterop": true,
         "allowUnreachableCode": false,
         "noImplicitThis": true,
-        "outDir": "dist"
+        "outDir": "dist",
+        "inlineSources": true
     },
     "include": ["./src/**/*.ts", "./src/types/*"],
     "exclude": ["node_modules"]

@@ -1,5 +1,6 @@
 import { injectable, unmanaged } from "inversify";
 import { Document, Model } from "mongoose";
+import { plainToClassFromExist } from "class-transformer";
 
 import {
     IBaseRepository,
@@ -9,13 +10,14 @@ import { BaseEntity } from "../../../domain/model/base";
 
 @injectable()
 export class BaseRepository<
-    TEntity extends BaseEntity<TEntity>,
+    TEntity extends BaseEntity,
     TModel extends Document
 > implements IBaseRepository<TEntity> {
     protected Model: Model<TModel>;
-
-    public constructor(@unmanaged() model: Model<TModel>) {
+    protected _constructor: () => TEntity;
+    public constructor(@unmanaged() model: Model<TModel>, @unmanaged() constructor: () => TEntity) {
         this.Model = model;
+        this._constructor = constructor;
     }
 
     // We wrap the mongoose API here so we can use async / await
@@ -109,22 +111,13 @@ export class BaseRepository<
      */
     private readMapper(model: TModel): TEntity {
         const obj: any = model.toJSON();
+        const entity = this._constructor();
         const propDesc = Object.getOwnPropertyDescriptor(
             obj,
             "_id"
         ) as PropertyDescriptor;
         Object.defineProperty(obj, "id", propDesc);
         delete obj._id;
-        return obj as TEntity;
+        return plainToClassFromExist(entity, obj);
     }
-    // private writeMapper(doc: TEntity): TEntity {
-    //     const obj: any = JSON.parse(JSON.stringify(doc));
-    //     const propDesc = Object.getOwnPropertyDescriptor(
-    //         obj,
-    //         "id"
-    //     ) as PropertyDescriptor;
-    //     Object.defineProperty(obj, "_id", propDesc);
-    //     delete obj["id"];
-    //     return obj as TEntity;
-    // }
 }

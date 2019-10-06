@@ -1,4 +1,4 @@
-import { index, prop, Ref, pre } from "@hasezoey/typegoose";
+import { index, prop, Ref, pre, instanceMethod } from "@hasezoey/typegoose";
 
 import { Writable } from "../utils/writable";
 import { BaseEntity } from "./base";
@@ -14,13 +14,13 @@ export enum UserRole {
 @index({ email: 1, tenant: 1 }, { unique: true })
 @index({ username: 1, tenant: 1 }, { unique: true })
 // eslint-disable-next-line
-@pre<User>("save", function(next) {
+@pre<User>("save", function (next) {
     if (global.currentUser.user) {
         this.setCreator(global.currentUser.user);
     }
     next();
 })
-export class User extends BaseEntity<User> implements IMustHaveTenant {
+export class User extends BaseEntity implements IMustHaveTenant {
     @prop({ required: true, maxlength: MAX_NAME_LENGTH, trim: true })
     readonly firstName!: string;
     @prop({ required: true, maxlength: MAX_NAME_LENGTH, trim: true })
@@ -56,15 +56,7 @@ export class User extends BaseEntity<User> implements IMustHaveTenant {
     })
     readonly role: UserRole = UserRole.USER;
 
-    private constructor({}); // eslint-disable-line
-    private constructor({
-        firstName,
-        lastName,
-        email,
-        username,
-        password,
-        tenant
-    }: {
+    public constructor(arg?: {
         firstName: string;
         lastName: string;
         email: string;
@@ -73,6 +65,15 @@ export class User extends BaseEntity<User> implements IMustHaveTenant {
         tenant: Tenant;
     }) {
         super();
+        if (arg == null) return;
+        const {
+            firstName,
+            lastName,
+            email,
+            username,
+            password,
+            tenant
+        } = arg;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -105,32 +106,48 @@ export class User extends BaseEntity<User> implements IMustHaveTenant {
         });
     };
     public static get model() {
-        return new User({}).getModelForClass(User, {
+        return new User().getModelForClass(User, {
             schemaOptions: { collection: "Users", timestamps: true }
         });
     }
-    setCreator = (creator: User) => {
+
+    @instanceMethod
+    setCreator(creator: User) {
         (this as Writable<User>).createdBy = creator.id;
     };
-    setRole = (role: UserRole) => {
+
+    @instanceMethod
+    setRole(role: UserRole) {
         (this as Writable<User>).role = role;
     };
-    setEmail = (email: string) => {
+
+    @instanceMethod
+    setEmail(email: string) {
         (this as Writable<User>).email = email;
     };
-    setUsername = (username: string) => {
+
+    @instanceMethod
+    setUsername(username: string) {
         (this as Writable<User>).username = username;
     };
-    setTenant = (tenant: Tenant) => {
+
+    @instanceMethod
+    setTenant(tenant: Tenant) {
         (this as Writable<User>).tenant = tenant.id;
     };
-    setFirstName = (firstName: string) => {
+
+    @instanceMethod
+    setFirstName(firstName: string) {
         (this as Writable<User>).firstName = firstName;
     };
-    setLastName = (lastName: string) => {
+
+    @instanceMethod
+    setLastName(lastName: string) {
         (this as Writable<User>).lastName = lastName;
     };
-    setPassword = (password: string) => {
+
+    @instanceMethod
+    setPassword(password: string) {
         (this as Writable<User>).password = password;
     };
 }

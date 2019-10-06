@@ -70,6 +70,3 @@ build
 
 # history
 .history
-
-# Local settings
-.vscode/settings.json
