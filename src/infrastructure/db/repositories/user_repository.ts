@@ -11,6 +11,6 @@ export interface UserModel extends User, Document {}
 export default class UserRepository extends BaseRepository<User, UserModel>
     implements IUserRepository {
     public constructor() {
-        super(User.model);
+        super(User.model, () => new User());
     }
 }

@@ -12,6 +12,6 @@ export default class TenantRepository extends BaseRepository<
     TenantModel
 > {
     constructor() {
-        super(Tenant.model);
+        super(Tenant.model, () => new Tenant());
     }
 }
