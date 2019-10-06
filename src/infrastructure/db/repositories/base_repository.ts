@@ -112,7 +112,7 @@ export class BaseRepository<
     private readMapper(model: TModel): TEntity {
         const obj: any = model.toJSON();
         const entity = this._constructor();
-        entity.id = obj["_id"];
+        entity.id = obj._id;
         return plainToClassFromExist(entity, obj);
     }
 }

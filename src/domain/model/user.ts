@@ -65,7 +65,7 @@ export class User extends BaseEntity implements IMustHaveTenant {
         tenant: Tenant;
     }) {
         super();
-        if (arg == undefined) return;
+        if (arg == null) return;
         const {
             firstName,
             lastName,

@@ -19,8 +19,8 @@ export class Tenant extends BaseEntity {
 
     constructor(name?: string, description?: string) {
         super();
-        this.name = name || '';
-        this.description = description || '';
+        this.name = name || "";
+        this.description = description || "";
     }
 
     static createInstance = (name: string, description: string) =>
