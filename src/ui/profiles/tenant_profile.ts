@@ -8,7 +8,8 @@ export default class TenantProfile extends MappingProfileBase {
     }
 
     configure(): void {
-        this.createMap(Tenant, TenantDto);
+        this.createMap(Tenant, TenantDto)
+            .forMember("id", options => options.mapFrom(tenant => tenant.id.toString()));
     }
 
 }
