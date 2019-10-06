@@ -1,5 +1,6 @@
 import { EventDispatcher } from "event-dispatch";
 import { ContainerModule } from "inversify";
+import { AutoMapper, Mapper } from "automapper-nartc";
 
 // Interfaces & Types
 import { TYPES } from "../../domain/constants/types";
@@ -9,10 +10,13 @@ import {
 } from "../../domain/interfaces/repositories";
 import {
     ILoggerService,
-    IMailService,
-    ITenantService
+    IMailService
 } from "../../domain/interfaces/services";
 import { IAuthService } from "../../ui/interfaces/auth_service";
+import { ITenantService } from "../../ui/interfaces/tenant_service";
+
+// Type Mappings
+import TenantProfile from "../../ui/profiles/tenant_profile";
 
 // Service implementations
 import LoggerService from "../../domain/services/logger_service";
@@ -39,6 +43,13 @@ export default new ContainerModule(bind => {
         .to(UserRepository)
         .inSingletonScope();
 
+    // Type Mappings
+    Mapper.initialize(config => {
+        config.addProfile(new TenantProfile());
+    });
+    bind<AutoMapper>(TYPES.AutoMapper)
+        .toConstantValue(Mapper);
+
     // Services
     bind<IMailService>(TYPES.MailService)
         .to(MailService)
@@ -56,7 +67,6 @@ export default new ContainerModule(bind => {
         .to(TenantService)
         .inSingletonScope();
 
-    bind<EventDispatcher>(TYPES.EventDispatcher).toConstantValue(
-        new EventDispatcher()
-    );
+    bind<EventDispatcher>(TYPES.EventDispatcher)
+        .toConstantValue(new EventDispatcher());
 });

@@ -15,12 +15,6 @@
         "allowUnreachableCode": false,
         "noImplicitThis": true,
         "outDir": "dist"
-        // "baseUrl": "src"
-        // "paths": {
-        //     "@ui/*": ["ui/*"],
-        //     "@domain/*": ["domain/*"],
-        //     "@infrastructure/*": ["infrastructure/*"]
-        // }
     },
     "include": ["./src/**/*.ts", "./src/types/*"],
     "exclude": ["node_modules"]

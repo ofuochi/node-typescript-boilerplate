@@ -3,6 +3,7 @@ export const TYPES = { // eslint-disable-line
     App: Symbol("App"),
     DbClient: Symbol("DbClient"),
     Typegoose: Symbol("Typegoose"),
+    AutoMapper: Symbol("AutoMapper"),
 
     UserRepository: Symbol("UserRepository"),
     TenantRepository: Symbol("TenantRepository"),
