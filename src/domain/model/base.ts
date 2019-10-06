@@ -3,9 +3,7 @@ import { Expose } from "class-transformer";
 import { Writable } from "../utils/writable";
 import { User } from "./user";
 
-
 export abstract class BaseEntity extends Typegoose {
-
     @Expose()
     id?: any;
 
@@ -20,7 +18,7 @@ export abstract class BaseEntity extends Typegoose {
     readonly updatedAt?: Date;
     @prop({ default: null })
     @Expose()
-    readonly updatedBy?: any = null;
+    readonly updatedBy?: Ref<User>;
     @prop({ required: true, default: true })
     @Expose()
     readonly isActive: boolean = true;
@@ -29,7 +27,7 @@ export abstract class BaseEntity extends Typegoose {
     readonly isDeleted: boolean = false;
     @prop({ default: null })
     @Expose()
-    readonly deletedBy?: any = null;
+    readonly deletedBy?: Ref<User>;
     @prop({ default: null })
     @Expose()
     readonly deletionTime?: Date;
@@ -37,20 +35,20 @@ export abstract class BaseEntity extends Typegoose {
     @instanceMethod
     delete(): void {
         (this as Writable<BaseEntity>).isDeleted = true;
-    };
+    }
 
     @instanceMethod
     restore(): void {
         (this as Writable<BaseEntity>).isDeleted = false;
-    };
+    }
 
     @instanceMethod
     deactivate(): void {
         (this as Writable<BaseEntity>).isActive = false;
-    };
+    }
 
     @instanceMethod
     activate(): void {
         (this as Writable<BaseEntity>).isActive = true;
-    };
+    }
 }
