@@ -112,7 +112,12 @@ export class BaseRepository<
     private readMapper(model: TModel): TEntity {
         const obj: any = model.toJSON();
         const entity = this._constructor();
-        entity.id = obj._id;
+        const propDesc = Object.getOwnPropertyDescriptor(
+            obj,
+            "_id"
+        ) as PropertyDescriptor;
+        Object.defineProperty(obj, "id", propDesc);
+        delete obj._id;
         return plainToClassFromExist(entity, obj);
     }
 }
