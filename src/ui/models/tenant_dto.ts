@@ -1,8 +1,8 @@
 import { IsNotEmpty, MaxLength, IsString, IsBoolean } from "class-validator";
+import { Expose } from "class-transformer";
 
 import { MAX_NAME_LENGTH } from "../../domain/model/user";
 import { BaseInputDto, BaseResponseDto } from "./base_dto";
-import { Expose } from "class-transformer";
 
 export class CreateTenantInput extends BaseInputDto {
     @MaxLength(MAX_NAME_LENGTH)

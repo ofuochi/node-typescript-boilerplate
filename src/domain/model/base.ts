@@ -1,7 +1,7 @@
 import { prop, Typegoose, Ref } from "@hasezoey/typegoose";
+import { Expose } from "class-transformer";
 
 import { Writable } from "../utils/writable";
-import { Expose } from "class-transformer";
 
 abstract class BaseEntity<T> extends Typegoose {
     @Expose()

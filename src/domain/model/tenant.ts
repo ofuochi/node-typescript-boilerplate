@@ -1,8 +1,8 @@
 import { prop } from "@hasezoey/typegoose";
+import { Expose } from "class-transformer";
 
 import BaseEntity from "./base";
 import { Writable } from "../utils/writable";
-import { Expose } from "class-transformer";
 
 export default class Tenant extends BaseEntity<Tenant> {
     @prop({

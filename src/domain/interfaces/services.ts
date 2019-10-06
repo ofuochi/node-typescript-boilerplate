@@ -1,5 +1,4 @@
 import { MailJobType } from "../../infrastructure/jobs/mail_job";
-import { TenantDto } from "../../ui/models/tenant_dto";
 
 export interface IMailService {
     sendWelcomeEmail(
