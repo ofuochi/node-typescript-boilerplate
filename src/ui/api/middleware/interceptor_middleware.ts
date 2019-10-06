@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 
 import CurrentUser from "../../../domain/utils/globals";
 import config from "../../../infrastructure/config";
-import { getCurrentTenant } from "../../../infrastructure/helpers/tenant_helpers";
+import getCurrentTenant from "../../../infrastructure/helpers/tenant_helpers";
 import HttpError from "../../error";
 
 @injectable()

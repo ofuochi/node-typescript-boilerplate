@@ -13,12 +13,8 @@ import { User, UserRole } from "../../domain/model/user";
 import config from "../../infrastructure/config";
 import { IAuthService } from "../interfaces/auth_service";
 import events from "../subscribers/events";
-import { HttpError } from "./../error";
-import {
-    UserDto,
-    UserSignInInput,
-    UserSignUpInput
-} from "./../models/user_dto";
+import { HttpError } from "../error";
+import { UserDto, UserSignInInput, UserSignUpInput } from "../models/user_dto";
 
 export interface DecodedJwt {
     userId: string;
@@ -38,7 +34,7 @@ export default class AuthService implements IAuthService {
     ): Promise<{ user: UserDto; token: string }> {
         // Use less salt round for faster hashing on test and development but stronger hashing on production
         const hashedPassword =
-            config.env === "development" || "test"
+            config.env === "development" || config.env === "test"
                 ? await bcrypt.hash(dto.password, 1)
                 : await bcrypt.hash(dto.password, 12);
 
@@ -97,12 +93,12 @@ export default class AuthService implements IAuthService {
 
     private async getUserRecord(emailOrUsername: string): Promise<User> {
         if (emailOrUsername.includes("@"))
-            return await this._userRepository.findOneByQuery({
+            return this._userRepository.findOneByQuery({
                 email: emailOrUsername,
                 tenant: global.currentUser.tenant.id
             });
 
-        return await this._userRepository.findOneByQuery({
+        return this._userRepository.findOneByQuery({
             username: emailOrUsername,
             tenant: global.currentUser.tenant.id
         });

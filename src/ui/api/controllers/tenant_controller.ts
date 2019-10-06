@@ -10,13 +10,13 @@ import {
 import { tenantService } from "../../../domain/constants/decorators";
 import { UserRole } from "../../../domain/model/user";
 import { CreateTenantInput, TenantDto } from "../../models/tenant_dto";
-import { authMiddleware } from "../middleware/auth_middleware";
-import { BaseController } from "./base_controller";
-import { ITenantService } from "domain/interfaces/services";
+import authMiddleware from "../middleware/auth_middleware";
+import BaseController from "./base_controller";
+import { ITenantService } from "../../interfaces/tenant_service";
 
 @controller("/tenants")
-export class TenantController extends BaseController {
-    @tenantService public _tenantService: ITenantService;
+export default class TenantController extends BaseController {
+    @tenantService private _tenantService: ITenantService;
 
     /**
      * Returns a list of TenantDto
@@ -34,14 +34,17 @@ export class TenantController extends BaseController {
     }
     @httpPost("/", authMiddleware({ role: UserRole.ADMIN }))
     public async post(@requestBody() input: CreateTenantInput) {
-        /** For some strange reason, "input" is not not a real instance of CreateTenantInput.
-         * Calling the method plainToClass does the trick 🙂*/
+        /* For some strange reason, "input" is not not a real instance of CreateTenantInput.
+          Calling the method plainToClass does the trick 🙂 */
         input = plainToClass(CreateTenantInput, input);
         const badRequest = await this.checkBadRequest(input);
         if (badRequest) return badRequest;
-        const existing = await this._tenantService.get(name);
-        if (existing != undefined) return this.conflict();
-        const tenant = await this._tenantService.create(input.name, input.description);
+        const existing = await this._tenantService.get(input.name);
+        if (existing) return this.conflict();
+        const tenant = await this._tenantService.create(
+            input.name,
+            input.description
+        );
         return tenant;
     }
 }

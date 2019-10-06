@@ -6,9 +6,9 @@ import jwt from "jsonwebtoken";
 import { TYPES } from "../../../domain/constants/types";
 import { IUserRepository } from "../../../domain/interfaces/repositories";
 import env from "../../../infrastructure/config";
-import { container } from "../../../infrastructure/utils/ioc_container";
+import container from "../../../infrastructure/utils/ioc_container";
 import HttpError from "../../error";
-import { UserRole } from "./../../../domain/model/user";
+import { UserRole } from "../../../domain/model/user";
 import { DecodedJwt } from "../../services/auth_service";
 
 function authMiddlewareFactory(container: Container) {
@@ -38,7 +38,7 @@ function authMiddlewareFactory(container: Container) {
                         email: decodedJwt.email
                     });
 
-                    return userRecord && userRecord.role == config.role
+                    return userRecord && userRecord.role === config.role
                         ? next()
                         : res.status(httpStatus.FORBIDDEN).end("Forbidden");
                 } catch (error) {
@@ -49,6 +49,4 @@ function authMiddlewareFactory(container: Container) {
     };
 }
 
-const authMiddleware = authMiddlewareFactory(container);
-
-export { authMiddleware };
+export default authMiddlewareFactory(container);

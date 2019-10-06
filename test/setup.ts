@@ -7,12 +7,13 @@ import supertest from "supertest";
 import { TYPES } from "../src/domain/constants/types";
 import { ITenantRepository } from "../src/domain/interfaces/repositories";
 import Tenant from "../src/domain/model/tenant";
-import { bootstrap } from "../src/infrastructure/bootstrapping";
-import { referenceDataIoCModule } from "../src/infrastructure/config/inversify.config";
-import { container } from "../src/infrastructure/utils/ioc_container";
+import bootstrap from "../src/infrastructure/bootstrapping";
+import referenceDataIoCModule from "../src/infrastructure/config/inversify.config";
+import container from "../src/infrastructure/utils/ioc_container";
 import { startAppServer } from "../src/infrastructure/utils/server_utils";
 
-let server: Server;
+let server: Server; // eslint-disable-line
+// eslint-disable-next-line
 let req: supertest.SuperTest<supertest.Test>;
 let mongoServer: MongoMemoryServer;
 before("Setup", async () => {
@@ -40,19 +41,6 @@ before("Setup", async () => {
             Tenant.createInstance("Default", "Default tenant")
         );
 });
-after("Teardown", async () => {
-    if (server) server.close();
-    await cleanupDb();
-    if (mongoServer) await mongoServer.stop();
-});
-// async function setupMongoInMemoryServer() {
-//     const mongoDb = new MongoMemoryServer();
-//     const uri = await mongoDb.getConnectionString();
-//     const port = await mongoDb.getPort();
-//     process.env.MONGODB_URI = uri;
-//     process.env.NODE_ENV = "test";
-//     process.env.PORT = port.toString();
-// }
 
 async function cleanupDb() {
     const collections = await mongoose.connection.db
@@ -62,4 +50,10 @@ async function cleanupDb() {
         await mongoose.connection.db.dropCollection(collection.name);
     });
 }
-export { req };
+after("Teardown", async () => {
+    if (server) server.close();
+    await cleanupDb();
+    if (mongoServer) await mongoServer.stop();
+});
+
+export { req, server };
