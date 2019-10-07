@@ -1,15 +1,14 @@
-import { classToClass, plainToClass } from "class-transformer";
+import { plainToClass } from "class-transformer";
 import { controller, httpPost, requestBody } from "inversify-express-utils";
 
+import { authService } from "../../../domain/constants/decorators";
 import { IAuthService } from "../../interfaces/auth_service";
 import {
-    UserDto,
     UserSignInInput,
     UserSignUpDto,
     UserSignUpInput
 } from "../../models/user_dto";
 import { BaseController } from "./base_controller";
-import { authService } from "../../../domain/constants/decorators";
 
 @controller("/auth")
 export class AuthController extends BaseController {
@@ -23,9 +22,8 @@ export class AuthController extends BaseController {
         const badRequest = await this.checkBadRequest(input);
         if (badRequest) return badRequest;
         const result = await this._authService.signUp(input);
-        const userDto = classToClass<UserDto>(result.user);
         const signUpDto: UserSignUpDto = {
-            userDto,
+            userDto: result.userDto,
             token: result.token
         };
         return signUpDto;

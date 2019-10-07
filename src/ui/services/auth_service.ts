@@ -1,3 +1,4 @@
+import { AutoMapper } from "automapper-nartc";
 import bcrypt from "bcrypt";
 import { EventDispatcher } from "event-dispatch";
 import httpStatus from "http-status-codes";
@@ -5,16 +6,17 @@ import { injectable } from "inversify";
 import jwt from "jsonwebtoken";
 
 import {
+    autoMapper,
     eventDispatcher,
     userRepository
 } from "../../domain/constants/decorators";
 import { IUserRepository } from "../../domain/interfaces/repositories";
 import { User, UserRole } from "../../domain/model/user";
 import { config } from "../../infrastructure/config";
-import { IAuthService } from "../interfaces/auth_service";
-import { events } from "../subscribers/events";
 import { HttpError } from "../error";
+import { IAuthService } from "../interfaces/auth_service";
 import { UserDto, UserSignInInput, UserSignUpInput } from "../models/user_dto";
+import { events } from "../subscribers/events";
 
 export interface DecodedJwt {
     userId: string;
@@ -28,43 +30,36 @@ export interface DecodedJwt {
 export class AuthService implements IAuthService {
     @userRepository private _userRepository: IUserRepository;
     @eventDispatcher private _eventDispatcher: EventDispatcher;
+    @autoMapper private _autoMapper: AutoMapper;
 
     public async signUp(
         dto: UserSignUpInput
-    ): Promise<{ user: UserDto; token: string }> {
+    ): Promise<{ userDto: UserDto; token: string }> {
         // Use less salt round for faster hashing on test and development but stronger hashing on production
         const hashedPassword =
             config.env === "development" || config.env === "test"
                 ? await bcrypt.hash(dto.password, 1)
                 : await bcrypt.hash(dto.password, 12);
 
-        let userRecord = await this._userRepository.findOneByQuery({
+        let user = await this._userRepository.findOneByQuery({
             email: dto.email,
             tenant: global.currentUser.tenant.id
         });
-        if (userRecord) throw new HttpError(httpStatus.CONFLICT);
+        if (user) throw new HttpError(httpStatus.CONFLICT);
 
-        const userInstance = User.createInstance({
-            ...dto,
-            password: hashedPassword
-        });
+        user = await this._userRepository.save(
+            User.createInstance({
+                ...dto,
+                password: hashedPassword
+            })
+        );
 
-        userRecord = await this._userRepository.save(userInstance);
-        userInstance.id = userRecord.id;
-        userInstance.setCreator(userRecord);
-        await this._userRepository.save(userInstance);
-        global.currentUser.setUser(userInstance);
-
-        const userDto: UserDto = {
-            firstName: dto.firstName,
-            lastName: dto.lastName,
-            email: userRecord.email,
-            username: userRecord.username,
-            id: userRecord.id
-        };
+        global.currentUser.setUser(user);
         this._eventDispatcher.dispatch(events.user.signUp, { ...dto });
-        const token = await this.generateToken(userRecord);
-        return { user: userDto, token };
+
+        const token = await this.generateToken(user);
+        const userDto = this._autoMapper.map(user, UserDto);
+        return { userDto, token };
     }
 
     public async signIn(dto: UserSignInInput): Promise<{ token: string }> {
