@@ -6,7 +6,8 @@ import jwt from "jsonwebtoken";
 
 import {
     eventDispatcher,
-    userRepository
+    userRepository,
+    autoMapper
 } from "../../domain/constants/decorators";
 import { IUserRepository } from "../../domain/interfaces/repositories";
 import { User, UserRole } from "../../domain/model/user";
@@ -15,6 +16,7 @@ import { IAuthService } from "../interfaces/auth_service";
 import { events } from "../subscribers/events";
 import { HttpError } from "../error";
 import { UserDto, UserSignInInput, UserSignUpInput } from "../models/user_dto";
+import { AutoMapper } from "automapper-nartc";
 
 export interface DecodedJwt {
     userId: string;
@@ -28,6 +30,7 @@ export interface DecodedJwt {
 export class AuthService implements IAuthService {
     @userRepository private _userRepository: IUserRepository;
     @eventDispatcher private _eventDispatcher: EventDispatcher;
+    @autoMapper private _autoMapper: AutoMapper;
 
     public async signUp(
         dto: UserSignUpInput
@@ -50,17 +53,13 @@ export class AuthService implements IAuthService {
                 password: hashedPassword
             })
         );
-        global.currentUser.setUser(user);
-        const userDto: UserDto = {
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
-            username: user.username,
-            id: user.id
-        };
 
+        global.currentUser.setUser(user);
         this._eventDispatcher.dispatch(events.user.signUp, { ...dto });
+
         const token = await this.generateToken(user);
+        const userDto = this._autoMapper.map(user, UserDto);
+        console.log(userDto);
         return { userDto, token };
     }
 

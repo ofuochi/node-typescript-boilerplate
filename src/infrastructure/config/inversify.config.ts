@@ -29,6 +29,7 @@ import { TenantRepository } from "../db/repositories/tenant_repository";
 import "../../ui/api/controllers/auth_controller";
 import "../../ui/api/controllers/secure_controller";
 import "../../ui/api/controllers/tenant_controller";
+import { UserProfile } from "../../ui/profiles/user_profile";
 
 export const referenceDataIoCModule = new ContainerModule(bind => {
     // Repositories
@@ -43,6 +44,7 @@ export const referenceDataIoCModule = new ContainerModule(bind => {
     // Type Mappings
     Mapper.initialize(config => {
         config.addProfile(new TenantProfile());
+        config.addProfile(new UserProfile());
     });
     bind<AutoMapper>(TYPES.AutoMapper).toConstantValue(Mapper);
 
