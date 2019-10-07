@@ -17,14 +17,20 @@ export class Tenant extends BaseEntity {
     @Expose()
     readonly description!: string;
 
-    constructor(name?: string, description?: string) {
+    constructor(arg?: { name: string; description: string }) {
         super();
-        this.name = name || "";
-        this.description = description || "";
+        if (!arg) return;
+
+        const { name, description } = arg;
+        this.name = name;
+        this.description = description;
     }
 
     static createInstance = (name: string, description: string) =>
-        new Tenant(name.replace(/\s/g, "").toUpperCase(), description);
+        new Tenant({
+            name: name.replace(/\s/g, "").toUpperCase(),
+            description
+        });
 
     public static get model() {
         return new Tenant().getModelForClass(Tenant, {
@@ -35,10 +41,10 @@ export class Tenant extends BaseEntity {
     @instanceMethod
     setName(name: string) {
         (this as Writable<Tenant>).name = name;
-    };
-    
+    }
+
     @instanceMethod
     setDescription(description: string) {
         (this as Writable<Tenant>).description = description;
-    };
+    }
 }

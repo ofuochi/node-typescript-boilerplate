@@ -42,9 +42,7 @@ describe("Tenant controller", async () => {
             username: "admin"
         });
         user.setRole(UserRole.ADMIN);
-        const result = (await userRepository.save(user)) as User;
-        user.id = result.id;
-
+        user = await userRepository.save(user);
         const { token } = await authService.signIn({
             password,
             emailOrUsername: user.username
