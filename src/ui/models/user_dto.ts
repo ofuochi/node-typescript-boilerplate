@@ -1,3 +1,4 @@
+import { Expose } from "class-transformer";
 import {
     IsEmail,
     IsNotEmpty,
@@ -45,16 +46,20 @@ export class UserDto {
     @MaxLength(MAX_NAME_LENGTH)
     @IsNotEmpty()
     @IsString()
+    @Expose()
     firstName: string;
     @MaxLength(MAX_NAME_LENGTH)
     @IsNotEmpty()
     @IsString()
+    @Expose()
     lastName: string;
     @MaxLength(MAX_NAME_LENGTH)
     @IsEmail()
+    @Expose()
     email: string;
     @MaxLength(MAX_NAME_LENGTH)
     @IsNotEmpty()
     @IsString()
+    @Expose()
     username: string;
 }

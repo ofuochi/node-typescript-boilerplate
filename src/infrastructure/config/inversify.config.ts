@@ -43,8 +43,8 @@ export const referenceDataIoCModule = new ContainerModule(bind => {
 
     // Type Mappings
     Mapper.initialize(config => {
-        config.addProfile(new TenantProfile());
         config.addProfile(new UserProfile());
+        config.addProfile(new TenantProfile());
     });
     bind<AutoMapper>(TYPES.AutoMapper).toConstantValue(Mapper);
 

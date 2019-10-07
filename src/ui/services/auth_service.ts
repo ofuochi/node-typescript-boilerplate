@@ -59,7 +59,6 @@ export class AuthService implements IAuthService {
 
         const token = await this.generateToken(user);
         const userDto = this._autoMapper.map(user, UserDto);
-        console.log(userDto);
         return { userDto, token };
     }
 
