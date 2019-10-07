@@ -14,7 +14,7 @@ export enum UserRole {
 @index({ email: 1, tenant: 1 }, { unique: true })
 @index({ username: 1, tenant: 1 }, { unique: true })
 // eslint-disable-next-line
-@pre<User>("save", function (next) {
+@pre<User>("save", function(next) {
     if (global.currentUser.user) {
         this.setCreator(global.currentUser.user);
     }
@@ -65,15 +65,8 @@ export class User extends BaseEntity implements IMustHaveTenant {
         tenant: Tenant;
     }) {
         super();
-        if (arg == null) return;
-        const {
-            firstName,
-            lastName,
-            email,
-            username,
-            password,
-            tenant
-        } = arg;
+        if (!arg) return;
+        const { firstName, lastName, email, username, password, tenant } = arg;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -114,40 +107,40 @@ export class User extends BaseEntity implements IMustHaveTenant {
     @instanceMethod
     setCreator(creator: User) {
         (this as Writable<User>).createdBy = creator.id;
-    };
+    }
 
     @instanceMethod
     setRole(role: UserRole) {
         (this as Writable<User>).role = role;
-    };
+    }
 
     @instanceMethod
     setEmail(email: string) {
         (this as Writable<User>).email = email;
-    };
+    }
 
     @instanceMethod
     setUsername(username: string) {
         (this as Writable<User>).username = username;
-    };
+    }
 
     @instanceMethod
     setTenant(tenant: Tenant) {
         (this as Writable<User>).tenant = tenant.id;
-    };
+    }
 
     @instanceMethod
     setFirstName(firstName: string) {
         (this as Writable<User>).firstName = firstName;
-    };
+    }
 
     @instanceMethod
     setLastName(lastName: string) {
         (this as Writable<User>).lastName = lastName;
-    };
+    }
 
     @instanceMethod
     setPassword(password: string) {
         (this as Writable<User>).password = password;
-    };
+    }
 }

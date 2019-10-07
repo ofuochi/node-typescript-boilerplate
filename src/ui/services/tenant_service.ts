@@ -1,7 +1,10 @@
 import { injectable } from "inversify";
 import { AutoMapper } from "automapper-nartc";
 
-import { tenantRepository, autoMapper } from "../../domain/constants/decorators";
+import {
+    tenantRepository,
+    autoMapper
+} from "../../domain/constants/decorators";
 import { ITenantRepository } from "../../domain/interfaces/repositories";
 import { TenantDto } from "../models/tenant_dto";
 import { ITenantService } from "../interfaces/tenant_service";
@@ -11,9 +14,11 @@ import { Tenant } from "../../domain/model/tenant";
 export class TenantService implements ITenantService {
     @autoMapper public _mapper: AutoMapper;
     @tenantRepository public _tenantRepository: ITenantRepository;
-    
+
     async create(name: string, description: string): Promise<TenantDto> {
-        const tenant = await this._tenantRepository.save(Tenant.createInstance(name, description));
+        const tenant = await this._tenantRepository.save(
+            Tenant.createInstance(name, description)
+        );
         return this._mapper.map(tenant, TenantDto);
     }
 
@@ -26,6 +31,6 @@ export class TenantService implements ITenantService {
         const tenants = name
             ? await this._tenantRepository.findManyByQuery({ name })
             : await this._tenantRepository.findAll();
-        return tenants.map(tenant => this._mapper.map(tenant, TenantDto));
+        return this._mapper.mapArray(tenants, TenantDto);
     }
 }
