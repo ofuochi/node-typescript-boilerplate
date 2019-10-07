@@ -1,3 +1,4 @@
+import { AutoMapper } from "automapper-nartc";
 import bcrypt from "bcrypt";
 import { EventDispatcher } from "event-dispatch";
 import httpStatus from "http-status-codes";
@@ -5,18 +6,17 @@ import { injectable } from "inversify";
 import jwt from "jsonwebtoken";
 
 import {
+    autoMapper,
     eventDispatcher,
-    userRepository,
-    autoMapper
+    userRepository
 } from "../../domain/constants/decorators";
 import { IUserRepository } from "../../domain/interfaces/repositories";
 import { User, UserRole } from "../../domain/model/user";
 import { config } from "../../infrastructure/config";
-import { IAuthService } from "../interfaces/auth_service";
-import { events } from "../subscribers/events";
 import { HttpError } from "../error";
+import { IAuthService } from "../interfaces/auth_service";
 import { UserDto, UserSignInInput, UserSignUpInput } from "../models/user_dto";
-import { AutoMapper } from "automapper-nartc";
+import { events } from "../subscribers/events";
 
 export interface DecodedJwt {
     userId: string;
