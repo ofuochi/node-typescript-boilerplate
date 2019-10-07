@@ -70,3 +70,4 @@ build
 
 # history
 .history
+.vscode/settings.json

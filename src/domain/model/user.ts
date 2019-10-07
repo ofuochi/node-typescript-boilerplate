@@ -1,4 +1,4 @@
-import { index, prop, Ref, pre, instanceMethod } from "@hasezoey/typegoose";
+import { index, instanceMethod, pre, prop, Ref } from "@hasezoey/typegoose";
 
 import { Writable } from "../utils/writable";
 import { BaseEntity } from "./base";
@@ -15,9 +15,8 @@ export enum UserRole {
 @index({ username: 1, tenant: 1 }, { unique: true })
 // eslint-disable-next-line
 @pre<User>("save", function(next) {
-    if (global.currentUser.user) {
-        this.setCreator(global.currentUser.user);
-    }
+    const createdBy = global.currentUser.user || this;
+    this.setCreator(createdBy);
     next();
 })
 export class User extends BaseEntity implements IMustHaveTenant {
@@ -106,7 +105,7 @@ export class User extends BaseEntity implements IMustHaveTenant {
 
     @instanceMethod
     setCreator(creator: User) {
-        (this as Writable<User>).createdBy = creator.id;
+        (this as Writable<User>).createdBy = creator;
     }
 
     @instanceMethod

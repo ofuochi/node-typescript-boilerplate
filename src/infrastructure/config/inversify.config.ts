@@ -8,10 +8,7 @@ import {
     ITenantRepository,
     IUserRepository
 } from "../../domain/interfaces/repositories";
-import {
-    ILoggerService,
-    IMailService
-} from "../../domain/interfaces/services";
+import { ILoggerService, IMailService } from "../../domain/interfaces/services";
 import { IAuthService } from "../../ui/interfaces/auth_service";
 import { ITenantService } from "../../ui/interfaces/tenant_service";
 
@@ -47,8 +44,7 @@ export const referenceDataIoCModule = new ContainerModule(bind => {
     Mapper.initialize(config => {
         config.addProfile(new TenantProfile());
     });
-    bind<AutoMapper>(TYPES.AutoMapper)
-        .toConstantValue(Mapper);
+    bind<AutoMapper>(TYPES.AutoMapper).toConstantValue(Mapper);
 
     // Services
     bind<IMailService>(TYPES.MailService)
@@ -67,6 +63,7 @@ export const referenceDataIoCModule = new ContainerModule(bind => {
         .to(TenantService)
         .inSingletonScope();
 
-    bind<EventDispatcher>(TYPES.EventDispatcher)
-        .toConstantValue(new EventDispatcher());
+    bind<EventDispatcher>(TYPES.EventDispatcher).toConstantValue(
+        new EventDispatcher()
+    );
 });

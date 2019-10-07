@@ -10,13 +10,13 @@ export abstract class BaseEntity extends Typegoose {
     @prop({ required: true, default: new Date() })
     @Expose()
     readonly createdAt: Date = new Date();
-    @prop({ default: null })
+    @prop({ default: null, ref: BaseEntity })
     @Expose()
     readonly createdBy?: Ref<User>;
     @prop({ default: null })
     @Expose()
     readonly updatedAt?: Date;
-    @prop({ default: null })
+    @prop({ default: null, ref: BaseEntity })
     @Expose()
     readonly updatedBy?: Ref<User>;
     @prop({ required: true, default: true })
@@ -25,7 +25,7 @@ export abstract class BaseEntity extends Typegoose {
     @prop({ required: true, default: false })
     @Expose()
     readonly isDeleted: boolean = false;
-    @prop({ default: null })
+    @prop({ default: null, ref: BaseEntity })
     @Expose()
     readonly deletedBy?: Ref<User>;
     @prop({ default: null })

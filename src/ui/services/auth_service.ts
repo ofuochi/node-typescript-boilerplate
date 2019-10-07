@@ -31,40 +31,37 @@ export class AuthService implements IAuthService {
 
     public async signUp(
         dto: UserSignUpInput
-    ): Promise<{ user: UserDto; token: string }> {
+    ): Promise<{ userDto: UserDto; token: string }> {
         // Use less salt round for faster hashing on test and development but stronger hashing on production
         const hashedPassword =
             config.env === "development" || config.env === "test"
                 ? await bcrypt.hash(dto.password, 1)
                 : await bcrypt.hash(dto.password, 12);
 
-        let userRecord = await this._userRepository.findOneByQuery({
+        let user = await this._userRepository.findOneByQuery({
             email: dto.email,
             tenant: global.currentUser.tenant.id
         });
-        if (userRecord) throw new HttpError(httpStatus.CONFLICT);
+        if (user) throw new HttpError(httpStatus.CONFLICT);
 
-        const userInstance = User.createInstance({
-            ...dto,
-            password: hashedPassword
-        });
-
-        userRecord = await this._userRepository.save(userInstance);
-        userInstance.id = userRecord.id;
-        userInstance.setCreator(userRecord);
-        await this._userRepository.save(userInstance);
-        global.currentUser.setUser(userInstance);
-
+        user = await this._userRepository.save(
+            User.createInstance({
+                ...dto,
+                password: hashedPassword
+            })
+        );
+        global.currentUser.setUser(user);
         const userDto: UserDto = {
-            firstName: dto.firstName,
-            lastName: dto.lastName,
-            email: userRecord.email,
-            username: userRecord.username,
-            id: userRecord.id
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            username: user.username,
+            id: user.id
         };
+
         this._eventDispatcher.dispatch(events.user.signUp, { ...dto });
-        const token = await this.generateToken(userRecord);
-        return { user: userDto, token };
+        const token = await this.generateToken(user);
+        return { userDto, token };
     }
 
     public async signIn(dto: UserSignInInput): Promise<{ token: string }> {
