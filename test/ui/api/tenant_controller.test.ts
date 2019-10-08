@@ -42,7 +42,7 @@ describe("Tenant controller", async () => {
             username: "admin"
         });
         user.setRole(UserRole.ADMIN);
-        user = await userRepository.save(user);
+        await userRepository.save(user);
         const { token } = await authService.signIn({
             password,
             emailOrUsername: user.username
@@ -71,7 +71,8 @@ describe("Tenant controller", async () => {
     });
     it("should return forbidden for non admin user that attempts to create tenant", async () => {
         user.setRole(UserRole.USER);
-        user = await userRepository.save(user);
+        await userRepository.save(user);
+
         const { token } = await authService.signIn({
             password,
             emailOrUsername: user.username

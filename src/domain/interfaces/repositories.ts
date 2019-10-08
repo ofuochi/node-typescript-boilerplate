@@ -12,6 +12,9 @@ export interface IBaseRepository<T> {
     findManyById(ids: string[]): Promise<T[]>;
     findOneByQuery(query: Query<T>): Promise<T>;
     findManyByQuery(query?: Query<T>): Promise<T[]>;
+    deleteById(id: string): Promise<boolean>;
+    // deleteOneByQuery(query: Query<T>): Promise<number>;
+    // deleteManyByQuery(query?: Query<T>): Promise<number>;
 }
 
 export type IUserRepository = IBaseRepository<User>;

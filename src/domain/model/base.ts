@@ -1,8 +1,34 @@
-import { prop, Typegoose, Ref, instanceMethod } from "@hasezoey/typegoose";
+import { instanceMethod, pre, prop, Ref, Typegoose } from "@hasezoey/typegoose";
 import { Expose } from "class-transformer";
+import { Query } from "mongoose";
+
 import { Writable } from "../utils/writable";
 import { User } from "./user";
 
+// eslint-disable-next-line
+@pre<User>("findOneAndUpdate", function(this: Query<User>, next) {
+    try {
+        const entity = this.getUpdate();
+        const currentUser = global.currentUser.user;
+        const user = (currentUser && currentUser.id) || entity.id;
+        entity.updatedBy = user;
+        if (entity.isDeleted) entity.deletedBy = user;
+        next();
+    } catch (error) {
+        next(error);
+    }
+})
+// eslint-disable-next-line
+@pre<User>("save", function(next) {
+    try {
+        const createdBy =
+            (global.currentUser && global.currentUser.user) || this;
+        this.setCreatedBy(createdBy);
+        next();
+    } catch (error) {
+        next(error);
+    }
+})
 export abstract class BaseEntity extends Typegoose {
     @Expose()
     id?: any;
@@ -50,5 +76,13 @@ export abstract class BaseEntity extends Typegoose {
     @instanceMethod
     activate(): void {
         (this as Writable<BaseEntity>).isActive = true;
+    }
+    @instanceMethod
+    private setDeletedBy(user: BaseEntity): void {
+        (this as Writable<BaseEntity>).deletedBy = user as User;
+    }
+    @instanceMethod
+    private setCreatedBy(user: BaseEntity) {
+        (this as Writable<BaseEntity>).createdBy = user as User;
     }
 }

@@ -1,6 +1,6 @@
+import { plainToClassFromExist } from "class-transformer";
 import { injectable, unmanaged } from "inversify";
 import { Document, Model } from "mongoose";
-import { plainToClassFromExist } from "class-transformer";
 
 import {
     IBaseRepository,
@@ -56,7 +56,8 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
                     (err, res) => {
                         if (err) return reject(err);
                         if (!res) return resolve();
-                        doc = this.readMapper(res);
+
+                        Object.assign(doc, this.readMapper(res));
                         return resolve(doc);
                     }
                 );
@@ -64,7 +65,8 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
                 const instance = new this.Model(doc);
                 instance.save((err, res) => {
                     if (err) return reject(err);
-                    return resolve(this.readMapper(res));
+                    const entity = Object.assign(doc, this.readMapper(res));
+                    return resolve(entity);
                 });
             }
         });
@@ -103,6 +105,19 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
             });
         });
     }
+    async deleteById(id: string): Promise<boolean> {
+        const item = await this.findById(id);
+        if (!item) return false;
+        item.delete();
+        await this.save(item);
+        return true;
+    }
+    // deleteOneByQuery(query: Query<TEntity>): Promise<number> {
+    //     throw new Error("Method not implemented.");
+    // }
+    // deleteManyByQuery(query?: Query<TEntity> | undefined): Promise<number> {
+    //     throw new Error("Method not implemented.");
+    // }
 
     /**
      * Maps '_id' from mongodb to 'id' of TEntity
