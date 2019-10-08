@@ -1,11 +1,12 @@
 # NodeJs/Typescript API Boilerplate
-### For Enterprise
+
+## For Enterprise
 
 ## Running the app
 
 > **NOTE**: These instructions require [MongoDB](https://docs.mongodb.com/manual/installation/) and [Node.js](https://nodejs.org/en/download/) to be installed on your environment.
 
-### Clone the Repository:
+### Clone the Repository
 
 ```sh
 git clone https://github.com/ofuochi/node-typescript-boilerplate.git
@@ -18,43 +19,52 @@ cd node-typescript-boilerplate
 git checkout -b <INSERT-BRANCH-NAME>
 ```
 
-### Install Dependencies:
+### Install Dependencies
 
 ```sh
 npm install
 ```
 
 ### Copy Files
-#### Sample `env` File into a `.env` File:
+
+#### Sample `env` File into a `.env` File
 
 ```sh
 cp env.sample .env
 ```
 
-### Run the App:
+### Run the App
 
 ```sh
 npm run start
 ```
 
-### Open:
+### Open
 
 ```sh
 http://localhost:3000/api/v1/tenants
 ```
 
-### Run Tests:
+### Run Tests
+
+Run test once
 
 ```sh
 npm run test
+```
+
+Or re-run test on every file change (watch mode)
+
+```sh
+npm run test-watch
 ```
 
 ## REST Services
 
 The application exposes a few REST endpoints which requires you to pass `x-tenant-id` header. First call the tenant endpoint `/api/v1/tenant` to get all the available tenants. Use any of the tenant IDs as the value for `x-tenant-id`
 
--   `HTTP` `GET` `/api/v1/tenats`
--   `HTTP` `GET` `/api/v1/tenats/:query`
+-   `HTTP` `GET` `/api/v1/tenants`
+-   `HTTP` `GET` `/api/v1/tenants/:query`
 -   `HTTP` `GET` `/api/v1/secured` (Requires a valid `x-auth-token` header)
 
 You can use the following code snippet to call the secured endpoint:
