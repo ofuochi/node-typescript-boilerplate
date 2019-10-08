@@ -9,13 +9,14 @@ import {
 import { BaseEntity } from "../../../domain/model/base";
 
 @injectable()
-export class BaseRepository<
-    TEntity extends BaseEntity,
-    TModel extends Document
-> implements IBaseRepository<TEntity> {
+export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
+    implements IBaseRepository<TEntity> {
     protected Model: Model<TModel>;
     protected _constructor: () => TEntity;
-    public constructor(@unmanaged() model: Model<TModel>, @unmanaged() constructor: () => TEntity) {
+    public constructor(
+        @unmanaged() model: Model<TModel>,
+        @unmanaged() constructor: () => TEntity
+    ) {
         this.Model = model;
         this._constructor = constructor;
     }
@@ -48,20 +49,21 @@ export class BaseRepository<
     public async save(doc: TEntity): Promise<TEntity> {
         return new Promise<TEntity>((resolve, reject) => {
             if (doc.id) {
-                this.Model.findByIdAndUpdate(
-                    doc.id,
+                this.Model.updateOne(
+                    { _id: doc.id },
                     doc,
                     { new: true },
                     (err, res) => {
                         if (err) return reject(err);
-                        resolve(this.readMapper(res as TModel));
+                        if (!res) return resolve();
+                        return resolve(doc);
                     }
                 );
             } else {
                 const instance = new this.Model(doc);
                 instance.save((err, res) => {
                     if (err) return reject(err);
-                    resolve(this.readMapper(res));
+                    return resolve(this.readMapper(res));
                 });
             }
         });

@@ -15,9 +15,13 @@ export enum UserRole {
 @index({ username: 1, tenant: 1 }, { unique: true })
 // eslint-disable-next-line
 @pre<User>("save", function(next) {
-    const createdBy = global.currentUser.user || this;
-    this.setCreator(createdBy);
-    next();
+    try {
+        const createdBy = global.currentUser.user || this;
+        this.setCreator(createdBy);
+        next();
+    } catch (error) {
+        next(error);
+    }
 })
 export class User extends BaseEntity implements IMustHaveTenant {
     @prop({ required: true, maxlength: MAX_NAME_LENGTH, trim: true })
