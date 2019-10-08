@@ -24,6 +24,7 @@ export enum UserRole {
         next(error);
     }
 })
+// eslint-disable-next-line
 @pre<User>("findOneAndUpdate", function(this: Query<User>, next) {
     try {
         const user = this.getUpdate();
