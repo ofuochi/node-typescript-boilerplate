@@ -1,4 +1,5 @@
 import { index, instanceMethod, pre, prop, Ref } from "@hasezoey/typegoose";
+import { Query } from "mongoose";
 
 import { Writable } from "../utils/writable";
 import { BaseEntity } from "./base";
@@ -18,6 +19,17 @@ export enum UserRole {
     try {
         const createdBy = global.currentUser.user || this;
         this.setCreator(createdBy);
+        next();
+    } catch (error) {
+        next(error);
+    }
+})
+// eslint-disable-next-line
+@pre<User>("findOneAndUpdate", function(this: Query<User>, next) {
+    try {
+        const user = this.getUpdate();
+        const currentUser = global.currentUser.user;
+        user.updatedBy = (currentUser && currentUser.id) || user.id;
         next();
     } catch (error) {
         next(error);
