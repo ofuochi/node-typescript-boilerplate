@@ -71,7 +71,7 @@ describe("Tenant controller", async () => {
     });
     it("should return forbidden for non admin user that attempts to create tenant", async () => {
         user.setRole(UserRole.USER);
-        await userRepository.save(user);
+        user = await userRepository.save(user);
         const { token } = await authService.signIn({
             password,
             emailOrUsername: user.username
@@ -82,6 +82,8 @@ describe("Tenant controller", async () => {
             .set(authTokenHeader, token)
             .send(createTenantInput)
             .expect(httpStatus.FORBIDDEN);
+
+        expect(user.updatedBy).to.be.ok;
     });
 
     it("should return list of tenants", async () => {

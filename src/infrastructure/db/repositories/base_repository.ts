@@ -49,13 +49,14 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
     public async save(doc: TEntity): Promise<TEntity> {
         return new Promise<TEntity>((resolve, reject) => {
             if (doc.id) {
-                this.Model.updateOne(
+                this.Model.findByIdAndUpdate(
                     { _id: doc.id },
                     doc,
                     { new: true },
                     (err, res) => {
                         if (err) return reject(err);
                         if (!res) return resolve();
+                        doc = this.readMapper(res);
                         return resolve(doc);
                     }
                 );
