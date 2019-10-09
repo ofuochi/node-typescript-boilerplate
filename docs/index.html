@@ -22,11 +22,19 @@
             repo: '',
             plugins: [
                 EditOnGithubPlugin.create(docBase, docEditBase, title)
-            ]
+            ],
+            // docsify-copy-code (defaults)
+            copyCode: {
+                buttonText: 'Copy to clipboard',
+                errorText: 'Error',
+                successText: 'Copied'
+            }
         }
     </script>
     <script src="//unpkg.com/docsify/lib/docsify.min.js"></script>
     <script src="//unpkg.com/docsify-edit-on-github/index.js"></script>
+    <!-- Latest v2.x.x -->
+    <script src="https://unpkg.com/docsify-copy-code@2"></script>
 </body>
 
 </html>
