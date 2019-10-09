@@ -1,7 +1,9 @@
 # NodeJs/Typescript API Boilerplate
 [![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/ofuochi/node-typescript-boilerplate/) [![GitHub issues](https://img.shields.io/github/issues/ofuochi/node-typescript-boilerplate)](https://github.com/ofuochi/node-typescript-boilerplate/issues) [![GitHub stars](https://img.shields.io/github/stars/ofuochi/node-typescript-boilerplate)](https://github.com/ofuochi/node-typescript-boilerplate/stargazers) [![GitHub forks](https://img.shields.io/github/forks/ofuochi/node-typescript-boilerplate)](https://github.com/ofuochi/node-typescript-boilerplate/network) [![GitHub license](https://img.shields.io/github/license/ofuochi/node-typescript-boilerplate)](https://github.com/ofuochi/node-typescript-boilerplate/blob/master/LICENSE)
 
-## For Enterprise
+## To Contribute
+
+Please feel free to contribute to this project. To contribute, please follow this [instructions](https://github.com/ofuochi/node-typescript-boilerplate/blob/master/CONTRIBUTING.md)
 
 ## Running the app
 
