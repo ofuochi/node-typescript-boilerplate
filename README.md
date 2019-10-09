@@ -3,7 +3,7 @@
 
 ## To Contribute
 
-Please feel free to contribute and to this project. To contribute, please follow this [instructions](https://github.com/ofuochi/node-typescript-boilerplate/blob/master/CONTRIBUTING.md)
+Please feel free to contribute to this project. To contribute, please follow this [instructions](https://github.com/ofuochi/node-typescript-boilerplate/blob/master/CONTRIBUTING.md)
 
 ## Running the app
 
