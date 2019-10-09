@@ -2,9 +2,9 @@ import { IsNotEmpty, MaxLength, IsString, IsBoolean } from "class-validator";
 import { Expose } from "class-transformer";
 
 import { MAX_NAME_LENGTH } from "../../domain/model/user";
-import { BaseInputDto, BaseResponseDto } from "./base_dto";
+import { BaseCreateDto, BaseReadDto } from "./base_dto";
 
-export class CreateTenantInput extends BaseInputDto {
+export class CreateTenantInput extends BaseCreateDto {
     @MaxLength(MAX_NAME_LENGTH)
     @IsNotEmpty()
     @IsString()
@@ -13,7 +13,7 @@ export class CreateTenantInput extends BaseInputDto {
     @IsNotEmpty()
     description: string;
 }
-export class TenantDto extends BaseResponseDto {
+export class TenantDto extends BaseReadDto {
     @MaxLength(MAX_NAME_LENGTH)
     @IsNotEmpty()
     @IsString()

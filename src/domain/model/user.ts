@@ -14,6 +14,8 @@ export enum UserRole {
 @index({ email: 1, tenant: 1 }, { unique: true })
 @index({ username: 1, tenant: 1 }, { unique: true })
 export class User extends BaseEntity implements IMustHaveTenant {
+    @prop({ required: true, default: "User" })
+    readonly type: string = "User";
     @prop({ required: true, maxlength: MAX_NAME_LENGTH, trim: true })
     readonly firstName!: string;
     @prop({ required: true, maxlength: MAX_NAME_LENGTH, trim: true })

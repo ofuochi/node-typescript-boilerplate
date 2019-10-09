@@ -38,10 +38,21 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
         return new Promise<TEntity>((resolve, reject) => {
             this.Model.findById(id, (err, res) => {
                 if (err) return reject(err);
-                if (!res) return reject();
+                if (!res) return resolve();
 
                 const result = this.readMapper(res);
                 return resolve(result.isDeleted ? undefined : result);
+            });
+        });
+    }
+    hardFindById(id: string): Promise<TEntity> {
+        return new Promise<TEntity>((resolve, reject) => {
+            this.Model.findById(id, (err, res) => {
+                if (err) return reject(err);
+                if (!res) return resolve();
+
+                const result = this.readMapper(res);
+                return resolve(result);
             });
         });
     }
@@ -56,7 +67,6 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
                     (err, res) => {
                         if (err) return reject(err);
                         if (!res) return resolve();
-
                         Object.assign(doc, this.readMapper(res));
                         return resolve(doc);
                     }
@@ -65,8 +75,8 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
                 const instance = new this.Model(doc);
                 instance.save((err, res) => {
                     if (err) return reject(err);
-                    const entity = Object.assign(doc, this.readMapper(res));
-                    return resolve(entity);
+                    Object.assign(doc, this.readMapper(res));
+                    return resolve(doc);
                 });
             }
         });

@@ -72,7 +72,6 @@ describe("Tenant controller", async () => {
     it("should return forbidden for non admin user that attempts to create tenant", async () => {
         user.setRole(UserRole.USER);
         await userRepository.save(user);
-
         const { token } = await authService.signIn({
             password,
             emailOrUsername: user.username
@@ -97,5 +96,27 @@ describe("Tenant controller", async () => {
             .query({ name: tenant.name })
             .expect(httpStatus.OK);
         expect(res.body[0]).to.contain.keys("isActive", "id", "name");
+    });
+    it("should soft delete tenant by admin", async () => {
+        user.setRole(UserRole.ADMIN);
+        await userRepository.save(user);
+
+        const { token } = await authService.signIn({
+            password,
+            emailOrUsername: user.username
+        });
+        await req
+            .delete(`${endpoint}/${tenant.id}`)
+            .set(authTokenHeader, token)
+            .expect(httpStatus.NO_CONTENT);
+
+        const tenantRecord = await tenantRepository.findById(tenant.id);
+        const deletedTenantRecord = await tenantRepository.hardFindById(
+            tenant.id
+        );
+        expect(tenantRecord).to.be.undefined;
+        expect(deletedTenantRecord.deletedBy.toString()).to.equal(
+            user.id.toString()
+        );
     });
 });

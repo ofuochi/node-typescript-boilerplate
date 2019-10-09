@@ -9,6 +9,7 @@ export interface IBaseRepository<T> {
     save(doc: T): Promise<T>;
     findAll(): Promise<T[]>;
     findById(id: string): Promise<T>;
+    hardFindById(id: string): Promise<T>;
     findManyById(ids: string[]): Promise<T[]>;
     findOneByQuery(query: Query<T>): Promise<T>;
     findManyByQuery(query?: Query<T>): Promise<T[]>;
