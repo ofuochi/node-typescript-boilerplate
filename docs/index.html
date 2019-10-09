@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>node-typescript-boilerplate - Enterprise NodeJs/Typescript API boilerplate</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="description" content="Enterprise NodeJs/Typescript API boilerplate">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <link rel="stylesheet" href="//unpkg.com/docsify/themes/vue.css">
+</head>
+
+<body>
+    <div id="app">Please wait...</div>
+    <script>
+        if (typeof navigator.serviceWorker !== 'undefined') {
+            navigator.serviceWorker.register('sw.js')
+        }
+        window.$docsify = {
+            name: 'node-typescript-boilerplate',
+            repo: '',
+            plugins: [
+                EditOnGithubPlugin.create(docBase, docEditBase, title)
+            ],
+            // docsify-copy-code (defaults)
+            copyCode: {
+                buttonText: 'Copy to clipboard',
+                errorText: 'Error',
+                successText: 'Copied'
+            }
+        }
+    </script>
+    <script src="//unpkg.com/docsify/lib/docsify.min.js"></script>
+    <script src="//unpkg.com/docsify-edit-on-github/index.js"></script>
+    <!-- Latest v2.x.x -->
+    <script src="https://unpkg.com/docsify-copy-code@2"></script>
+</body>
+
+</html>

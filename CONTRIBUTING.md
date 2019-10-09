@@ -6,6 +6,8 @@ When contributing, please follow the community's [Code of Conduct](CODE_OF_CONDU
 
 Please use our [Slack Channel](https://join.slack.com/t/nodetypescript-boiler/shared_invite/enQtNzg3NTI3NDc3MzgxLTBmNWI2ZjFlMzcxNTI2MmEyMWI4MDY4NjBlNTNhNzNjY2QxMmQxM2M5OWU4ZDNhMmYzOTNjODUxODllYjM2OGY) to collaborate with other contributors.
 
+<a href="https://communityinviter.com/apps/nodetypescript-boiler/node-typescript-boilerplate" rel="Node TypeScript Boilerplate Community">![Node TypeScript Boilerplate Slack](https://img.shields.io/badge/JOIN-Slack%20Channel-green.svg?longCache=true&style=for-the-badge)</a>
+
 Issues
 ------
 
