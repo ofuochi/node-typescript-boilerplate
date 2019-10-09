@@ -8,12 +8,15 @@
     <meta name="description" content="Enterprise NodeJs/Typescript API boilerplate">
     <meta name="viewport"
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-        <link rel="stylesheet" href="//unpkg.com/docsify/themes/vue.css">
+    <link rel="stylesheet" href="//unpkg.com/docsify/themes/vue.css">
 </head>
 
 <body>
     <div id="app">Please wait...</div>
     <script>
+        if (typeof navigator.serviceWorker !== 'undefined') {
+            navigator.serviceWorker.register('sw.js')
+        }
         window.$docsify = {
             name: 'node-typescript-boilerplate',
             repo: ''
