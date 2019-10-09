@@ -26,7 +26,9 @@ export class TenantService implements ITenantService {
         const tenant = await this._tenantRepository.findOneByQuery({ name });
         return tenant && this._mapper.map(tenant, TenantDto);
     }
-
+    async delete(id: string): Promise<boolean> {
+        return this._tenantRepository.deleteById(id);
+    }
     async search(name?: string): Promise<TenantDto[]> {
         const tenants = name
             ? await this._tenantRepository.findManyByQuery({ name })
