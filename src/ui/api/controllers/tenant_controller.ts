@@ -1,18 +1,21 @@
 import { plainToClass } from "class-transformer";
 import {
     controller,
+    httpDelete,
     httpGet,
     httpPost,
     queryParam,
-    requestBody
+    requestBody,
+    requestParam
 } from "inversify-express-utils";
+import { Types } from "mongoose";
 
 import { tenantService } from "../../../domain/constants/decorators";
 import { UserRole } from "../../../domain/model/user";
+import { ITenantService } from "../../interfaces/tenant_service";
 import { CreateTenantInput, TenantDto } from "../../models/tenant_dto";
 import { authMiddleware } from "../middleware/auth_middleware";
 import { BaseController } from "./base_controller";
-import { ITenantService } from "../../interfaces/tenant_service";
 
 @controller("/tenants")
 export class TenantController extends BaseController {
@@ -41,10 +44,12 @@ export class TenantController extends BaseController {
         if (badRequest) return badRequest;
         const existing = await this._tenantService.get(input.name);
         if (existing) return this.conflict();
-        const tenant = await this._tenantService.create(
-            input.name,
-            input.description
-        );
-        return tenant;
+        return this._tenantService.create(input.name, input.description);
+    }
+    @httpDelete("/:id", authMiddleware({ role: UserRole.ADMIN }))
+    public async deleteById(@requestParam("id") input: string) {
+        if (!Types.ObjectId.isValid(input))
+            return this.badRequest(`ID "${input}" is invalid`);
+        await this._tenantService.delete(input);
     }
 }

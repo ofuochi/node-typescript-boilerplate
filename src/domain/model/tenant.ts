@@ -5,6 +5,8 @@ import { BaseEntity } from "./base";
 import { Writable } from "../utils/writable";
 
 export class Tenant extends BaseEntity {
+    @prop({ required: true, default: "Tenant" })
+    readonly type: string = "Tenant";
     @prop({
         required: true,
         uppercase: true,

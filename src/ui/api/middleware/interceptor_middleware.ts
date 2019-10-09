@@ -56,7 +56,7 @@ export function exceptionLoggerMiddleware(
 ) {
     // const log = container.get<ILoggerService>(TYPES.LoggerService);
 
-    // log.error(`
+    // console.error(`
     // ----------------------------------
     // EXCEPTION MIDDLEWARE
     // HTTP ${req.method} ${req.url}
