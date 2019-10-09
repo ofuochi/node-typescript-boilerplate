@@ -49,7 +49,7 @@ describe("Auth controller", () => {
     describe("Sign up user", () => {
         signUpInput = {
             username: "john",
-            firstName: "Doe",
+            firstName: "John",
             lastName: "Doe",
             email: "john@email.com",
             password: "valid_P@ssW1d"
@@ -69,7 +69,6 @@ describe("Auth controller", () => {
             expect(result).to.contain.keys("userDto", "token");
 
             const userRecord = await userRepository.findById(result.userDto.id);
-
             expect(result.userDto.id.toString()).to.equal(
                 userRecord.createdBy.toString()
             );

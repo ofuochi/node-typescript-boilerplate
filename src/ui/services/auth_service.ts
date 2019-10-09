@@ -112,6 +112,7 @@ export class AuthService implements IAuthService {
             firstName: user.firstName,
             tenantId: user.tenant
         };
+        global.currentUser.setUser(user);
         return jwt.sign(payload, config.jwtSecret, { expiresIn: "2 days" });
     }
 }

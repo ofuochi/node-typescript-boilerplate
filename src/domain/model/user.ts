@@ -1,4 +1,4 @@
-import { index, instanceMethod, pre, prop, Ref } from "@hasezoey/typegoose";
+import { index, instanceMethod, prop, Ref } from "@hasezoey/typegoose";
 
 import { Writable } from "../utils/writable";
 import { BaseEntity } from "./base";
@@ -13,17 +13,9 @@ export enum UserRole {
 
 @index({ email: 1, tenant: 1 }, { unique: true })
 @index({ username: 1, tenant: 1 }, { unique: true })
-// eslint-disable-next-line
-@pre<User>("save", function(next) {
-    try {
-        const createdBy = global.currentUser.user || this;
-        this.setCreator(createdBy);
-        next();
-    } catch (error) {
-        next(error);
-    }
-})
 export class User extends BaseEntity implements IMustHaveTenant {
+    @prop({ required: true, default: "User" })
+    readonly type: string = "User";
     @prop({ required: true, maxlength: MAX_NAME_LENGTH, trim: true })
     readonly firstName!: string;
     @prop({ required: true, maxlength: MAX_NAME_LENGTH, trim: true })
@@ -105,11 +97,6 @@ export class User extends BaseEntity implements IMustHaveTenant {
         return new User().getModelForClass(User, {
             schemaOptions: { collection: "Users", timestamps: true }
         });
-    }
-
-    @instanceMethod
-    setCreator(creator: User) {
-        (this as Writable<User>).createdBy = creator;
     }
 
     @instanceMethod
