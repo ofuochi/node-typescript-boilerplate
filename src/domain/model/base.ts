@@ -9,12 +9,13 @@ import { User } from "./user";
 @pre<BaseEntity>("findOneAndUpdate", function(this: Query<BaseEntity>, next) {
     try {
         const entity = this.getUpdate();
-        const user = global.currentUser.user as User;
-        entity.updatedBy = user.id;
-
-        if (entity.isDeleted) {
-            entity.deletedBy = user.id;
-            entity.deletionTime = new Date();
+        const user = (global.currentUser && global.currentUser.user) as User;
+        if (user) {
+            entity.updatedBy = user.id;
+            if (entity.isDeleted) {
+                entity.deletedBy = user.id;
+                entity.deletionTime = new Date();
+            }
         }
         next();
     } catch (error) {

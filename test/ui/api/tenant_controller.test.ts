@@ -13,7 +13,7 @@ import { config } from "../../../src/infrastructure/config";
 import { container } from "../../../src/infrastructure/utils/ioc_container";
 import { IAuthService } from "../../../src/ui/interfaces/auth_service";
 import { CreateTenantInput } from "../../../src/ui/models/tenant_dto";
-import { req } from "../../setup";
+import { req, cleanupDb } from "../../setup";
 
 const endpoint = `${config.api.prefix}/tenants`;
 let authService: IAuthService;
@@ -27,12 +27,16 @@ describe("Tenant controller", async () => {
     let tenant: Tenant;
 
     before(async () => {
+        await cleanupDb();
+
         userRepository = container.get<IUserRepository>(TYPES.UserRepository);
         authService = container.get<IAuthService>(TYPES.AuthService);
         tenantRepository = container.get<ITenantRepository>(
             TYPES.TenantRepository
         );
-        tenant = await tenantRepository.findOneByQuery({ name: "Default" });
+        tenant = await tenantRepository.insertOrUpdate(
+            Tenant.createInstance("Default", "Default")
+        );
         const hashedPw = await bcrypt.hash(password, 1);
         user = User.createInstance({
             firstName: "Admin",
@@ -42,7 +46,7 @@ describe("Tenant controller", async () => {
             username: "admin"
         });
         user.setRole(UserRole.ADMIN);
-        await userRepository.save(user);
+        await userRepository.insertOrUpdate(user);
         const { token } = await authService.signIn({
             password,
             emailOrUsername: user.username
@@ -71,7 +75,7 @@ describe("Tenant controller", async () => {
     });
     it("should return forbidden for non admin user that attempts to create tenant", async () => {
         user.setRole(UserRole.USER);
-        await userRepository.save(user);
+        await userRepository.insertOrUpdate(user);
         const { token } = await authService.signIn({
             password,
             emailOrUsername: user.username
@@ -99,7 +103,7 @@ describe("Tenant controller", async () => {
     });
     it("should soft delete tenant by admin", async () => {
         user.setRole(UserRole.ADMIN);
-        await userRepository.save(user);
+        await userRepository.insertOrUpdate(user);
 
         const { token } = await authService.signIn({
             password,

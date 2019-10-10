@@ -3,8 +3,8 @@ import { injectable } from "inversify";
 import {
     winstonLoggerInstance,
     IWinstonLogger
-} from "../../infrastructure/bootstrapping/loaders/logger";
-import { ILoggerService } from "../interfaces/services";
+} from "../bootstrapping/loaders/logger";
+import { ILoggerService } from "../../domain/interfaces/services";
 
 @injectable()
 export class LoggerService implements ILoggerService {

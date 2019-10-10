@@ -12,6 +12,8 @@ import { BaseEntity } from "../../../domain/model/base";
 export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
     implements IBaseRepository<TEntity> {
     protected Model: Model<TModel>;
+    protected CurrentTenantId?: string =
+        global.currentUser && global.currentUser.tenant.id;
     protected _constructor: () => TEntity;
     public constructor(
         @unmanaged() model: Model<TModel>,
@@ -21,14 +23,11 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
         this._constructor = constructor;
     }
 
-    // We wrap the mongoose API here so we can use async / await
-
     public async findAll() {
         return new Promise<TEntity[]>((resolve, reject) => {
             this.Model.find((err, res) => {
                 if (err) return reject(err);
-                let results = res.map(r => this.readMapper(r));
-                results = results.filter(r => !r.isDeleted);
+                const results = res.map(r => this.readMapper(r));
                 return resolve(results);
             });
         });
@@ -57,7 +56,7 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
         });
     }
 
-    public async save(doc: TEntity): Promise<TEntity> {
+    public async insertOrUpdate(doc: TEntity): Promise<TEntity> {
         return new Promise<TEntity>((resolve, reject) => {
             if (doc.id) {
                 this.Model.findByIdAndUpdate(
@@ -119,7 +118,7 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
         const item = await this.findById(id);
         if (!item) return false;
         item.delete();
-        await this.save(item);
+        await this.insertOrUpdate(item);
         return true;
     }
     // deleteOneByQuery(query: Query<TEntity>): Promise<number> {
