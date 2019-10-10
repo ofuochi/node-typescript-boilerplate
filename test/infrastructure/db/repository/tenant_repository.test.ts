@@ -1,3 +1,5 @@
+import { expect } from "chai";
+
 import { TYPES } from "../../../../src/domain/constants/types";
 import { ITenantRepository } from "../../../../src/domain/interfaces/repositories";
 import { Tenant } from "../../../../src/domain/model/tenant";
@@ -16,15 +18,13 @@ describe("Tenant Repository", () => {
         tenantRepository = container.get<ITenantRepository>(
             TYPES.TenantRepository
         );
-        tenants.forEach(async (doc, i) => {
-            tenants[i] = await tenantRepository.insertOrUpdate(doc);
+        tenants.forEach(async tenant => {
+            tenants[0].delete();
+            await tenantRepository.insertOrUpdate(tenant);
         });
     });
-    it("should get all the tenants without the deleted one", async () => {
-        tenants[0].delete();
-        // console.log(tenants);
-        // await tenantRepository.insertOrUpdate(tenants[0]);
-        // const res = await tenantRepository.findAll();
-        // expect(res.length).to.equal(2);
+    it("should get all the tenants but without the deleted ones", async () => {
+        const res = await tenantRepository.findAll();
+        expect(res.length).to.equal(2);
     });
 });

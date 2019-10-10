@@ -25,7 +25,7 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
 
     public async findAll() {
         return new Promise<TEntity[]>((resolve, reject) => {
-            this.Model.find((err, res) => {
+            this.Model.find({ isDeleted: { $ne: true } }, (err, res) => {
                 if (err) return reject(err);
                 const results = res.map(r => this.readMapper(r));
                 return resolve(results);
