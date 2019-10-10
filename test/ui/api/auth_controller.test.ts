@@ -14,7 +14,7 @@ import {
     UserSignUpInput
 } from "../../../src/ui/models/user_dto";
 import { TYPES } from "../../../src/domain/constants/types";
-import { req } from "../../setup";
+import { req, cleanupDb } from "../../setup";
 
 const endpoint = `${config.api.prefix}/auth`;
 const tenantHeaderProp = "x-tenant-id";
@@ -25,17 +25,19 @@ describe("Auth controller", () => {
     let tenant1: Tenant;
     let tenant2: Tenant;
     before(async () => {
+        await cleanupDb();
+
         tenantRepository = container.get<ITenantRepository>(
             TYPES.TenantRepository
         );
 
         // Get first tenant because it already exists from the setup.ts file
-        tenant1 = await tenantRepository.findOneByQuery({
-            name: "Default"
-        });
+        tenant1 = await tenantRepository.insertOrUpdate(
+            Tenant.createInstance("Tenant1", "Second tenant")
+        );
 
         // Create a second tenant
-        tenant2 = await tenantRepository.save(
+        tenant2 = await tenantRepository.insertOrUpdate(
             Tenant.createInstance("Tenant2", "Second tenant")
         );
         tenant = tenant1;

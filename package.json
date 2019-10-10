@@ -54,7 +54,7 @@
         "@hapi/joi": "^16.1.7",
         "@hasezoey/typegoose": "^5.9.2",
         "agenda": "^2.1.0",
-        "automapper-nartc": "^3.0.23",
+        "automapper-nartc": "^3.1.2",
         "bcrypt": "^3.0.6",
         "body-parser": "^1.19.0",
         "class-transformer": "^0.2.3",
@@ -72,7 +72,7 @@
         "jsonwebtoken": "^8.5.1",
         "mailgun-js": "^0.22.0",
         "method-override": "^3.0.0",
-        "mongoose": "^5.7.3",
+        "mongoose": "^5.7.4",
         "reflect-metadata": "^0.1.13",
         "tsconfig-paths": "^3.9.0",
         "winston": "^3.2.1",
@@ -86,14 +86,14 @@
         "@types/cors": "^2.8.6",
         "@types/dotenv": "^6.1.1",
         "@types/express": "^4.17.1",
-        "@types/hapi__joi": "^16.0.0",
+        "@types/hapi__joi": "^16.0.1",
         "@types/helmet": "0.0.44",
         "@types/http-status-codes": "^1.2.0",
         "@types/jsonwebtoken": "^8.3.4",
         "@types/mailgun-js": "^0.22.3",
         "@types/method-override": "0.0.31",
         "@types/mocha": "^5.2.7",
-        "@types/mongoose": "^5.5.19",
+        "@types/mongoose": "^5.5.20",
         "@types/supertest": "^2.0.8",
         "@types/winston": "^2.4.4",
         "@typescript-eslint/eslint-plugin": "^2.3.3",
@@ -113,7 +113,7 @@
         "supertest": "^4.0.2",
         "ts-mocha": "^6.0.0",
         "ts-node": "^8.4.1",
-        "typescript": "^3.6.3"
+        "typescript": "^3.6.4"
     },
     "config": {
         "ghooks": {

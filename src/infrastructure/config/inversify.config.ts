@@ -16,7 +16,7 @@ import { ITenantService } from "../../ui/interfaces/tenant_service";
 import { TenantProfile } from "../../ui/profiles/tenant_profile";
 
 // Service implementations
-import { LoggerService } from "../../domain/services/logger_service";
+import { LoggerService } from "../services/logger_service";
 import { MailService } from "../services/mail_service";
 import { AuthService } from "../../ui/services/auth_service";
 import { TenantService } from "../../ui/services/tenant_service";

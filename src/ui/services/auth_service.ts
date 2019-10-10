@@ -47,7 +47,7 @@ export class AuthService implements IAuthService {
         });
         if (user) throw new HttpError(httpStatus.CONFLICT);
 
-        user = await this._userRepository.save(
+        user = await this._userRepository.insertOrUpdate(
             User.createInstance({
                 ...dto,
                 password: hashedPassword

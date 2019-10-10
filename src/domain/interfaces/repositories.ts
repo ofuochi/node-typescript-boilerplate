@@ -6,7 +6,7 @@ export type Query<T> = {
 };
 
 export interface IBaseRepository<T> {
-    save(doc: T): Promise<T>;
+    insertOrUpdate(doc: T): Promise<T>;
     findAll(): Promise<T[]>;
     findById(id: string): Promise<T>;
     hardFindById(id: string): Promise<T>;

@@ -16,7 +16,7 @@ export class TenantService implements ITenantService {
     @tenantRepository public _tenantRepository: ITenantRepository;
 
     async create(name: string, description: string): Promise<TenantDto> {
-        const tenant = await this._tenantRepository.save(
+        const tenant = await this._tenantRepository.insertOrUpdate(
             Tenant.createInstance(name, description)
         );
         return this._mapper.map(tenant, TenantDto);
