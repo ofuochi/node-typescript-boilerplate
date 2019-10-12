@@ -11,6 +11,7 @@
         "noImplicitAny": true,
         "sourceMap": true,
         "noUnusedLocals": true,
+        "resolveJsonModule": true,
         "esModuleInterop": true,
         "allowUnreachableCode": false,
         "noImplicitThis": true,
