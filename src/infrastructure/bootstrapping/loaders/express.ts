@@ -3,6 +3,8 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import methodOverride from "method-override";
+import swaggerUi from "swagger-ui-express";
+import * as swaggerDocument from "../swagger.json";
 
 import { RequestMiddleware } from "../../../ui/api/middleware/interceptor_middleware";
 
@@ -15,6 +17,10 @@ export const expressLoader = (app: express.Application) => {
     app.head("/status", (_req, res) => {
         res.status(200).end();
     });
+
+    // Load SwaggerUI
+    app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
     // Useful if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
     // It shows the real origin IP in the heroku or Cloudwatch logs
     app.enable("trust proxy");

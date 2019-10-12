@@ -1,0 +1,367 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "v1",
+        "title": "Node TypeScript BoilerPlate API"
+    },
+    "host": "localhost:3000",
+    "basePath": "/api/v1/",
+    "schemes": ["http", "https"],
+    "consumes": ["application/json"],
+    "produces": ["application/json"],
+    "paths": {
+        "/delete/{id}": {
+            "delete": {
+                "tags": ["Tenant"],
+                "consumes": [],
+                "produces": [],
+                "parameters": [
+                    {
+                        "name": "Id",
+                        "in": "query",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                }
+            }
+        },
+        "/tenants": {
+            "get": {
+                "tags": ["Tenant"],
+                "consumes": [],
+                "produces": ["text/plain", "application/json", "text/json"],
+                "parameters": [
+                    {
+                        "name": "SkipCount",
+                        "in": "query",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int32",
+                        "maximum": 2147483647,
+                        "minimum": 0
+                    },
+                    {
+                        "name": "MaxResultCount",
+                        "in": "query",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int32",
+                        "maximum": 2147483647,
+                        "minimum": 1
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/PagedResultDto[TenantDto]"
+                        }
+                    }
+                }
+            },
+            "/post": {
+                "tags": ["Tenant"],
+                "operationId": "ApiServicesAppTenantCreatePost",
+                "consumes": [
+                    "application/json-patch+json",
+                    "application/json",
+                    "text/json",
+                    "application/*+json"
+                ],
+                "produces": ["text/plain", "application/json", "text/json"],
+                "parameters": [
+                    {
+                        "name": "input",
+                        "in": "body",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/CreateTenantDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/TenantDto"
+                        }
+                    }
+                }
+            }
+        },
+        "/update/{id}": {
+            "put": {
+                "tags": ["Tenant"],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": ["text/plain", "application/json", "text/json"],
+                "parameters": [
+                    {
+                        "name": "input",
+                        "in": "body",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/TenantDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/TenantDto"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/signup": {
+            "post": {
+                "tags": ["TokenAuth"],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": ["text/plain", "application/json", "text/json"],
+                "parameters": [
+                    {
+                        "name": "input",
+                        "in": "body",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/SignUpDto"
+                        }
+                    },
+                    {
+                      "name": "X-Tenant-Id",
+                      "in": "header",
+                      "description": "an authorization header",
+                      "required": true,
+                      "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/PagedResultDto[userDto]"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/signin": {
+          "post": {
+              "tags": ["TokenAuth"],
+              "consumes": [
+                  "application/json"
+              ],
+              "produces": ["text/plain", "application/json", "text/json"],
+              "parameters": [
+                  {
+                      "name": "input",
+                      "in": "body",
+                      "required": false,
+                      "schema": {
+                          "$ref": "#/definitions/SignInReqDto"
+                      }
+                  },
+                  {
+                    "name": "X-Tenant-Id",
+                    "in": "header",
+                    "description": "an authorization header",
+                    "required": true,
+                    "type": "string"
+                  }
+              ],
+              "responses": {
+                  "200": {
+                      "description": "Success",
+                      "schema": {
+                          "$ref": "#/definitions/PagedResultDto[SignInRespDto]"
+                      }
+                  }
+              }
+          }
+      }
+    },
+    "definitions": {
+        "CreateTenantDto": {
+            "required": ["name", "description"],
+            "type": "object",
+            "properties": {
+                "name": {
+                    "maxLength": 128,
+                    "minLength": 0,
+                    "type": "string"
+                },
+                "description": {
+                    "maxLength": 256,
+                    "minLength": 0,
+                    "type": "string"
+                }
+            }
+        },
+        "TenantDto": {
+            "required": ["description", "name"],
+            "type": "object",
+            "properties": {
+                "id": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "name": {
+                    "maxLength": 128,
+                    "minLength": 0,
+                    "type": "string"
+                },
+                "description": {
+                    "maxLength": 64,
+                    "minLength": 0,
+                    "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{1,}$",
+                    "type": "string"
+                },
+                "isActive": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "PagedResultDto[TenantDto]": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "uniqueItems": false,
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/TenantDto"
+                    }
+                }
+            }
+        },
+        "SignUpDto": {
+            "required": ["name", "description"],
+            "type": "object",
+            "properties": {
+              "firstName": {
+                "maxLength": 50,
+                "minLength": 0,
+                "type": "string"
+            },
+            "lastName": {
+                "maxLength": 50,
+                "minLength": 0,
+                "type": "string"
+            },
+            "email": {
+                "maxLength": 128,
+                "minLength": 0,
+                "type": "string"
+            },
+            "username": {
+                "maxLength": 100,
+                "minLength": 0,
+                "type": "string"
+            },
+            "password": {
+                "maxLength": 128,
+                "minLength": 0,
+                "type": "string"
+            }
+            }
+        },
+        "userDto": {
+            "required": [
+                "firstName",
+                "lastName",
+                "email",
+                "username",
+                "password"
+            ],
+            "type": "object",
+            "properties": {
+                "firstName": {
+                    "maxLength": 50,
+                    "minLength": 0,
+                    "type": "string"
+                },
+                "lastName": {
+                    "maxLength": 50,
+                    "minLength": 0,
+                    "type": "string"
+                },
+                "email": {
+                    "maxLength": 128,
+                    "minLength": 0,
+                    "type": "string"
+                },
+                "username": {
+                    "maxLength": 100,
+                    "minLength": 0,
+                    "type": "string"
+                },
+                "id": {
+                  "maxLength": 200,
+                  "type": "string"
+                }
+            }
+        },
+        "PagedResultDto[userDto]": {
+            "type": "object",
+            "properties": {
+                "userDto": {
+                    "uniqueItems": false,
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/userDto"
+                    }
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "SignInReqDto": {
+          "required": ["emailOrUsername", "password"],
+          "type": "object",
+          "properties": {
+          "emailOrUsername": {
+              "maxLength": 100,
+              "minLength": 0,
+              "type": "string"
+          },
+          "password": {
+              "maxLength": 128,
+              "minLength": 0,
+              "type": "string"
+          }
+          }
+      },
+      "PagedResultDto[SignInRespDto]": {
+          "type": "object",
+          "properties": {
+              "token": {
+                  "type": "string"
+              }
+          }
+      }
+    },
+    "securityDefinitions": {
+        "Bearer": {
+            "name": "Authorization",
+            "in": "header",
+            "type": "apiKey",
+            "description": "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\""
+        }
+    },
+    "security": [
+        {
+            "Bearer": []
+        }
+    ]
+}
