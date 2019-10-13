@@ -42,11 +42,19 @@ cp env.sample .env
 npm run start
 ```
 
+Or run in development watch mode.
+
+```sh
+npm run dev
+```
+
 ### Open
 
 ```sh
 http://localhost:3000/api/v1/tenants
 ```
+
+For a sample swagger documentation `http://localhost:3000/api-docs`
 
 ### Run Tests
 
