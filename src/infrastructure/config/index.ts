@@ -16,7 +16,7 @@ const envConfigSchema = Joi.object({
     JWT_SECRET: Joi.string()
         .required()
         .description("JWT Secret required"),
-    HOST: Joi.string().default("localhost:3000"),
+    HOST: Joi.string().default("http://localhost:3000"),
     APP_EMAIL: Joi.string().default("node-typescript-boilerplate@sample.com"),
     LOG_LEVEL: Joi.string().default("silly"),
     MAILGUN_API_KEY: Joi.string().description("Mail gun API key"),

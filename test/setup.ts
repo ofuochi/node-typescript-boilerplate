@@ -1,14 +1,12 @@
-import "reflect-metadata";
 import { Server } from "http";
-import { cleanUpMetadata } from "inversify-express-utils";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import supertest from "supertest";
+
 import { bootstrap } from "../src/infrastructure/bootstrapping";
 import { referenceDataIoCModule } from "../src/infrastructure/config/inversify.config";
-import { iocContainer } from "../src/infrastructure/config/ioc";
+import { container } from "../src/infrastructure/utils/ioc_container";
 import { startAppServer } from "../src/infrastructure/utils/server_utils";
-import { X_AUTH_TOKEN_KEY } from "../src/ui/constants/header_constants";
 
 let server: Server; // eslint-disable-line
 // eslint-disable-next-line
@@ -19,14 +17,13 @@ before("Setup", async () => {
     const connStr = await mongoServer.getConnectionString();
 
     const app = await bootstrap({
-        iocContainer,
+        container,
         connStr,
         containerModules: [referenceDataIoCModule]
     });
 
     server = startAppServer(app);
     req = supertest(server);
-    cleanUpMetadata();
 });
 
 export async function cleanupDb() {
@@ -42,5 +39,5 @@ after("Teardown", async () => {
     await cleanupDb();
     if (mongoServer) await mongoServer.stop();
 });
-const tokenHeaderKey = X_AUTH_TOKEN_KEY;
-export { req, server, tokenHeaderKey };
+
+export { req, server };

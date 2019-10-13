@@ -26,11 +26,9 @@ import { UserRepository } from "../db/repositories/user_repository";
 import { TenantRepository } from "../db/repositories/tenant_repository";
 
 // Controllers
-import "../../ui/api/controllers/foo_controller";
 import "../../ui/api/controllers/auth_controller";
 import "../../ui/api/controllers/secure_controller";
 import "../../ui/api/controllers/tenant_controller";
-
 import { UserProfile } from "../../ui/profiles/user_profile";
 
 export const referenceDataIoCModule = new ContainerModule(bind => {

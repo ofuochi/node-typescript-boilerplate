@@ -1,68 +1,57 @@
-import Agenda from "agenda";
-import { Container, ContainerModule, decorate, injectable } from "inversify";
-import { buildProviderModule } from "inversify-binding-decorators";
-import { InversifyExpressServer } from "inversify-express-utils";
 import "reflect-metadata";
-import { Controller } from "tsoa";
+
+import Agenda from "agenda";
+import { Container, ContainerModule } from "inversify";
+import { InversifyExpressServer } from "inversify-express-utils";
+
 import { TYPES } from "../../domain/constants/types";
 import { exceptionLoggerMiddleware } from "../../ui/api/middleware/interceptor_middleware";
-import { RegisterRoutes } from "../../ui/api/routes";
 import { config } from "../config";
-import { swaggerGen } from "../config/swagger.config";
 import { DbClient, getDatabaseClient } from "../db/db_client";
 import { getAgendaInstance } from "./loaders/agenda_loader";
-import "./loaders/events";
-import { App, expressLoader } from "./loaders/express";
+import { expressLoader, App } from "./loaders/express";
 import { Jobs } from "./loaders/jobs";
-import { winstonLoggerInstance as logger } from "./loaders/logger";
+import { winstonLoggerInstance } from "./loaders/logger";
+import "./loaders/events";
 
 export async function bootstrap({
-    iocContainer,
+    container,
     connStr,
     containerModules = []
 }: {
-    iocContainer: Container;
+    container: Container;
     connStr: string;
     containerModules?: ContainerModule[];
 }): Promise<App> {
-    if (iocContainer.isBound(TYPES.App) === true)
-        return iocContainer.get<App>(TYPES.App);
+    if (container.isBound(TYPES.App) === true)
+        return container.get<App>(TYPES.App);
 
-    // iocContainer.applyMiddleware(makeLoggerMiddleware());
+    // container.applyMiddleware(makeLoggerMiddleware());
     const dbClient = await getDatabaseClient(connStr);
-    iocContainer.bind<DbClient>(TYPES.DbClient).toConstantValue(dbClient);
-    iocContainer
+    container.bind<DbClient>(TYPES.DbClient).toConstantValue(dbClient);
+    container
         .bind<Agenda>(TYPES.Agenda)
         .toConstantValue(getAgendaInstance(connStr));
-    decorate(injectable(), Controller);
 
-    iocContainer.load(buildProviderModule());
+    container.load(...containerModules);
+    winstonLoggerInstance.info("✔️  Dependency Injector loaded");
 
-    iocContainer.load(...containerModules);
-    logger.info("✔️  Dependency Injector loaded");
-
-    Jobs.forEach(async job => job(iocContainer.get<Agenda>(TYPES.Agenda)));
-    logger.info("✔️  Jobs loaded");
+    Jobs.forEach(async job => job(container.get<Agenda>(TYPES.Agenda)));
+    winstonLoggerInstance.info("✔️  Jobs loaded");
 
     // Configure express server using inversify IoC
-    const server = new InversifyExpressServer(iocContainer, null, {
+    const server = new InversifyExpressServer(container, null, {
         rootPath: config.api.prefix
     });
 
-    logger.info("✔️  Generating swagger doc...");
-    await swaggerGen();
-    server.setConfig((app: App) => expressLoader(app));
-    logger.info("✔️  Express loaded");
+    server.setConfig(app => expressLoader(app));
+    winstonLoggerInstance.info("✔️  Express loaded");
 
     server.setErrorConfig(app => {
         // Catch and log all exceptions
         app.use(exceptionLoggerMiddleware);
     });
-    const app = server.build() as App;
+    winstonLoggerInstance.info(`✔️  Environment: ${process.env.NODE_ENV}`);
 
-    logger.info("✔️  Generating routes...");
-    RegisterRoutes(app);
-
-    logger.info(`✔️  Environment: ${process.env.NODE_ENV}`);
-    return app;
+    return server.build();
 }

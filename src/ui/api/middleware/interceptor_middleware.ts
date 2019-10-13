@@ -8,9 +8,6 @@ import { CurrentUser } from "../../../domain/utils/globals";
 import { config } from "../../../infrastructure/config";
 import { getCurrentTenant } from "../../../infrastructure/helpers/tenant_helpers";
 import { HttpError } from "../../error";
-import { TYPES } from "../../../domain/constants/types";
-import { iocContainer } from "../../../infrastructure/config/ioc";
-import { ILoggerService } from "../../../domain/interfaces/services";
 
 @injectable()
 export class RequestMiddleware extends BaseMiddleware {
@@ -19,32 +16,22 @@ export class RequestMiddleware extends BaseMiddleware {
         res: Response,
         next: NextFunction
     ): Promise<void> {
-        // const log = iocContainer.get<ILoggerService>(TYPES.LoggerService);
-        // log.info(`
-        //     ----------------------------------
-        //     REQUEST MIDDLEWARE
-        //     HTTP ${req.method} ${req.url}
-        //     ----------------------------------
-        //     `);
-        iocContainer
-            .bind<string>(TYPES.TenantId)
-            .toConstantValue(`${req.tenantId}`);
-        const isTenantUrl =
-            req.url.toLowerCase().startsWith("/api-docs") ||
-            req.url
-                .toLowerCase()
-                .startsWith(
-                    `${config.api.prefix}/tenants`.toLocaleLowerCase()
-                ) ||
-            req.url
-                .toLowerCase()
-                .startsWith(`${config.api.prefix}/foos`.toLocaleLowerCase());
-
         req.tenantId = req.header("X-Tenant-Id");
+        const isTenantUrl = req.url
+            .toLowerCase()
+            .startsWith(`${config.api.prefix}/tenants`.toLocaleLowerCase());
+
         if (!req.tenantId && !isTenantUrl)
             return res
                 .status(httpStatus.BAD_REQUEST)
                 .end("x-tenant-id header is missing");
+        // const log = container.get<ILoggerService>(TYPES.LoggerService);
+        // log.info(`
+        // ----------------------------------
+        // REQUEST MIDDLEWARE
+        // HTTP ${req.method} ${req.url}
+        // ----------------------------------
+        // `);
         if (isTenantUrl) return next();
         if (!mongoose.Types.ObjectId.isValid(req.tenantId as string))
             return next(
@@ -67,15 +54,15 @@ export function exceptionLoggerMiddleware(
     res: Response,
     _next: NextFunction
 ) {
-    const log = iocContainer.get<ILoggerService>(TYPES.LoggerService);
+    // const log = container.get<ILoggerService>(TYPES.LoggerService);
 
-    log.error(`
-    ----------------------------------
-    EXCEPTION MIDDLEWARE
-    HTTP ${req.method} ${req.url}
-    ${error.message}
-    ----------------------------------
-    `);
+    // console.error(`
+    // ----------------------------------
+    // EXCEPTION MIDDLEWARE
+    // HTTP ${req.method} ${req.url}
+    // ${error.message}
+    // ----------------------------------
+    // `);
     if (error instanceof HttpError) return res.status(error.status).send(error);
     error =
         config.env === "development" || config.env === "test"
