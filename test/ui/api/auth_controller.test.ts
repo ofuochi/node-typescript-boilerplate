@@ -1,6 +1,5 @@
 import { expect } from "chai";
 import httpStatus from "http-status-codes";
-import { X_TENANT_ID } from "../../../.history/src/ui/constants/header_constants_20191012170119";
 import { TYPES } from "../../../src/domain/constants/types";
 import {
     ITenantRepository,
@@ -9,6 +8,7 @@ import {
 import { Tenant } from "../../../src/domain/model/tenant";
 import { config } from "../../../src/infrastructure/config";
 import { iocContainer } from "../../../src/infrastructure/config/ioc";
+import { X_TENANT_ID } from "../../../src/ui/constants/header_constants";
 import {
     UserSignInInput,
     UserSignUpDto,
