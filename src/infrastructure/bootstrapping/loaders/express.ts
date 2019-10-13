@@ -1,15 +1,14 @@
 import bodyParser from "body-parser";
 import cors from "cors";
-import { Express } from "express";
+import express from "express";
 import helmet from "helmet";
 import methodOverride from "method-override";
-import swaggerUi from "swagger-ui-express";
-import swaggerDoc from "../../../../swagger.json";
+
 import { RequestMiddleware } from "../../../ui/api/middleware/interceptor_middleware";
 
-export type App = Express;
+export type App = express.Application;
 
-export const expressLoader = (app: App) => {
+export const expressLoader = (app: express.Application) => {
     app.get("/status", (_req, res) => {
         res.status(200).end();
     });
@@ -43,6 +42,4 @@ export const expressLoader = (app: App) => {
 
     // Log all requests that hit the server
     app.use(new RequestMiddleware().handler);
-
-    app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 };

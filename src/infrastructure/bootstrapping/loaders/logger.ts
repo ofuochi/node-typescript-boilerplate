@@ -2,7 +2,7 @@ import winston from "winston";
 import { config } from "../../config";
 
 const transports = [];
-if (process.env.NODE_ENV !== "development" && process.env.NODE_ENV !== "test") {
+if (process.env.NODE_ENV !== "development") {
     transports.push(new winston.transports.Console());
 } else {
     transports.push(
@@ -24,7 +24,7 @@ export const winstonLoggerInstance = winston.createLogger({
         }),
         winston.format.errors({ stack: true }),
         winston.format.splat(),
-        winston.format.json({ space: -1 })
+        winston.format.json()
     ),
     transports
 });

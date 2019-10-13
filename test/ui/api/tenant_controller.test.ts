@@ -10,7 +10,7 @@ import {
 import { Tenant } from "../../../src/domain/model/tenant";
 import { User, UserRole } from "../../../src/domain/model/user";
 import { config } from "../../../src/infrastructure/config";
-import { iocContainer } from "../../../src/infrastructure/config/ioc";
+import { container } from "../../../src/infrastructure/utils/ioc_container";
 import { IAuthService } from "../../../src/ui/interfaces/auth_service";
 import { CreateTenantInput } from "../../../src/ui/models/tenant_dto";
 import { req, cleanupDb } from "../../setup";
@@ -29,11 +29,9 @@ describe("Tenant controller", async () => {
     before(async () => {
         await cleanupDb();
 
-        userRepository = iocContainer.get<IUserRepository>(
-            TYPES.UserRepository
-        );
-        authService = iocContainer.get<IAuthService>(TYPES.AuthService);
-        tenantRepository = iocContainer.get<ITenantRepository>(
+        userRepository = container.get<IUserRepository>(TYPES.UserRepository);
+        authService = container.get<IAuthService>(TYPES.AuthService);
+        tenantRepository = container.get<ITenantRepository>(
             TYPES.TenantRepository
         );
         tenant = await tenantRepository.insertOrUpdate(
