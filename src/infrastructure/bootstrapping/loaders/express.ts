@@ -4,7 +4,7 @@ import express from "express";
 import helmet from "helmet";
 import methodOverride from "method-override";
 import swaggerUi from "swagger-ui-express";
-import * as swaggerDocument from "../swagger.json";
+import * as swaggerDocument from "../../../../swagger.json";
 
 import { RequestMiddleware } from "../../../ui/api/middleware/interceptor_middleware";
 
