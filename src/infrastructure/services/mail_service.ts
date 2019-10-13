@@ -6,7 +6,7 @@ import { TYPES } from "../../domain/constants/types";
 import { IMailService } from "../../domain/interfaces/services";
 import { config } from "../config";
 import { MailJobType } from "../jobs/mail_job";
-import { container } from "../utils/ioc_container";
+import { iocContainer } from "../config/ioc";
 
 @injectable()
 export class MailService implements IMailService {
@@ -31,7 +31,7 @@ export class MailService implements IMailService {
         return resp != null;
     }
     public startEmailSequence(sequenceType: MailJobType, data: any): void {
-        const agenda = container.get<Agenda>(TYPES.Agenda);
+        const agenda = iocContainer.get<Agenda>(TYPES.Agenda);
         switch (sequenceType) {
             case MailJobType.SEND_WELCOME_MAIL:
                 agenda.schedule(

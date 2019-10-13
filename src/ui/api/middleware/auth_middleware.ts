@@ -2,19 +2,23 @@ import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status-codes";
 import { Container } from "inversify";
 import jwt from "jsonwebtoken";
-
 import { TYPES } from "../../../domain/constants/types";
-import { IUserRepository } from "../../../domain/interfaces/repositories";
-import { config as env } from "../../../infrastructure/config";
-import { container } from "../../../infrastructure/utils/ioc_container";
-import { HttpError } from "../../error";
+import {
+    ITenantRepository,
+    IUserRepository
+} from "../../../domain/interfaces/repositories";
 import { UserRole } from "../../../domain/model/user";
+import { config as env } from "../../../infrastructure/config";
+import { iocContainer } from "../../../infrastructure/config/ioc";
+import { TenantRepository } from "../../../infrastructure/db/repositories/tenant_repository";
+import { HttpError } from "../../error";
 import { DecodedJwt } from "../../services/auth_service";
+import { X_AUTH_TOKEN_KEY } from "../../constants/header_constants";
 
-function authMiddlewareFactory(container: Container) {
+function authMiddlewareFactory(iocContainer: Container) {
     return (config: { role: UserRole }) => {
         return (req: Request, res: Response, next: NextFunction) => {
-            const accountRepository = container.get<IUserRepository>(
+            const accountRepository = iocContainer.get<IUserRepository>(
                 TYPES.UserRepository
             );
 
@@ -48,5 +52,45 @@ function authMiddlewareFactory(container: Container) {
         };
     };
 }
+function authentication(iocContainer: Container) {
+    return async (
+        request: Request,
+        securityName: string,
+        roles: string[] = ["user"]
+    ): Promise<DecodedJwt> => {
+        if (securityName.toLowerCase() !== "jwt")
+            throw new Error("Invalid security name");
 
-export const authMiddleware = authMiddlewareFactory(container);
+        const token = request.headers[X_AUTH_TOKEN_KEY.toLowerCase()] as string;
+        if (!token)
+            throw new HttpError(
+                httpStatus.UNAUTHORIZED,
+                `${X_AUTH_TOKEN_KEY} is missing!`
+            );
+
+        try {
+            const decodedJwt = jwt.verify(token, env.jwtSecret) as DecodedJwt;
+
+            const userRole = (UserRole as any)[roles[0].toUpperCase()];
+            if (userRole !== UserRole.USER && !decodedJwt.role === userRole)
+                throw new HttpError(httpStatus.FORBIDDEN, "Access denied!");
+
+            const tenantRepository = iocContainer.get<ITenantRepository>(
+                TenantRepository
+            );
+            const tenant = await tenantRepository.findById(decodedJwt.tenantId);
+
+            if (!tenant || !tenant.isActive)
+                throw new HttpError(
+                    httpStatus.FORBIDDEN,
+                    "Tenant is not available!"
+                );
+            global.currentUser.setUserDetails(decodedJwt);
+            return decodedJwt;
+        } catch (error) {
+            throw new HttpError(httpStatus.BAD_REQUEST, error);
+        }
+    };
+}
+export const expressAuthentication = authentication(iocContainer);
+export const authMiddleware = authMiddlewareFactory(iocContainer);
