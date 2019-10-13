@@ -1,0 +1,154 @@
+{
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {
+			"TenantDto": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"description": {
+						"type": "string"
+					},
+					"isActive": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"id",
+					"name",
+					"description",
+					"isActive"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CreateTenantDto": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"description": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"name",
+					"description"
+				],
+				"type": "object",
+				"additionalProperties": false
+			}
+		},
+		"securitySchemes": {
+			"jwt": {
+				"scheme": "basic",
+				"type": "http"
+			},
+			"X-Tenant-Id": {
+				"type": "apiKey",
+				"in": "header",
+				"name": "X-Tenant-Id",
+				"description": "Tenant ID"
+			}
+		}
+	},
+	"info": {
+		"title": "node-typescript-boilerplate",
+		"version": "1.0.0",
+		"description": "Enterprise NodeJs/Typescript API boilerplate"
+	},
+	"openapi": "3.0.0",
+	"paths": {
+		"/foos": {
+			"get": {
+				"operationId": "Get",
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/TenantDto"
+									},
+									"type": "array"
+								}
+							}
+						},
+						"description": "Ok"
+					},
+					"400": {
+						"content": {
+							"application/json": {}
+						},
+						"description": "Bad request"
+					}
+				},
+				"tags": [
+					"Foos"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "tenantName",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"post": {
+				"operationId": "Create",
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/TenantDto"
+								}
+							}
+						},
+						"description": "Ok"
+					}
+				},
+				"tags": [
+					"Foos"
+				],
+				"security": [
+					{
+						"jwt": [
+							"admin"
+						],
+						"X-Tenant-Id": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateTenantDto"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "http://localhost:3000/api/v1"
+		}
+	]
+}

@@ -5,6 +5,7 @@
         "types": ["express", "inversify", "mocha", "reflect-metadata"],
         "module": "commonjs",
         "moduleResolution": "node",
+        "resolveJsonModule": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "strictNullChecks": true,
