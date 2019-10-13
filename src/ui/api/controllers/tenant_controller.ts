@@ -1,4 +1,5 @@
 import { plainToClass } from "class-transformer";
+import { inject } from "inversify";
 import {
     controller,
     httpDelete,
@@ -9,17 +10,20 @@ import {
     requestParam
 } from "inversify-express-utils";
 import { Types } from "mongoose";
-
-import { tenantService } from "../../../domain/constants/decorators";
 import { UserRole } from "../../../domain/model/user";
 import { ITenantService } from "../../interfaces/tenant_service";
-import { CreateTenantInput, TenantDto } from "../../models/tenant_dto";
+import { CreateTenantDto, TenantDto } from "../../models/tenant_dto";
+import { TenantService } from "../../services/tenant_service";
 import { authMiddleware } from "../middleware/auth_middleware";
 import { BaseController } from "./base_controller";
 
 @controller("/tenants")
 export class TenantController extends BaseController {
-    @tenantService private _tenantService: ITenantService;
+    constructor(
+        @inject(TenantService) private readonly _tenantService: ITenantService
+    ) {
+        super();
+    }
 
     /**
      * Returns a list of TenantDto
@@ -36,10 +40,10 @@ export class TenantController extends BaseController {
         return tenants;
     }
     @httpPost("/", authMiddleware({ role: UserRole.ADMIN }))
-    public async post(@requestBody() input: CreateTenantInput) {
+    public async post(@requestBody() input: CreateTenantDto) {
         /* For some strange reason, "input" is not not a real instance of CreateTenantInput.
           Calling the method plainToClass does the trick 🙂 */
-        input = plainToClass(CreateTenantInput, input);
+        input = plainToClass(CreateTenantDto, input);
         const badRequest = await this.checkBadRequest(input);
         if (badRequest) return badRequest;
         const existing = await this._tenantService.get(input.name);

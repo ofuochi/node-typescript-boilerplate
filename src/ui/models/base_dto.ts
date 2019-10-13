@@ -1,11 +1,11 @@
 import { IsUUID } from "class-validator";
 import { Expose } from "class-transformer";
 
-export abstract class BaseCreateDto {}
+export abstract class BaseCreateEntityDto {}
 
-export abstract class BaseReadDto {
+export abstract class BaseEntityDto {
     @IsUUID()
     @Expose()
     id: string;
 }
-export abstract class BaseUpdateDto extends BaseReadDto {}
+export abstract class BaseUpdateDto extends BaseEntityDto {}

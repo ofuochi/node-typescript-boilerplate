@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 
 import { ILoggerService, IMailService } from "../../domain/interfaces/services";
 import { User } from "../../domain/model/user";
-import { container } from "../../infrastructure/utils/ioc_container";
+import { iocContainer } from "../../infrastructure/config/ioc";
 import { TYPES } from "../../domain/constants/types";
 import { events } from "./events";
 import { MailJobType } from "../../infrastructure/jobs/mail_job";
@@ -11,10 +11,10 @@ import { UserDto } from "../models/user_dto";
 
 @EventSubscriber()
 export class UserSubscriber {
-    private readonly _logger = container.get<ILoggerService>(
+    private readonly _logger = iocContainer.get<ILoggerService>(
         TYPES.LoggerService
     );
-    private readonly _mailService = container.get<IMailService>(
+    private readonly _mailService = iocContainer.get<IMailService>(
         TYPES.MailService
     );
     /**
@@ -30,7 +30,7 @@ export class UserSubscriber {
     @On(events.user.signIn)
     public onUserSignIn({ id }: Partial<UserDto>) {
         try {
-            const UserModel = container.get("UserModel") as mongoose.Model<
+            const UserModel = iocContainer.get("UserModel") as mongoose.Model<
                 User & mongoose.Document
             >;
 

@@ -1,16 +1,15 @@
-import { injectable } from "inversify";
 import { AutoMapper } from "automapper-nartc";
-
 import {
-    tenantRepository,
-    autoMapper
+    autoMapper,
+    tenantRepository
 } from "../../domain/constants/decorators";
 import { ITenantRepository } from "../../domain/interfaces/repositories";
-import { TenantDto } from "../models/tenant_dto";
-import { ITenantService } from "../interfaces/tenant_service";
 import { Tenant } from "../../domain/model/tenant";
+import { provideSingleton } from "../../infrastructure/config/ioc";
+import { ITenantService } from "../interfaces/tenant_service";
+import { TenantDto } from "../models/tenant_dto";
 
-@injectable()
+@provideSingleton(TenantService)
 export class TenantService implements ITenantService {
     @autoMapper public _mapper: AutoMapper;
     @tenantRepository public _tenantRepository: ITenantRepository;

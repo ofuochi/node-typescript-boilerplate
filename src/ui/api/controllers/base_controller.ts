@@ -1,10 +1,11 @@
 import { validate, ValidationError } from "class-validator";
-import { BaseHttpController } from "inversify-express-utils";
+import { BaseHttpController, interfaces } from "inversify-express-utils";
 
-import { BaseCreateDto } from "../../models/base_dto";
+import { BaseCreateEntityDto } from "../../models/base_dto";
 
-export abstract class BaseController extends BaseHttpController {
-    protected async checkBadRequest(input: BaseCreateDto) {
+export abstract class BaseController extends BaseHttpController
+    implements interfaces.Controller {
+    protected async checkBadRequest(input: BaseCreateEntityDto) {
         const errors = await validate(input);
         if (errors.length > 0) {
             const error = errors

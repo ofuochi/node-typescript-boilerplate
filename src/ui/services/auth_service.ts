@@ -2,9 +2,7 @@ import { AutoMapper } from "automapper-nartc";
 import bcrypt from "bcrypt";
 import { EventDispatcher } from "event-dispatch";
 import httpStatus from "http-status-codes";
-import { injectable } from "inversify";
 import jwt from "jsonwebtoken";
-
 import {
     autoMapper,
     eventDispatcher,
@@ -13,6 +11,7 @@ import {
 import { IUserRepository } from "../../domain/interfaces/repositories";
 import { User, UserRole } from "../../domain/model/user";
 import { config } from "../../infrastructure/config";
+import { provideSingleton } from "../../infrastructure/config/ioc";
 import { HttpError } from "../error";
 import { IAuthService } from "../interfaces/auth_service";
 import { UserDto, UserSignInInput, UserSignUpInput } from "../models/user_dto";
@@ -26,11 +25,12 @@ export interface DecodedJwt {
     firstName: string;
     tenantId: any;
 }
-@injectable()
+@provideSingleton(AuthService)
 export class AuthService implements IAuthService {
     @userRepository private _userRepository: IUserRepository;
     @eventDispatcher private _eventDispatcher: EventDispatcher;
     @autoMapper private _autoMapper: AutoMapper;
+    // @inject(TYPES.TenantId) private readonly _tenantId: string;
 
     public async signUp(
         dto: UserSignUpInput
@@ -46,7 +46,7 @@ export class AuthService implements IAuthService {
             tenant: global.currentUser.tenant.id
         });
         if (user) throw new HttpError(httpStatus.CONFLICT);
-
+        //   console.log(iocContainer.get<string>(TYPES.TenantId));
         user = await this._userRepository.insertOrUpdate(
             User.createInstance({
                 ...dto,
