@@ -48,6 +48,8 @@ npm run start
 http://localhost:3000/api/v1/tenants
 ```
 
+For a sample swagger documentation `http://localhost:3000/api-docs`
+
 ### Run Tests
 
 Run test once
