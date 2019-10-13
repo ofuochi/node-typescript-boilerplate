@@ -97,6 +97,7 @@
         "@types/mocha": "^5.2.7",
         "@types/mongoose": "^5.5.20",
         "@types/supertest": "^2.0.8",
+        "@types/swagger-ui-express": "^3.0.1",
         "@types/winston": "^2.4.4",
         "@typescript-eslint/eslint-plugin": "^2.3.3",
         "@typescript-eslint/parser": "^2.3.3",
