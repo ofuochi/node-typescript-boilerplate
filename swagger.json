@@ -51,16 +51,19 @@
 			"jwt": {
 				"scheme": "basic",
 				"type": "http"
+			},
+			"X-Tenant-Id": {
+				"type": "apiKey",
+				"in": "header",
+				"name": "X-Tenant-Id",
+				"description": "Tenant ID"
 			}
 		}
 	},
 	"info": {
 		"title": "node-typescript-boilerplate",
 		"version": "1.0.0",
-		"description": "Enterprise NodeJs/Typescript API boilerplate",
-		"license": {
-			"name": "MIT"
-		}
+		"description": "Enterprise NodeJs/Typescript API boilerplate"
 	},
 	"openapi": "3.0.0",
 	"paths": {
@@ -124,7 +127,8 @@
 					{
 						"jwt": [
 							"admin"
-						]
+						],
+						"X-Tenant-Id": []
 					}
 				],
 				"parameters": [],

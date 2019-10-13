@@ -35,7 +35,7 @@ export class FooController extends Controller {
     }
 
     @Post()
-    @Security("jwt", ["admin"])
+    @Security({ jwt: ["admin"], "X-Tenant-Id": [] })
     @Response(httpStatus.CONFLICT, http.STATUS_CODES[httpStatus.CONFLICT])
     @Response(httpStatus.FORBIDDEN, http.STATUS_CODES[httpStatus.FORBIDDEN])
     @Response(httpStatus.BAD_REQUEST, http.STATUS_CODES[httpStatus.BAD_REQUEST])

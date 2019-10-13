@@ -62,6 +62,7 @@ function authentication(iocContainer: Container) {
             throw new Error("Invalid security name");
 
         const token = request.headers[X_AUTH_TOKEN_KEY.toLowerCase()] as string;
+        console.log(request.headers);
         if (!token)
             throw new HttpError(
                 httpStatus.UNAUTHORIZED,
@@ -70,7 +71,6 @@ function authentication(iocContainer: Container) {
 
         try {
             const decodedJwt = jwt.verify(token, env.jwtSecret) as DecodedJwt;
-
             const userRole = (UserRole as any)[roles[0].toUpperCase()];
             if (userRole !== UserRole.USER && !decodedJwt.role === userRole)
                 throw new HttpError(httpStatus.FORBIDDEN, "Access denied!");
