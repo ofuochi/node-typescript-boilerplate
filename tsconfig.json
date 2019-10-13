@@ -4,6 +4,7 @@
         "lib": ["es6", "dom"],
         "types": ["express", "inversify", "mocha", "reflect-metadata"],
         "module": "commonjs",
+        "resolveJsonModule": true,
         "moduleResolution": "node",
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,

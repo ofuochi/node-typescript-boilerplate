@@ -1,7 +1,7 @@
 import { bootstrap } from "./infrastructure/bootstrapping";
 import { config } from "./infrastructure/config";
 import { referenceDataIoCModule } from "./infrastructure/config/inversify.config";
-import { container } from "./infrastructure/utils/ioc_container";
+import { iocContainer } from "./infrastructure/config/ioc";
 import {
     exitProcess,
     startAppServer
@@ -10,7 +10,7 @@ import {
 export async function startServer(connStr: string, port: number) {
     try {
         const app = await bootstrap({
-            container,
+            iocContainer,
             connStr,
             containerModules: [referenceDataIoCModule]
         });

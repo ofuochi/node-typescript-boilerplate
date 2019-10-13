@@ -1,25 +1,24 @@
 import { expect } from "chai";
 import httpStatus from "http-status-codes";
-
+import { X_TENANT_ID } from "../../../.history/src/ui/constants/header_constants_20191012170119";
+import { TYPES } from "../../../src/domain/constants/types";
 import {
     ITenantRepository,
     IUserRepository
 } from "../../../src/domain/interfaces/repositories";
 import { Tenant } from "../../../src/domain/model/tenant";
 import { config } from "../../../src/infrastructure/config";
-import { container } from "../../../src/infrastructure/utils/ioc_container";
+import { iocContainer } from "../../../src/infrastructure/config/ioc";
 import {
     UserSignInInput,
     UserSignUpDto,
     UserSignUpInput
 } from "../../../src/ui/models/user_dto";
-import { TYPES } from "../../../src/domain/constants/types";
-import { req, cleanupDb } from "../../setup";
+import { cleanupDb, req } from "../../setup";
 
 const endpoint = `${config.api.prefix}/auth`;
-const tenantHeaderProp = "x-tenant-id";
 
-describe("Auth controller", () => {
+describe("AuthController", () => {
     let tenantRepository: ITenantRepository;
     let tenant: Tenant;
     let tenant1: Tenant;
@@ -27,10 +26,9 @@ describe("Auth controller", () => {
     before(async () => {
         await cleanupDb();
 
-        tenantRepository = container.get<ITenantRepository>(
+        tenantRepository = iocContainer.get<ITenantRepository>(
             TYPES.TenantRepository
         );
-
         // Get first tenant because it already exists from the setup.ts file
         tenant1 = await tenantRepository.insertOrUpdate(
             Tenant.createInstance("Tenant1", "Second tenant")
@@ -56,15 +54,14 @@ describe("Auth controller", () => {
             email: "john@email.com",
             password: "valid_P@ssW1d"
         };
-
         it("should sign-up a new user and return token and user DTO. Creator should be the signed up user", async () => {
             const res = await req
                 .post(`${endpoint}/signUp`)
-                .set(tenantHeaderProp, tenant.id)
+                .set(X_TENANT_ID, tenant.id)
                 .send(signUpInput)
                 .expect(httpStatus.OK);
 
-            const userRepository = container.get<IUserRepository>(
+            const userRepository = iocContainer.get<IUserRepository>(
                 TYPES.UserRepository
             );
             const result = res.body as UserSignUpDto;
@@ -81,7 +78,7 @@ describe("Auth controller", () => {
             input.username = `1${input.username}`;
             await req
                 .post(`${endpoint}/signUp`)
-                .set(tenantHeaderProp, tenant.id)
+                .set(X_TENANT_ID, tenant.id)
                 .send(input)
                 .expect(httpStatus.CONFLICT);
         });
@@ -90,7 +87,7 @@ describe("Auth controller", () => {
             input.email = `1${input.email}`;
             await req
                 .post(`${endpoint}/signUp`)
-                .set(tenantHeaderProp, tenant.id)
+                .set(X_TENANT_ID, tenant.id)
                 .send(signUpInput)
                 .expect(httpStatus.CONFLICT);
         });
@@ -100,7 +97,7 @@ describe("Auth controller", () => {
             input.username = `${input.username}2`;
             await req
                 .post(`${endpoint}/signUp`)
-                .set(tenantHeaderProp, tenant.id)
+                .set(X_TENANT_ID, tenant.id)
                 .send(input)
                 .expect(httpStatus.BAD_REQUEST);
         });
@@ -110,7 +107,7 @@ describe("Auth controller", () => {
             input.username = `${input.username}2`;
             await req
                 .post(`${endpoint}/signUp`)
-                .set(tenantHeaderProp, "invalid_tenatId")
+                .set(X_TENANT_ID, "invalid_tenatId")
                 .send(input)
                 .expect(httpStatus.BAD_REQUEST);
         });
@@ -118,7 +115,7 @@ describe("Auth controller", () => {
             tenant = tenant2;
             const res = await req
                 .post(`${endpoint}/signUp`)
-                .set(tenantHeaderProp, tenant.id)
+                .set(X_TENANT_ID, tenant.id)
                 .send(signUpInput)
                 .expect(httpStatus.OK);
             expect(res.body).to.contain.keys("userDto", "token");
@@ -134,7 +131,7 @@ describe("Auth controller", () => {
         it("should sign user in with email and return token", async () => {
             const res = await req
                 .post(`${endpoint}/signIn`)
-                .set(tenantHeaderProp, tenant.id)
+                .set(X_TENANT_ID, tenant.id)
                 .send(signInInput)
                 .expect(httpStatus.OK);
             expect(res.body).to.contain.keys("token");
@@ -143,7 +140,7 @@ describe("Auth controller", () => {
             signInInput.emailOrUsername = signUpInput.username;
             const res = await req
                 .post(`${endpoint}/signIn`)
-                .set(tenantHeaderProp, tenant.id)
+                .set(X_TENANT_ID, tenant.id)
                 .send(signInInput)
                 .expect(httpStatus.OK);
             expect(res.body).to.contain.keys("token");
@@ -153,7 +150,7 @@ describe("Auth controller", () => {
             signInInput.emailOrUsername = signUpInput.username;
             const res = await req
                 .post(`${endpoint}/signIn`)
-                .set(tenantHeaderProp, tenant.id)
+                .set(X_TENANT_ID, tenant.id)
                 .send(signInInput)
                 .expect(httpStatus.OK);
             expect(res.body).to.contain.keys("token");
@@ -163,7 +160,7 @@ describe("Auth controller", () => {
             signInInput.emailOrUsername = signUpInput.email;
             const res = await req
                 .post(`${endpoint}/signIn`)
-                .set(tenantHeaderProp, tenant.id)
+                .set(X_TENANT_ID, tenant.id)
                 .send(signInInput)
                 .expect(httpStatus.OK);
             expect(res.body).to.contain.keys("token");

@@ -1,12 +1,10 @@
 import { TYPES } from "../../domain/constants/types";
 import { Tenant } from "../../domain/model/tenant";
 import { TenantRepository } from "../db/repositories/tenant_repository";
-import { container } from "../utils/ioc_container";
+import { iocContainer } from "../config/ioc";
 
-export async function getCurrentTenant(
-    tenantId: string
-): Promise<Tenant> {
-    const tenantRepository = container.get<TenantRepository>(
+export async function getCurrentTenant(tenantId: string): Promise<Tenant> {
+    const tenantRepository = iocContainer.get<TenantRepository>(
         TYPES.TenantRepository
     );
     const tenant = await tenantRepository.findById(tenantId);

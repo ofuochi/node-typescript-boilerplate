@@ -1,0 +1,5 @@
+{
+    "watch": ["src", ".env", "test"],
+    "ext": "ts",
+    "ignore": ["src/ui/api/routes.ts"]
+}
