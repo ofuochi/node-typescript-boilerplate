@@ -3,14 +3,12 @@ import httpStatus from "http-status-codes";
 import { injectable } from "inversify";
 import { BaseMiddleware } from "inversify-express-utils";
 import mongoose from "mongoose";
-
+import { TYPES } from "../../../domain/constants/types";
 import { CurrentUser } from "../../../domain/utils/globals";
 import { config } from "../../../infrastructure/config";
+import { iocContainer } from "../../../infrastructure/config/ioc";
 import { getCurrentTenant } from "../../../infrastructure/helpers/tenant_helpers";
 import { HttpError } from "../../error";
-import { TYPES } from "../../../domain/constants/types";
-import { iocContainer } from "../../../infrastructure/config/ioc";
-import { ILoggerService } from "../../../domain/interfaces/services";
 
 @injectable()
 export class RequestMiddleware extends BaseMiddleware {
@@ -67,15 +65,15 @@ export function exceptionLoggerMiddleware(
     res: Response,
     _next: NextFunction
 ) {
-    const log = iocContainer.get<ILoggerService>(TYPES.LoggerService);
+    // const log = iocContainer.get<ILoggerService>(TYPES.LoggerService);
 
-    log.error(`
-    ----------------------------------
-    EXCEPTION MIDDLEWARE
-    HTTP ${req.method} ${req.url}
-    ${error.message}
-    ----------------------------------
-    `);
+    // log.error(`
+    // ----------------------------------
+    // EXCEPTION MIDDLEWARE
+    // HTTP ${req.method} ${req.url}
+    // ${error.message}
+    // ----------------------------------
+    // `);
     if (error instanceof HttpError) return res.status(error.status).send(error);
     error =
         config.env === "development" || config.env === "test"

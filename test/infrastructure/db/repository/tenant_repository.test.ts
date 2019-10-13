@@ -15,6 +15,7 @@ import { CreateTenantDto } from "../../../../src/ui/models/tenant_dto";
 import { UserDto, UserSignUpInput } from "../../../../src/ui/models/user_dto";
 import { AuthService } from "../../../../src/ui/services/auth_service";
 import { cleanupDb, req, tokenHeaderKey } from "../../../setup";
+import { X_TENANT_ID } from "../../../../src/ui/constants/header_constants";
 
 const endpoint = config.api.prefix;
 describe("Tenant Repository", () => {
@@ -53,7 +54,7 @@ describe("Tenant Repository", () => {
         const { body } = await req
             .post(`${endpoint}/auth/signUp`)
             .send(signUpInput)
-            .set("x-tenant-id", tenant.id)
+            .set(X_TENANT_ID, tenant.id)
             .expect(httpStatus.OK);
         userDto = body.userDto;
     });
@@ -81,6 +82,7 @@ describe("Tenant Repository", () => {
             emailOrUsername: signUpInput.email,
             password: signUpInput.password
         });
+
         const createTenantInput: CreateTenantDto = {
             name: "NewTenant",
             description: "New tenant description"
@@ -91,6 +93,7 @@ describe("Tenant Repository", () => {
             .set(tokenHeaderKey, token)
             .send(createTenantInput)
             .expect(httpStatus.OK);
+
         expect(resp.body).to.contain.keys(
             "id",
             "name",

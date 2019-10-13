@@ -3,7 +3,9 @@ import { Container, ContainerModule, decorate, injectable } from "inversify";
 import { buildProviderModule } from "inversify-binding-decorators";
 import { InversifyExpressServer } from "inversify-express-utils";
 import swaggerUi from "swagger-ui-express";
+
 import { Controller } from "tsoa";
+import swaggerJsonDoc from "../../../swagger.json";
 import { TYPES } from "../../domain/constants/types";
 import { exceptionLoggerMiddleware } from "../../ui/api/middleware/interceptor_middleware";
 import { RegisterRoutes } from "../../ui/api/routes";
@@ -15,7 +17,6 @@ import "./loaders/events";
 import { App, expressLoader } from "./loaders/express";
 import { Jobs } from "./loaders/jobs";
 import { winstonLoggerInstance as logger } from "./loaders/logger";
-import swaggerJsonDoc from "../../../swagger.json";
 
 export async function bootstrap({
     iocContainer,

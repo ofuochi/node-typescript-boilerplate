@@ -128,7 +128,9 @@
 						"jwt": [
 							"admin"
 						],
-						"X-Tenant-Id": []
+						"X-Tenant-Id": [
+							"admin"
+						]
 					}
 				],
 				"parameters": [],
