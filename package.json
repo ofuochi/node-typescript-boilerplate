@@ -42,7 +42,7 @@
         "rm-files": "rm -r -f coverage .nyc_output dist",
         "start": "npm run rm-files && npm run tsc && npm run start-node",
         "dev": "nodemon -e ts --exec \"npx ts-node -r tsconfig-paths/register -T --pretty --project tsconfig.json src/index.ts\"",
-        "start-node": "node dist/index.js",
+        "start-node": "node dist/src/index.js",
         "test": "ts-mocha --paths",
         "test-watch": "nodemon -e ts --exec \"ts-mocha --paths\"",
         "test-cover": "npm run rm-files && npm run nyc",

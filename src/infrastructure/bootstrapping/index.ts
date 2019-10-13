@@ -2,7 +2,6 @@ import Agenda from "agenda";
 import { Container, ContainerModule, decorate, injectable } from "inversify";
 import { buildProviderModule } from "inversify-binding-decorators";
 import { InversifyExpressServer } from "inversify-express-utils";
-import "reflect-metadata";
 import { Controller } from "tsoa";
 import { TYPES } from "../../domain/constants/types";
 import { exceptionLoggerMiddleware } from "../../ui/api/middleware/interceptor_middleware";
