@@ -3,7 +3,6 @@ import { Container, ContainerModule, decorate, injectable } from "inversify";
 import { buildProviderModule } from "inversify-binding-decorators";
 import { InversifyExpressServer } from "inversify-express-utils";
 import swaggerUi from "swagger-ui-express";
-
 import { Controller } from "tsoa";
 import swaggerJsonDoc from "../../../swagger.json";
 import { TYPES } from "../../domain/constants/types";
