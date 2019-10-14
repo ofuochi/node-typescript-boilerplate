@@ -9,6 +9,10 @@ import { X_TENANT_ID } from "../../ui/constants/header_constants";
 
 const basePath = config.api.prefix;
 const entryFile = "./src/index.ts";
+const protocol =
+    process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test"
+        ? "http"
+        : "https";
 export const swaggerGen = async () => {
     const swaggerOptions: SwaggerConfig = {
         basePath,
@@ -31,7 +35,7 @@ export const swaggerGen = async () => {
         version: "1.0.0",
         name: "node-typescript-boilerplate",
         specVersion: 3,
-        schemes: ["http", "https"],
+        schemes: [protocol],
         tags: [
             {
                 name: "Foos",
