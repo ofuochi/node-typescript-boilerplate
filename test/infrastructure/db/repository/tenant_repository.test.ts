@@ -49,19 +49,14 @@ describe("Tenant Repository", () => {
             username: "admin"
         };
     });
-    it("should create user using the foo endpoint", done => {
-        tenantRepository
-            .findOneByQuery({ name: "T2" })
-            .then(async tenant => {
-                const { body } = await req
-                    .post(`${endpoint}/auth/signUp`)
-                    .send(signUpInput)
-                    .set(X_TENANT_ID, tenant.id)
-                    .expect(httpStatus.OK);
-                userDto = body.userDto;
-                done();
-            })
-            .catch(done);
+    it("should create user using the foo endpoint", async () => {
+        const tenant = await tenantRepository.findOneByQuery({ name: "T1" });
+        const { body } = await req
+            .post(`${endpoint}/auth/signUp`)
+            .send(signUpInput)
+            .set(X_TENANT_ID, tenant.id)
+            .expect(httpStatus.OK);
+        userDto = body.userDto;
     });
 
     it("should get all the tenants but without the deleted ones", async () => {

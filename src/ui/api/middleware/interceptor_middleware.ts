@@ -2,12 +2,13 @@ import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status-codes";
 import { injectable } from "inversify";
 import { BaseMiddleware } from "inversify-express-utils";
-import mongoose from "mongoose";
 import { TYPES } from "../../../domain/constants/types";
 import { CurrentUser } from "../../../domain/utils/globals";
 import { config } from "../../../infrastructure/config";
 import { iocContainer } from "../../../infrastructure/config/ioc";
 import { getCurrentTenant } from "../../../infrastructure/helpers/tenant_helpers";
+import { isIdValid } from "../../../infrastructure/utils/server_utils";
+import { X_TENANT_ID } from "../../constants/header_constants";
 import { HttpError } from "../../error";
 
 @injectable()
@@ -27,8 +28,8 @@ export class RequestMiddleware extends BaseMiddleware {
         iocContainer
             .bind<string>(TYPES.TenantId)
             .toConstantValue(`${req.tenantId}`);
-        const isTenantUrl =
-            req.url.toLowerCase().startsWith("/api-docs") ||
+        const isPublicUrl =
+            req.url.toLowerCase() === "/api-docs" ||
             req.url
                 .toLowerCase()
                 .startsWith(
@@ -38,13 +39,14 @@ export class RequestMiddleware extends BaseMiddleware {
                 .toLowerCase()
                 .startsWith(`${config.api.prefix}/foos`.toLocaleLowerCase());
 
-        req.tenantId = req.header("X-Tenant-Id");
-        if (!req.tenantId && !isTenantUrl)
+        req.tenantId = req.headers[X_TENANT_ID.toLocaleLowerCase()] as string;
+        if (!req.tenantId && !isPublicUrl)
             return res
                 .status(httpStatus.BAD_REQUEST)
-                .end("x-tenant-id header is missing");
-        if (isTenantUrl) return next();
-        if (!mongoose.Types.ObjectId.isValid(req.tenantId as string))
+                .end(`${X_TENANT_ID} header is missing`);
+
+        if (isPublicUrl) return next();
+        if (!isIdValid(req.tenantId as string))
             return next(
                 new HttpError(
                     httpStatus.BAD_REQUEST,

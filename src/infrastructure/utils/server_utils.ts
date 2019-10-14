@@ -1,10 +1,10 @@
 import { Server } from "http";
-
+import { Types } from "mongoose";
 import { TYPES } from "../../domain/constants/types";
 import { App } from "../bootstrapping/loaders/express";
 import { winstonLoggerInstance } from "../bootstrapping/loaders/logger";
-import { iocContainer } from "../config/ioc";
 import { config } from "../config";
+import { iocContainer } from "../config/ioc";
 
 export function exitProcess(error: any): void {
     winstonLoggerInstance.error(`❌  ${error}`);
@@ -17,4 +17,7 @@ export function startAppServer(app: App, serverPort?: number): Server {
         iocContainer.bind<App>(TYPES.App).toConstantValue(app);
         winstonLoggerInstance.info(`✔️  Server listening on port: ${port}`);
     });
+}
+export function isIdValid(id: string): boolean {
+    return Types.ObjectId.isValid(id);
 }

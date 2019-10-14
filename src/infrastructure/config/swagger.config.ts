@@ -49,7 +49,6 @@ export const swaggerGen = async () => {
     const routeOptions: RoutesConfig = {
         basePath,
         entryFile,
-
         middleware: "express",
         authenticationModule: "./src/ui/api/middleware/auth_middleware",
         iocModule: "./src/infrastructure/config/ioc",

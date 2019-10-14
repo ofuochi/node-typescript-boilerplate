@@ -23,8 +23,7 @@ export class AuthController extends BaseController {
         /* For some strange reason, "input" is not not a real instance of UserSignUpInput.
           Calling the method plainToClass does the trick 🙂 */
         input = plainToClass(UserSignUpInput, input);
-        const badRequest = await this.checkBadRequest(input);
-        if (badRequest) return badRequest;
+        await this.checkBadRequest(input);
         const result = await this._authService.signUp(input);
         const signUpDto: UserSignUpDto = {
             userDto: result.userDto,
