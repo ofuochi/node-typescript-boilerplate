@@ -144,32 +144,6 @@
 					}
 				}
 			}
-		},
-		"/Groups": {
-			"get": {
-				"operationId": "Get",
-				"responses": {
-					"200": {
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "string"
-								}
-							}
-						},
-						"description": "Ok"
-					}
-				},
-				"tags": [
-					"Groups"
-				],
-				"security": [
-					{
-						"X-Tenant-Id": []
-					}
-				],
-				"parameters": []
-			}
 		}
 	},
 	"servers": [
