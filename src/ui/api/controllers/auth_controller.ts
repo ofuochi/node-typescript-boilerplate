@@ -1,6 +1,7 @@
 import { plainToClass } from "class-transformer";
 import { inject } from "inversify";
-import { controller, httpPost, requestBody } from "inversify-express-utils";
+import { Body, Post, Route, Security, Tags } from "tsoa";
+import { provideSingleton } from "../../../infrastructure/config/ioc";
 import { IAuthService } from "../../interfaces/auth_service";
 import {
     UserSignInInput,
@@ -10,7 +11,9 @@ import {
 import { AuthService } from "../../services/auth_service";
 import { BaseController } from "./base_controller";
 
-@controller("/auth")
+@Tags("Auth")
+@Route("auth")
+@provideSingleton(AuthController)
 export class AuthController extends BaseController {
     constructor(
         @inject(AuthService) private readonly _authService: IAuthService
@@ -18,22 +21,20 @@ export class AuthController extends BaseController {
         super();
     }
 
-    @httpPost("/signUp")
-    public async signUp(@requestBody() input: UserSignUpInput) {
-        /* For some strange reason, "input" is not not a real instance of UserSignUpInput.
-          Calling the method plainToClass does the trick 🙂 */
-        input = plainToClass(UserSignUpInput, input);
-        await this.checkBadRequest(input);
-        const result = await this._authService.signUp(input);
-        const signUpDto: UserSignUpDto = {
-            userDto: result.userDto,
-            token: result.token
-        };
-        return signUpDto;
+    @Post("signUp")
+    @Security("x-tenant-id")
+    public async signUp(
+        @Body() input: UserSignUpInput
+    ): Promise<UserSignUpDto> {
+        await this.checkBadRequest(plainToClass(UserSignUpInput, input));
+        const { token, userDto } = await this._authService.signUp(input);
+        return { userDto, token };
     }
 
-    @httpPost("/signIn")
-    public async signIn(@requestBody() input: UserSignInInput) {
+    @Post("signIn")
+    @Security("x-tenant-id")
+    public async signIn(@Body() input: UserSignInInput) {
+        await this.checkBadRequest(plainToClass(UserSignInInput, input));
         return this._authService.signIn(input);
     }
 }

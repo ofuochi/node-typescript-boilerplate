@@ -5,7 +5,10 @@ import {
     SwaggerConfig
 } from "tsoa";
 import { config } from "./index";
-import { X_TENANT_ID } from "../../ui/constants/header_constants";
+import {
+    X_TENANT_ID,
+    X_AUTH_TOKEN_KEY
+} from "../../ui/constants/header_constants";
 
 const basePath = config.api.prefix;
 const entryFile = "./src/index.ts";
@@ -18,15 +21,17 @@ export const swaggerGen = async () => {
         basePath,
         entryFile,
         securityDefinitions: {
-            jwt: {
-                type: "basic",
-                description: "Authentication"
-            },
             [X_TENANT_ID]: {
                 type: "apiKey",
                 in: "header",
                 name: X_TENANT_ID,
                 description: "Tenant ID"
+            },
+            [X_AUTH_TOKEN_KEY]: {
+                type: "apiKey",
+                in: "header",
+                name: X_AUTH_TOKEN_KEY,
+                description: "JWT access token"
             }
         },
         noImplicitAdditionalProperties: "throw-on-extras",
@@ -36,12 +41,6 @@ export const swaggerGen = async () => {
         name: "node-typescript-boilerplate",
         specVersion: 3,
         schemes: [protocol],
-        tags: [
-            {
-                name: "Foos",
-                description: "Operations about foos"
-            }
-        ],
         outputDirectory: "./",
         controllerPathGlobs: ["./src/ui/api/controllers/*.ts"]
     };

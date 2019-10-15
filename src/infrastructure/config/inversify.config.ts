@@ -1,6 +1,5 @@
 import { EventDispatcher } from "event-dispatch";
 import { ContainerModule } from "inversify";
-import { AutoMapper, Mapper } from "automapper-nartc";
 
 // Interfaces & Types
 import { TYPES } from "../../domain/constants/types";
@@ -11,9 +10,6 @@ import {
 import { ILoggerService, IMailService } from "../../domain/interfaces/services";
 import { IAuthService } from "../../ui/interfaces/auth_service";
 import { ITenantService } from "../../ui/interfaces/tenant_service";
-
-// Type Mappings
-import { TenantProfile } from "../../ui/profiles/tenant_profile";
 
 // Service implementations
 import { LoggerService } from "../services/logger_service";
@@ -26,12 +22,9 @@ import { UserRepository } from "../db/repositories/user_repository";
 import { TenantRepository } from "../db/repositories/tenant_repository";
 
 // Controllers
-import "../../ui/api/controllers/foo_controller";
 import "../../ui/api/controllers/auth_controller";
 import "../../ui/api/controllers/secure_controller";
 import "../../ui/api/controllers/tenant_controller";
-
-import { UserProfile } from "../../ui/profiles/user_profile";
 
 export const referenceDataIoCModule = new ContainerModule(bind => {
     // Repositories
@@ -42,13 +35,6 @@ export const referenceDataIoCModule = new ContainerModule(bind => {
     bind<IUserRepository>(TYPES.UserRepository)
         .to(UserRepository)
         .inSingletonScope();
-
-    // Type Mappings
-    Mapper.initialize(config => {
-        config.addProfile(new UserProfile());
-        config.addProfile(new TenantProfile());
-    });
-    bind<AutoMapper>(TYPES.AutoMapper).toConstantValue(Mapper);
 
     // Services
     bind<IMailService>(TYPES.MailService)

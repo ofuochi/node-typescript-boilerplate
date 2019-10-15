@@ -8,15 +8,17 @@ import {
     IUserRepository
 } from "../../../domain/interfaces/repositories";
 import { UserRole } from "../../../domain/model/user";
+import { CurrentUser } from "../../../domain/utils/globals";
 import { config as env } from "../../../infrastructure/config";
 import { iocContainer } from "../../../infrastructure/config/ioc";
 import { TenantRepository } from "../../../infrastructure/db/repositories/tenant_repository";
-import { HttpError } from "../../error";
-import { DecodedJwt } from "../../services/auth_service";
+import { isIdValid } from "../../../infrastructure/utils/server_utils";
 import {
     X_AUTH_TOKEN_KEY,
     X_TENANT_ID
 } from "../../constants/header_constants";
+import { HttpError } from "../../error";
+import { DecodedJwt } from "../../services/auth_service";
 
 function authMiddlewareFactory(iocContainer: Container) {
     return (config: { role: UserRole }) => {
@@ -55,46 +57,92 @@ function authMiddlewareFactory(iocContainer: Container) {
         };
     };
 }
+
 function authentication(iocContainer: Container) {
     return async (
-        request: Request,
+        req: Request,
         securityName: string,
-        roles: string[] = ["user"]
-    ): Promise<DecodedJwt> => {
+        scopes: string[] = ["user"]
+    ): Promise<any> => {
         if (
-            securityName.toLowerCase() !== "jwt" &&
+            securityName.toLowerCase() !== X_AUTH_TOKEN_KEY.toLowerCase() &&
             securityName.toLowerCase() !== X_TENANT_ID.toLowerCase()
         )
             throw new Error("Invalid security name");
 
-        const token = request.headers[X_AUTH_TOKEN_KEY.toLowerCase()] as string;
-        if (!token)
-            throw new HttpError(
-                httpStatus.UNAUTHORIZED,
-                `${X_AUTH_TOKEN_KEY} is missing!`
-            );
+        switch (securityName.toLowerCase()) {
+            case X_AUTH_TOKEN_KEY.toLowerCase(): {
+                const tenantId = req.headers[
+                    X_TENANT_ID.toLowerCase()
+                ] as string;
+                const token = req.headers[
+                    X_AUTH_TOKEN_KEY.toLowerCase()
+                ] as string;
+                await assignTenantToReqAsync(tenantId, req);
+                if (!token)
+                    throw new HttpError(
+                        httpStatus.UNAUTHORIZED,
+                        `Missing ${X_AUTH_TOKEN_KEY} token!`
+                    );
+                await assignJwtAsync(token, scopes, iocContainer);
+                return token;
+            }
+            case X_TENANT_ID.toLowerCase(): {
+                const tenantId = req.headers[
+                    X_TENANT_ID.toLowerCase()
+                ] as string;
 
-        try {
-            const decodedJwt = jwt.verify(token, env.jwtSecret) as DecodedJwt;
-            const userRole = (UserRole as any)[roles[0].toUpperCase()];
-            if (userRole !== UserRole.USER && !decodedJwt.role === userRole)
-                throw new HttpError(httpStatus.FORBIDDEN, "Access denied!");
-            const tenantRepository = iocContainer.get<ITenantRepository>(
-                TenantRepository
-            );
-            const tenant = await tenantRepository.findById(decodedJwt.tenantId);
-
-            if (!tenant || !tenant.isActive)
-                throw new HttpError(
-                    httpStatus.FORBIDDEN,
-                    "Tenant is not available!"
-                );
-            global.currentUser.setUserDetails(decodedJwt);
-            return decodedJwt;
-        } catch (error) {
-            throw new HttpError(httpStatus.BAD_REQUEST, error);
+                await assignTenantToReqAsync(tenantId, req);
+                return tenantId;
+            }
+            default:
+                throw new HttpError(httpStatus.UNAUTHORIZED);
         }
     };
+}
+
+async function assignJwtAsync(
+    token: string,
+    scopes: string[],
+    iocContainer: Container
+) {
+    try {
+        const decodedJwt = jwt.verify(token, env.jwtSecret) as DecodedJwt;
+        const userRole = (UserRole as any)[scopes[0].toUpperCase()];
+        if (userRole !== UserRole.USER && !decodedJwt.role === userRole)
+            throw new HttpError(httpStatus.FORBIDDEN, "Access denied!");
+        const tenantRepository = iocContainer.get<ITenantRepository>(
+            TenantRepository
+        );
+        const tenant = await tenantRepository.findById(decodedJwt.tenantId);
+
+        if (!tenant || !tenant.isActive)
+            throw new HttpError(
+                httpStatus.FORBIDDEN,
+                "Tenant is not available!"
+            );
+        global.currentUser.setUserDetails(decodedJwt);
+    } catch (error) {
+        throw new HttpError(httpStatus.BAD_REQUEST, error);
+    }
+}
+async function assignTenantToReqAsync(tenantId: string, req: Request) {
+    if (!isIdValid(tenantId))
+        throw new HttpError(
+            httpStatus.BAD_REQUEST,
+            `${tenantId} is not a valid ${X_TENANT_ID} header`
+        );
+    const tenantRepo = iocContainer.get<ITenantRepository>(
+        TYPES.TenantRepository
+    );
+    const tenant = await tenantRepo.findById(tenantId);
+    if (!tenant)
+        throw new HttpError(
+            httpStatus.BAD_REQUEST,
+            `Tenant ID ${tenantId} is unavailable`
+        );
+    global.currentUser = CurrentUser.createInstance(tenant);
+    req.tenantId = tenantId;
 }
 export const expressAuthentication = authentication(iocContainer);
 export const authMiddleware = authMiddlewareFactory(iocContainer);

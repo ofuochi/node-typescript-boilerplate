@@ -95,7 +95,7 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
 
     public findManyByQuery(query: Query<TEntity>) {
         return new Promise<TEntity[]>((resolve, reject) => {
-            this.Model.find(query as any, (err, res) => {
+            this.Model.find(query, "-__v", (err, res) => {
                 if (err) return reject(err);
                 if (!res) return resolve();
                 let result = res.map(r => this.readMapper(r));
@@ -104,9 +104,9 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
             });
         });
     }
-    public findOneByQuery(query: Query<TEntity>) {
+    public async findOneByQuery(query: Query<TEntity>) {
         return new Promise<TEntity>((resolve, reject) => {
-            this.Model.findOne(query as any, (err, res) => {
+            this.Model.findOne(query, "-__v", (err, res) => {
                 if (err) return reject(err);
                 if (!res) return resolve();
                 const result = this.readMapper(res);
