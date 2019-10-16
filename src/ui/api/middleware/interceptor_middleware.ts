@@ -1,23 +1,25 @@
 import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status-codes";
-import { injectable } from "inversify";
 import { BaseMiddleware } from "inversify-express-utils";
-import { TYPES } from "../../../domain/constants/types";
 import { ILoggerService } from "../../../domain/interfaces/services";
 import { config } from "../../../infrastructure/config";
-import { iocContainer } from "../../../infrastructure/config/ioc";
+import {
+    iocContainer,
+    provideSingleton
+} from "../../../infrastructure/config/ioc";
+import { LoggerService } from "../../../infrastructure/services/logger_service";
 import { isIdValid } from "../../../infrastructure/utils/server_utils";
 import { X_TENANT_ID } from "../../constants/header_constants";
 import { HttpError } from "../../error";
 
-@injectable()
+@provideSingleton(RequestMiddleware)
 export class RequestMiddleware extends BaseMiddleware {
     async handler(
         req: Request,
         res: Response,
         next: NextFunction
     ): Promise<void> {
-        const log = iocContainer.get<ILoggerService>(TYPES.LoggerService);
+        const log = iocContainer.get<ILoggerService>(LoggerService);
         log.info(`
             ----------------------------------
             REQUEST MIDDLEWARE
@@ -25,9 +27,7 @@ export class RequestMiddleware extends BaseMiddleware {
             ----------------------------------
             `);
         if (req.url.toLowerCase().startsWith("/api-docs")) return next();
-        iocContainer
-            .bind<string>(TYPES.TenantId)
-            .toConstantValue(`${req.tenantId}`);
+
         const isPublicUrl =
             req.url
                 .toLowerCase()
@@ -39,12 +39,16 @@ export class RequestMiddleware extends BaseMiddleware {
                 .startsWith(`${config.api.prefix}/foos`.toLocaleLowerCase());
 
         if (isPublicUrl) return next();
+
         const tenantId = req.headers[X_TENANT_ID.toLocaleLowerCase()];
 
         if (!tenantId && !isPublicUrl)
-            return res
-                .status(httpStatus.BAD_REQUEST)
-                .end(`${X_TENANT_ID} header is missing`);
+            return next(
+                new HttpError(
+                    httpStatus.BAD_REQUEST,
+                    `${X_TENANT_ID} header is missing`
+                )
+            );
 
         if (!isIdValid(tenantId as string))
             return next(
@@ -73,11 +77,12 @@ export function exceptionLoggerMiddleware(
     // ${error.message}
     // ----------------------------------
     // `);
-    if (error instanceof HttpError) return res.status(error.status).send(error);
+    if (error instanceof HttpError)
+        return res.status(error.status).send(error.message);
     error =
         config.env === "development" || config.env === "test"
             ? new HttpError(httpStatus.INTERNAL_SERVER_ERROR, error.message)
             : new HttpError(httpStatus.INTERNAL_SERVER_ERROR);
 
-    res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error.message);
 }

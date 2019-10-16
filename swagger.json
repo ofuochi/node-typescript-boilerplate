@@ -137,7 +137,7 @@
 				],
 				"security": [
 					{
-						"x-tenant-id": []
+						"X-Tenant-Id": []
 					}
 				],
 				"parameters": [],
@@ -180,7 +180,7 @@
 				],
 				"security": [
 					{
-						"x-tenant-id": []
+						"X-Tenant-Id": []
 					}
 				],
 				"parameters": [],

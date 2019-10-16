@@ -37,9 +37,9 @@ export async function bootstrap({
         .toConstantValue(getAgendaInstance(connStr));
     decorate(injectable(), Controller);
 
+    iocContainer.load(...containerModules);
     iocContainer.load(buildProviderModule());
 
-    iocContainer.load(...containerModules);
     logger.info("✔️  Dependency Injector loaded");
 
     Jobs.forEach(async job => job(iocContainer.get<Agenda>(TYPES.Agenda)));
@@ -63,6 +63,7 @@ export async function bootstrap({
 
     logger.info(`✔️  Environment: ${process.env.NODE_ENV}`);
 
+    iocContainer.bind<App>(TYPES.App).toConstantValue(app);
     return app;
 }
 async function setupSwagger(app: App) {

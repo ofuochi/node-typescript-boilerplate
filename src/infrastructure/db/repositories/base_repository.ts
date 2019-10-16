@@ -1,14 +1,14 @@
 import { plainToClassFromExist } from "class-transformer";
-import { injectable, unmanaged } from "inversify";
+import { unmanaged } from "inversify";
 import { Document, Model } from "mongoose";
-
 import {
     IBaseRepository,
     Query
 } from "../../../domain/interfaces/repositories";
 import { BaseEntity } from "../../../domain/model/base";
+import { provideSingleton } from "../../config/ioc";
 
-@injectable()
+@provideSingleton(BaseRepository)
 export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
     implements IBaseRepository<TEntity> {
     protected Model: Model<TModel>;

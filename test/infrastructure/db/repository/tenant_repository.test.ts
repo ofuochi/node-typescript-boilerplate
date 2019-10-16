@@ -1,8 +1,8 @@
 import { expect } from "chai";
-import { TYPES } from "../../../../src/domain/constants/types";
 import { ITenantRepository } from "../../../../src/domain/interfaces/repositories";
 import { Tenant } from "../../../../src/domain/model/tenant";
 import { iocContainer } from "../../../../src/infrastructure/config/ioc";
+import { TenantRepository } from "../../../../src/infrastructure/db/repositories/tenant_repository";
 import { cleanupDb } from "../../../setup";
 
 describe("Tenant Repository", () => {
@@ -16,7 +16,7 @@ describe("Tenant Repository", () => {
         await cleanupDb();
 
         tenantRepository = iocContainer.get<ITenantRepository>(
-            TYPES.TenantRepository
+            TenantRepository
         );
         tenants.forEach(async tenant => {
             tenants[0].delete();

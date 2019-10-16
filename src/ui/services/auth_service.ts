@@ -3,14 +3,12 @@ import { plainToClass } from "class-transformer";
 import { EventDispatcher } from "event-dispatch";
 import httpStatus from "http-status-codes";
 import jwt from "jsonwebtoken";
-import {
-    eventDispatcher,
-    userRepository
-} from "../../domain/constants/decorators";
+import { eventDispatcher } from "../../domain/constants/decorators";
 import { IUserRepository } from "../../domain/interfaces/repositories";
 import { User, UserRole } from "../../domain/model/user";
 import { config } from "../../infrastructure/config";
-import { provideSingleton } from "../../infrastructure/config/ioc";
+import { inject, provideSingleton } from "../../infrastructure/config/ioc";
+import { UserRepository } from "../../infrastructure/db/repositories/user_repository";
 import { HttpError } from "../error";
 import { IAuthService } from "../interfaces/auth_service";
 import { UserDto, UserSignInInput, UserSignUpInput } from "../models/user_dto";
@@ -26,7 +24,7 @@ export interface DecodedJwt {
 }
 @provideSingleton(AuthService)
 export class AuthService implements IAuthService {
-    @userRepository private _userRepository: IUserRepository;
+    @inject(UserRepository) private _userRepository: IUserRepository;
     @eventDispatcher private _eventDispatcher: EventDispatcher;
 
     public async signUp(

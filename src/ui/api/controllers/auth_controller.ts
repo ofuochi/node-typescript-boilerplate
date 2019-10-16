@@ -15,14 +15,10 @@ import { BaseController } from "./base_controller";
 @Route("auth")
 @provideSingleton(AuthController)
 export class AuthController extends BaseController {
-    constructor(
-        @inject(AuthService) private readonly _authService: IAuthService
-    ) {
-        super();
-    }
+    @inject(AuthService) private readonly _authService: IAuthService;
 
     @Post("signUp")
-    @Security("x-tenant-id")
+    @Security("X-Tenant-Id")
     public async signUp(
         @Body() input: UserSignUpInput
     ): Promise<UserSignUpDto> {
@@ -32,7 +28,7 @@ export class AuthController extends BaseController {
     }
 
     @Post("signIn")
-    @Security("x-tenant-id")
+    @Security("X-Tenant-Id")
     public async signIn(@Body() input: UserSignInInput) {
         await this.checkBadRequest(plainToClass(UserSignInInput, input));
         return this._authService.signIn(input);

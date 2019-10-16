@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status-codes";
 import { Container } from "inversify";
 import jwt from "jsonwebtoken";
-import { TYPES } from "../../../domain/constants/types";
 import {
     ITenantRepository,
     IUserRepository
@@ -12,6 +11,7 @@ import { CurrentUser } from "../../../domain/utils/globals";
 import { config as env } from "../../../infrastructure/config";
 import { iocContainer } from "../../../infrastructure/config/ioc";
 import { TenantRepository } from "../../../infrastructure/db/repositories/tenant_repository";
+import { UserRepository } from "../../../infrastructure/db/repositories/user_repository";
 import { isIdValid } from "../../../infrastructure/utils/server_utils";
 import {
     X_AUTH_TOKEN_KEY,
@@ -24,7 +24,7 @@ function authMiddlewareFactory(iocContainer: Container) {
     return (config: { role: UserRole }) => {
         return (req: Request, res: Response, next: NextFunction) => {
             const accountRepository = iocContainer.get<IUserRepository>(
-                TYPES.UserRepository
+                UserRepository
             );
 
             (async () => {
@@ -91,7 +91,6 @@ function authentication(iocContainer: Container) {
                 const tenantId = req.headers[
                     X_TENANT_ID.toLowerCase()
                 ] as string;
-
                 await assignTenantToReqAsync(tenantId, req);
                 return tenantId;
             }
@@ -132,9 +131,7 @@ async function assignTenantToReqAsync(tenantId: string, req: Request) {
             httpStatus.BAD_REQUEST,
             `${tenantId} is not a valid ${X_TENANT_ID} header`
         );
-    const tenantRepo = iocContainer.get<ITenantRepository>(
-        TYPES.TenantRepository
-    );
+    const tenantRepo = iocContainer.get<ITenantRepository>(TenantRepository);
     const tenant = await tenantRepo.findById(tenantId);
     if (!tenant)
         throw new HttpError(

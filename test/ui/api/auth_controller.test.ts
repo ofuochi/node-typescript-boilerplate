@@ -1,6 +1,5 @@
 import { expect } from "chai";
 import httpStatus from "http-status-codes";
-import { TYPES } from "../../../src/domain/constants/types";
 import {
     ITenantRepository,
     IUserRepository
@@ -8,6 +7,8 @@ import {
 import { Tenant } from "../../../src/domain/model/tenant";
 import { config } from "../../../src/infrastructure/config";
 import { iocContainer } from "../../../src/infrastructure/config/ioc";
+import { TenantRepository } from "../../../src/infrastructure/db/repositories/tenant_repository";
+import { UserRepository } from "../../../src/infrastructure/db/repositories/user_repository";
 import { X_TENANT_ID } from "../../../src/ui/constants/header_constants";
 import {
     UserSignInInput,
@@ -27,7 +28,7 @@ describe("AuthController", () => {
         await cleanupDb();
 
         tenantRepository = iocContainer.get<ITenantRepository>(
-            TYPES.TenantRepository
+            TenantRepository
         );
         // Get first tenant because it already exists from the setup.ts file
         tenant1 = await tenantRepository.insertOrUpdate(
@@ -62,7 +63,7 @@ describe("AuthController", () => {
                 .expect(httpStatus.OK);
 
             const userRepository = iocContainer.get<IUserRepository>(
-                TYPES.UserRepository
+                UserRepository
             );
             const result = res.body as UserSignUpDto;
             expect(result).to.contain.keys("userDto", "token");

@@ -1,8 +1,6 @@
 import bcrypt from "bcrypt";
 import { expect } from "chai";
 import httpStatus from "http-status-codes";
-
-import { TYPES } from "../../../src/domain/constants/types";
 import {
     ITenantRepository,
     IUserRepository
@@ -11,9 +9,12 @@ import { Tenant } from "../../../src/domain/model/tenant";
 import { User, UserRole } from "../../../src/domain/model/user";
 import { config } from "../../../src/infrastructure/config";
 import { iocContainer } from "../../../src/infrastructure/config/ioc";
+import { TenantRepository } from "../../../src/infrastructure/db/repositories/tenant_repository";
+import { UserRepository } from "../../../src/infrastructure/db/repositories/user_repository";
 import { IAuthService } from "../../../src/ui/interfaces/auth_service";
-import { CreateTenantInput } from "../../../src/ui/models/tenant_dto";
-import { req, cleanupDb } from "../../setup";
+import { CreateTenantDto } from "../../../src/ui/models/tenant_dto";
+import { AuthService } from "../../../src/ui/services/auth_service";
+import { cleanupDb, req } from "../../setup";
 
 const endpoint = `${config.api.prefix}/tenants`;
 let authService: IAuthService;
@@ -29,12 +30,10 @@ describe("Tenant controller", async () => {
     before(async () => {
         await cleanupDb();
 
-        userRepository = iocContainer.get<IUserRepository>(
-            TYPES.UserRepository
-        );
-        authService = iocContainer.get<IAuthService>(TYPES.AuthService);
+        userRepository = iocContainer.get<IUserRepository>(UserRepository);
+        authService = iocContainer.get<IAuthService>(AuthService);
         tenantRepository = iocContainer.get<ITenantRepository>(
-            TYPES.TenantRepository
+            TenantRepository
         );
         tenant = await tenantRepository.insertOrUpdate(
             Tenant.createInstance("Default", "Default")
@@ -55,7 +54,7 @@ describe("Tenant controller", async () => {
         });
         jwtToken = token;
     });
-    const createTenantInput: CreateTenantInput = {
+    const createTenantInput: CreateTenantDto = {
         name: "NewTenant",
         description: "New tenant"
     };

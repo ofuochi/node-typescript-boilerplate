@@ -64,7 +64,7 @@ export function RegisterRoutes(app: express.Express) {
     //      Please look into the "controllerPathGlobs" config option described in the readme: https://github.com/lukeautry/tsoa
     // ###########################################################################################################
     app.post('/api/v1/auth/signUp',
-        authenticateMiddleware([{ "x-tenant-id": [] }]),
+        authenticateMiddleware([{ "X-Tenant-Id": [] }]),
         function(request: any, response: any, next: any) {
             const args = {
                 input: { "in": "body", "name": "input", "required": true, "ref": "UserSignUpInput" },
@@ -90,7 +90,7 @@ export function RegisterRoutes(app: express.Express) {
         });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     app.post('/api/v1/auth/signIn',
-        authenticateMiddleware([{ "x-tenant-id": [] }]),
+        authenticateMiddleware([{ "X-Tenant-Id": [] }]),
         function(request: any, response: any, next: any) {
             const args = {
                 input: { "in": "body", "name": "input", "required": true, "ref": "UserSignInInput" },

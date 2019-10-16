@@ -17,7 +17,7 @@ const provideNamed = (
 ) =>
     fluentProvide(identifier)
         .whenTargetNamed(name)
-        .done();
+        .done(true);
 
 const provideSingleton = (
     identifier:
@@ -28,7 +28,7 @@ const provideSingleton = (
 ) =>
     fluentProvide(identifier)
         .inSingletonScope()
-        .done();
+        .done(true);
 
 export {
     iocContainer,
