@@ -235,7 +235,7 @@
 				}
 			}
 		},
-		"/tenants": {
+		"/tenants/{tenantName}": {
 			"get": {
 				"operationId": "Get",
 				"responses": {
@@ -243,10 +243,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/TenantDto"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/TenantDto"
 								}
 							}
 						},
@@ -259,15 +256,17 @@
 				"security": [],
 				"parameters": [
 					{
-						"in": "query",
-						"name": "name",
-						"required": false,
+						"in": "path",
+						"name": "tenantName",
+						"required": true,
 						"schema": {
 							"type": "string"
 						}
 					}
 				]
-			},
+			}
+		},
+		"/tenants": {
 			"post": {
 				"operationId": "Create",
 				"responses": {
@@ -308,11 +307,15 @@
 			"delete": {
 				"operationId": "Delete",
 				"responses": {
-					"204": {
+					"200": {
 						"content": {
-							"application/json": {}
+							"application/json": {
+								"schema": {
+									"type": "boolean"
+								}
+							}
 						},
-						"description": "No content"
+						"description": "Ok"
 					}
 				},
 				"tags": [

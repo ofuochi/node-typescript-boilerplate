@@ -30,6 +30,10 @@ export class AuthService implements IAuthService {
     public async signUp(
         dto: UserSignUpInput
     ): Promise<{ userDto: UserDto; token: string }> {
+        // Check that user is not already signed in
+        if (global.currentUser && global.currentUser.decodedJwt)
+            throw new HttpError(httpStatus.CONFLICT, "You are still signed in");
+
         // Use less salt round for faster hashing on test and development but stronger hashing on production
         const hashedPassword =
             config.env === "development" || config.env === "test"

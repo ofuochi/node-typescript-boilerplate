@@ -12,10 +12,12 @@ import {
 
 const basePath = config.api.prefix;
 const entryFile = "./src/index.ts";
+const controllers = "./src/ui/api/controllers/*.ts";
 const protocol =
     process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test"
         ? "http"
         : "https";
+
 export const swaggerGen = async () => {
     const swaggerOptions: SwaggerConfig = {
         basePath,
@@ -42,7 +44,7 @@ export const swaggerGen = async () => {
         specVersion: 3,
         schemes: [protocol],
         outputDirectory: "./",
-        controllerPathGlobs: ["./src/ui/api/controllers/*.ts"]
+        controllerPathGlobs: [controllers]
     };
 
     const routeOptions: RoutesConfig = {
@@ -52,7 +54,7 @@ export const swaggerGen = async () => {
         authenticationModule: "./src/ui/api/middleware/auth_middleware",
         iocModule: "./src/infrastructure/config/ioc",
         routesDir: "./src/ui/api",
-        controllerPathGlobs: ["./src/ui/api/controllers/*.ts"]
+        controllerPathGlobs: [controllers]
     };
 
     await generateSwaggerSpec(swaggerOptions, routeOptions);

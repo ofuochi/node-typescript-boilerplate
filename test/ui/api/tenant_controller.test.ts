@@ -12,7 +12,7 @@ import { iocContainer } from "../../../src/infrastructure/config/ioc";
 import { TenantRepository } from "../../../src/infrastructure/db/repositories/tenant_repository";
 import { UserRepository } from "../../../src/infrastructure/db/repositories/user_repository";
 import { IAuthService } from "../../../src/ui/interfaces/auth_service";
-import { CreateTenantDto } from "../../../src/ui/models/tenant_dto";
+import { CreateTenantInput } from "../../../src/ui/models/tenant_dto";
 import { AuthService } from "../../../src/ui/services/auth_service";
 import { cleanupDb, req } from "../../setup";
 
@@ -54,7 +54,7 @@ describe("Tenant controller", async () => {
         });
         jwtToken = token;
     });
-    const createTenantInput: CreateTenantDto = {
+    const createTenantInput: CreateTenantInput = {
         name: "NewTenant",
         description: "New tenant"
     };
@@ -91,16 +91,12 @@ describe("Tenant controller", async () => {
         expect(user.updatedBy).to.be.ok;
     });
 
-    it("should return list of tenants", async () => {
-        const res = await req.get(endpoint).expect(httpStatus.OK);
-        expect(res.body).to.be.an("array");
-    });
     it("should return tenant object when queried by tenant name", async () => {
         const res = await req
             .get(endpoint)
             .query({ name: tenant.name })
             .expect(httpStatus.OK);
-        expect(res.body[0]).to.contain.keys("isActive", "id", "name");
+        expect(res.body).to.contain.keys("isActive", "id", "name");
     });
     it("should soft delete tenant by admin", async () => {
         user.setRole(UserRole.ADMIN);

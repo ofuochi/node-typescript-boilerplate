@@ -137,10 +137,10 @@ export function RegisterRoutes(app: express.Express) {
             promiseHandler(controller, promise, response, next);
         });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    app.get('/api/v1/tenants',
+    app.get('/api/v1/tenants/:tenantName',
         function(request: any, response: any, next: any) {
             const args = {
-                tenantName: { "in": "query", "name": "name", "dataType": "string" },
+                tenantName: { "in": "path", "name": "tenantName", "required": true, "dataType": "string" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa

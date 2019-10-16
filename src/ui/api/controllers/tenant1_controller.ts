@@ -14,7 +14,7 @@ import { UserRole } from "../../../domain/model/user";
 import { isIdValid } from "../../../infrastructure/utils/server_utils";
 import { HttpError } from "../../error";
 import { ITenantService } from "../../interfaces/tenant_service";
-import { CreateTenantInput, TenantDto } from "../../models/tenant_dto";
+import { CreateTenantInput } from "../../models/tenant_dto";
 import { TenantService } from "../../services/tenant_service";
 import { authMiddleware } from "../middleware/auth_middleware";
 import { BaseController } from "./base_controller";
@@ -31,11 +31,8 @@ export class TenantController extends BaseController {
      * @memberof TenantController
      */
     @httpGet("/")
-    public async get(
-        @queryParam("name") tenantName?: string
-    ): Promise<TenantDto[]> {
-        const tenants = await this._tenantService.search(tenantName);
-        return tenants;
+    public async get(@queryParam("name") tenantName: string) {
+        return this._tenantService.get(tenantName);
     }
     @httpPost("/", authMiddleware({ role: UserRole.ADMIN }))
     public async post(@requestBody() input: CreateTenantInput) {

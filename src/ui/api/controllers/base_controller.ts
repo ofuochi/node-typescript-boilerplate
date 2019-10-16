@@ -16,4 +16,10 @@ export abstract class BaseController extends Controller {
             throw new HttpError(httpStatus.BAD_REQUEST, error);
         }
     }
+    protected async checkConflict(input: any) {
+        if (input) {
+            this.setStatus(httpStatus.CONFLICT);
+            throw new HttpError(httpStatus.CONFLICT);
+        }
+    }
 }

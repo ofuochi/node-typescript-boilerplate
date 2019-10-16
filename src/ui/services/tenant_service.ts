@@ -21,20 +21,19 @@ export class TenantService implements ITenantService {
 
     async get(name: string): Promise<TenantDto | undefined> {
         const tenant = await this._tenantRepository.findOneByQuery({ name });
-        return (
+        const tenantDto =
             tenant &&
             plainToClass(TenantDto, tenant, {
+                enableImplicitConversion: true,
                 excludeExtraneousValues: true
-            })
-        );
+            });
+        return tenantDto;
     }
     async delete(id: string): Promise<boolean> {
         return this._tenantRepository.deleteById(id);
     }
-    async search(name?: string): Promise<TenantDto[]> {
-        const tenants = name
-            ? await this._tenantRepository.findManyByQuery({ name })
-            : await this._tenantRepository.findAll();
+    async search(): Promise<TenantDto[]> {
+        const tenants = await this._tenantRepository.findAll();
 
         const tenantDto = plainToClass(TenantDto, tenants, {
             enableImplicitConversion: true,
