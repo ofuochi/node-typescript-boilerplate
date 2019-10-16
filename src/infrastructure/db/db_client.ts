@@ -1,16 +1,46 @@
+import { Ref } from "@hasezoey/typegoose";
+import bcrypt from "bcrypt";
 import mongoose, { Mongoose } from "mongoose";
-
 import { Tenant } from "../../domain/model/tenant";
+import { User, UserRole } from "../../domain/model/user";
 import { winstonLoggerInstance } from "../bootstrapping/loaders/logger";
 
 export type DbClient = Mongoose;
-async function seedDefaultTenant() {
+export async function seedDefaultTenant() {
     const tenantInstance = Tenant.createInstance("Default", "Default tenant");
     const tenantModel = tenantInstance.getModelForClass(Tenant, {
         schemaOptions: { collection: "Tenants", timestamps: true }
     });
     const defaultTenant = await tenantModel.findOne({ name: "Default" });
-    if (!defaultTenant) await tenantModel.create(tenantInstance);
+
+    if (defaultTenant) return defaultTenant.id;
+    return tenantModel.create(tenantInstance);
+}
+export async function seedDefaultAdmin(tenant: Ref<Tenant>) {
+    const password = await bcrypt.hash("123qwe", 1);
+    const userInstance = User.createInstance({
+        firstName: "Admin",
+        lastName: "Admin",
+        username: "Admin",
+        email: "defaultAdmin@email.com",
+        tenant,
+        password
+    });
+    const tenantModel = userInstance.getModelForClass(User, {
+        schemaOptions: { collection: "Users", timestamps: true }
+    });
+    const defaultAdminUser = await tenantModel.findOne({
+        $or: [
+            { email: userInstance.email, tenant },
+            { username: userInstance.username, tenant }
+        ]
+    });
+    if (!defaultAdminUser) {
+        userInstance.setRole(UserRole.ADMIN);
+        userInstance.setTenant(tenant);
+
+        await tenantModel.create(userInstance);
+    }
 }
 
 export async function getDatabaseClient(connStr: string) {
@@ -28,7 +58,7 @@ export async function getDatabaseClient(connStr: string) {
         });
         db.once("open", async () => {
             winstonLoggerInstance.info("✔️  Db connection successful");
-            await seedDefaultTenant();
+
             resolve(mongoose);
         });
     });

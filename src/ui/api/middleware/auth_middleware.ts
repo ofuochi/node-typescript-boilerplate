@@ -122,7 +122,7 @@ async function assignJwtAsync(
             );
         global.currentUser.setUserDetails(decodedJwt);
     } catch (error) {
-        throw new HttpError(httpStatus.BAD_REQUEST, error);
+        throw new HttpError(httpStatus.UNAUTHORIZED, error.message);
     }
 }
 async function assignTenantToReqAsync(tenantId: string, req: Request) {

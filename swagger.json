@@ -93,6 +93,46 @@
 				],
 				"type": "object",
 				"additionalProperties": false
+			},
+			"TenantDto": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"description": {
+						"type": "string"
+					},
+					"isActive": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"id",
+					"name",
+					"description",
+					"isActive"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CreateTenantInput": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"description": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"name",
+					"description"
+				],
+				"type": "object",
+				"additionalProperties": false
 			}
 		},
 		"securitySchemes": {
@@ -193,6 +233,108 @@
 						}
 					}
 				}
+			}
+		},
+		"/tenants": {
+			"get": {
+				"operationId": "Get",
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/TenantDto"
+									},
+									"type": "array"
+								}
+							}
+						},
+						"description": "Ok"
+					}
+				},
+				"tags": [
+					"Tenants"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "name",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"post": {
+				"operationId": "Create",
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/TenantDto"
+								}
+							}
+						},
+						"description": "Ok"
+					}
+				},
+				"tags": [
+					"Tenants"
+				],
+				"security": [
+					{
+						"X-Auth-Token": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateTenantInput"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/tenants/{id}": {
+			"delete": {
+				"operationId": "Delete",
+				"responses": {
+					"204": {
+						"content": {
+							"application/json": {}
+						},
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"Tenants"
+				],
+				"security": [
+					{
+						"X-Auth-Token": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
 			}
 		}
 	},

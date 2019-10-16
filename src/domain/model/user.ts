@@ -57,7 +57,7 @@ export class User extends BaseEntity implements IMustHaveTenant {
         email: string;
         username: string;
         password: string;
-        tenant: Tenant;
+        tenant: Ref<Tenant>;
     }) {
         super();
         if (!arg) return;
@@ -74,23 +74,26 @@ export class User extends BaseEntity implements IMustHaveTenant {
         lastName,
         email,
         username,
-        password
+        password,
+        tenant
     }: {
         firstName: string;
         lastName: string;
         email: string;
         username: string;
         password: string;
+        tenant?: Ref<Tenant>;
     }) => {
-        const tenantId = global.currentUser.tenant.id;
-        if (!tenantId) throw new Error("Tenant Id is required");
+        const globalTenantId =
+            (global.currentUser && global.currentUser.tenant.id) || tenant;
+        if (!globalTenantId) throw new Error("Tenant Id is required");
         return new User({
             firstName,
             lastName,
             email,
             username,
             password,
-            tenant: tenantId
+            tenant: globalTenantId
         });
     };
     public static get model() {
@@ -115,8 +118,8 @@ export class User extends BaseEntity implements IMustHaveTenant {
     }
 
     @instanceMethod
-    setTenant(tenant: Tenant) {
-        (this as Writable<User>).tenant = tenant.id;
+    setTenant(tenant: Ref<Tenant>) {
+        (this as Writable<User>).tenant = tenant;
     }
 
     @instanceMethod

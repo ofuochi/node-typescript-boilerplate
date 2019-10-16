@@ -14,7 +14,7 @@ import { UserRole } from "../../../domain/model/user";
 import { isIdValid } from "../../../infrastructure/utils/server_utils";
 import { HttpError } from "../../error";
 import { ITenantService } from "../../interfaces/tenant_service";
-import { CreateTenantDto, TenantDto } from "../../models/tenant_dto";
+import { CreateTenantInput, TenantDto } from "../../models/tenant_dto";
 import { TenantService } from "../../services/tenant_service";
 import { authMiddleware } from "../middleware/auth_middleware";
 import { BaseController } from "./base_controller";
@@ -38,8 +38,8 @@ export class TenantController extends BaseController {
         return tenants;
     }
     @httpPost("/", authMiddleware({ role: UserRole.ADMIN }))
-    public async post(@requestBody() input: CreateTenantDto) {
-        await this.checkBadRequest(plainToClass(CreateTenantDto, input));
+    public async post(@requestBody() input: CreateTenantInput) {
+        await this.checkBadRequest(plainToClass(CreateTenantInput, input));
         const existing = await this._tenantService.get(input.name);
         if (existing) throw new HttpError(httpStatus.CONFLICT);
         return this._tenantService.create(input.name, input.description);

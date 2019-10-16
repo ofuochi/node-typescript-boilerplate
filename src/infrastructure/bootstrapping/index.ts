@@ -10,12 +10,17 @@ import { exceptionLoggerMiddleware } from "../../ui/api/middleware/interceptor_m
 import { RegisterRoutes } from "../../ui/api/routes";
 import { config } from "../config";
 import { swaggerGen } from "../config/swagger.config";
-import { DbClient, getDatabaseClient } from "../db/db_client";
+import {
+    DbClient,
+    getDatabaseClient,
+    seedDefaultAdmin,
+    seedDefaultTenant
+} from "../db/db_client";
 import { getAgendaInstance } from "./loaders/agenda_loader";
 import "./loaders/events";
 import { App, expressLoader } from "./loaders/express";
 import { Jobs } from "./loaders/jobs";
-import { winstonLoggerInstance as logger } from "./loaders/logger";
+import { winstonLoggerInstance as log } from "./loaders/logger";
 
 export async function bootstrap({
     iocContainer,
@@ -35,15 +40,17 @@ export async function bootstrap({
     iocContainer
         .bind<Agenda>(TYPES.Agenda)
         .toConstantValue(getAgendaInstance(connStr));
-    decorate(injectable(), Controller);
 
     iocContainer.load(...containerModules);
-    iocContainer.load(buildProviderModule());
 
-    logger.info("✔️  Dependency Injector loaded");
+    decorate(injectable(), Controller);
+    iocContainer.load(buildProviderModule());
+    log.info("✔️  Dependency Injector loaded");
+
+    await seedDb();
 
     Jobs.forEach(async job => job(iocContainer.get<Agenda>(TYPES.Agenda)));
-    logger.info("✔️  Jobs loaded");
+    log.info("✔️  Jobs loaded");
 
     // Configure express server using inversify IoC
     const server = new InversifyExpressServer(iocContainer, null, {
@@ -51,25 +58,27 @@ export async function bootstrap({
     });
 
     server.setConfig((app: App) => expressLoader(app));
-    logger.info("✔️  Express loaded");
+    log.info("✔️  Express loaded");
 
     server.setErrorConfig(app => {
         // Catch and log all exceptions
         app.use(exceptionLoggerMiddleware);
     });
     const app = server.build() as App;
-
     await setupSwagger(app);
+    log.info(`✔️  Environment: ${config.port}`);
 
-    logger.info(`✔️  Environment: ${process.env.NODE_ENV}`);
-
-    iocContainer.bind<App>(TYPES.App).toConstantValue(app);
     return app;
 }
 async function setupSwagger(app: App) {
-    logger.info("✔️  Generating routes...");
+    log.info("✔️  Generating routes...");
     RegisterRoutes(app);
-    logger.info("✔️  Generating swagger doc...");
+    log.info("✔️  Generating swagger doc...");
     await swaggerGen();
     app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerJsonDoc));
+}
+async function seedDb() {
+    log.info("✔️  Seeding DB...");
+    const tenant = await seedDefaultTenant();
+    await seedDefaultAdmin(tenant);
 }
