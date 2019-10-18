@@ -128,7 +128,7 @@ describe("AuthController", () => {
             emailOrUsername: signUpInput.email
         };
 
-        it("should sign user in with email and return token", async () => {
+        it("should sign-in user with email and return token", async () => {
             const res = await req
                 .post(`${endpoint}/signIn`)
                 .set(X_TENANT_ID, tenant.id)
@@ -136,7 +136,7 @@ describe("AuthController", () => {
                 .expect(httpStatus.OK);
             expect(res.body).to.contain.keys("token");
         });
-        it("should sign user in with username and return token", async () => {
+        it("should sign-in user with username and return token", async () => {
             signInInput.emailOrUsername = signUpInput.username;
             const res = await req
                 .post(`${endpoint}/signIn`)
@@ -145,7 +145,7 @@ describe("AuthController", () => {
                 .expect(httpStatus.OK);
             expect(res.body).to.contain.keys("token");
         });
-        it("should sign user with a another tenantId with username and return token", async () => {
+        it("should sign-in user that has same username on a different tenant using username and return token", async () => {
             tenant = tenant2;
             signInInput.emailOrUsername = signUpInput.username;
             const res = await req
@@ -155,7 +155,7 @@ describe("AuthController", () => {
                 .expect(httpStatus.OK);
             expect(res.body).to.contain.keys("token");
         });
-        it("should sign user with a another tenantId with email and return token", async () => {
+        it("should sign-in user that has same email on a different tenant using email and return token", async () => {
             tenant = tenant2;
             signInInput.emailOrUsername = signUpInput.email;
             const res = await req
