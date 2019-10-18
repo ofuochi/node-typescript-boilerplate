@@ -53,9 +53,14 @@ export async function bootstrap({
     log.info("✔️  Jobs loaded");
 
     // Configure express server using inversify IoC
-    const server = new InversifyExpressServer(iocContainer, null, {
-        rootPath: config.api.prefix
-    });
+    const server = new InversifyExpressServer(
+        iocContainer,
+        null,
+        null,
+        null,
+        null,
+        false
+    );
 
     server.setConfig((app: App) => expressLoader(app));
     log.info("✔️  Express loaded");

@@ -1,13 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status-codes";
 import { BaseMiddleware } from "inversify-express-utils";
-import { ILoggerService } from "../../../domain/interfaces/services";
 import { config } from "../../../infrastructure/config";
-import {
-    iocContainer,
-    provideSingleton
-} from "../../../infrastructure/config/ioc";
-import { LoggerService } from "../../../infrastructure/services/logger_service";
+import { provideSingleton } from "../../../infrastructure/config/ioc";
 import { isIdValid } from "../../../infrastructure/utils/server_utils";
 import { X_TENANT_ID } from "../../constants/header_constants";
 import { HttpError } from "../../error";
@@ -19,24 +14,18 @@ export class RequestMiddleware extends BaseMiddleware {
         res: Response,
         next: NextFunction
     ): Promise<void> {
-        const log = iocContainer.get<ILoggerService>(LoggerService);
-        log.info(`
-            ----------------------------------
-            REQUEST MIDDLEWARE
-            HTTP ${req.method} ${req.url}
-            ----------------------------------
-            `);
+        // const log = iocContainer.get<ILoggerService>(LoggerService);
+        // log.info(`
+        //     ----------------------------------
+        //     REQUEST MIDDLEWARE
+        //     HTTP ${req.method} ${req.url}
+        //     ----------------------------------
+        //     `);
         if (req.url.toLowerCase().startsWith("/api-docs")) return next();
 
-        const isPublicUrl =
-            req.url
-                .toLowerCase()
-                .startsWith(
-                    `${config.api.prefix}/tenants`.toLocaleLowerCase()
-                ) ||
-            req.url
-                .toLowerCase()
-                .startsWith(`${config.api.prefix}/foos`.toLocaleLowerCase());
+        const isPublicUrl = req.url
+            .toLowerCase()
+            .startsWith(`${config.api.prefix}/tenants`.toLocaleLowerCase());
 
         if (isPublicUrl) return next();
 
