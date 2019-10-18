@@ -13,7 +13,10 @@ import { iocContainer } from "../../../infrastructure/config/ioc";
 import { TenantRepository } from "../../../infrastructure/db/repositories/tenant_repository";
 import { HttpError } from "../../error";
 import { DecodedJwt } from "../../services/auth_service";
-import { X_AUTH_TOKEN_KEY } from "../../constants/header_constants";
+import {
+    X_AUTH_TOKEN_KEY,
+    X_TENANT_ID
+} from "../../constants/header_constants";
 
 function authMiddlewareFactory(iocContainer: Container) {
     return (config: { role: UserRole }) => {
@@ -58,7 +61,10 @@ function authentication(iocContainer: Container) {
         securityName: string,
         roles: string[] = ["user"]
     ): Promise<DecodedJwt> => {
-        if (securityName.toLowerCase() !== "jwt")
+        if (
+            securityName.toLowerCase() !== "jwt" &&
+            securityName.toLowerCase() !== X_TENANT_ID.toLowerCase()
+        )
             throw new Error("Invalid security name");
 
         const token = request.headers[X_AUTH_TOKEN_KEY.toLowerCase()] as string;
@@ -70,11 +76,9 @@ function authentication(iocContainer: Container) {
 
         try {
             const decodedJwt = jwt.verify(token, env.jwtSecret) as DecodedJwt;
-
             const userRole = (UserRole as any)[roles[0].toUpperCase()];
             if (userRole !== UserRole.USER && !decodedJwt.role === userRole)
                 throw new HttpError(httpStatus.FORBIDDEN, "Access denied!");
-
             const tenantRepository = iocContainer.get<ITenantRepository>(
                 TenantRepository
             );

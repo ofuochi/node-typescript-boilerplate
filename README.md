@@ -42,6 +42,12 @@ cp env.sample .env
 npm run start
 ```
 
+Or run in development watch mode.
+
+```sh
+npm run dev
+```
+
 ### Open
 
 ```sh

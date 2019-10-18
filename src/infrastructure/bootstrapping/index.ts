@@ -2,8 +2,9 @@ import Agenda from "agenda";
 import { Container, ContainerModule, decorate, injectable } from "inversify";
 import { buildProviderModule } from "inversify-binding-decorators";
 import { InversifyExpressServer } from "inversify-express-utils";
-import "reflect-metadata";
+import swaggerUi from "swagger-ui-express";
 import { Controller } from "tsoa";
+import swaggerJsonDoc from "../../../swagger.json";
 import { TYPES } from "../../domain/constants/types";
 import { exceptionLoggerMiddleware } from "../../ui/api/middleware/interceptor_middleware";
 import { RegisterRoutes } from "../../ui/api/routes";
@@ -49,8 +50,6 @@ export async function bootstrap({
         rootPath: config.api.prefix
     });
 
-    logger.info("✔️  Generating swagger doc...");
-    await swaggerGen();
     server.setConfig((app: App) => expressLoader(app));
     logger.info("✔️  Express loaded");
 
@@ -60,9 +59,16 @@ export async function bootstrap({
     });
     const app = server.build() as App;
 
-    logger.info("✔️  Generating routes...");
-    RegisterRoutes(app);
+    await setupSwagger(app);
 
     logger.info(`✔️  Environment: ${process.env.NODE_ENV}`);
+
     return app;
+}
+async function setupSwagger(app: App) {
+    logger.info("✔️  Generating routes...");
+    RegisterRoutes(app);
+    logger.info("✔️  Generating swagger doc...");
+    await swaggerGen();
+    app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerJsonDoc));
 }

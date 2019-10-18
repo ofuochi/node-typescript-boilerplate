@@ -15,6 +15,7 @@ import { CreateTenantDto } from "../../../../src/ui/models/tenant_dto";
 import { UserDto, UserSignUpInput } from "../../../../src/ui/models/user_dto";
 import { AuthService } from "../../../../src/ui/services/auth_service";
 import { cleanupDb, req, tokenHeaderKey } from "../../../setup";
+import { X_TENANT_ID } from "../../../../src/ui/constants/header_constants";
 
 const endpoint = config.api.prefix;
 describe("Tenant Repository", () => {
@@ -48,14 +49,19 @@ describe("Tenant Repository", () => {
             username: "admin"
         };
     });
-    it("should create user using the foo endpoint", async () => {
-        const tenant = await tenantRepository.findOneByQuery({ name: "T2" });
-        const { body } = await req
-            .post(`${endpoint}/auth/signUp`)
-            .send(signUpInput)
-            .set("x-tenant-id", tenant.id)
-            .expect(httpStatus.OK);
-        userDto = body.userDto;
+    it("should create user using the foo endpoint", done => {
+        tenantRepository
+            .findOneByQuery({ name: "T2" })
+            .then(async tenant => {
+                const { body } = await req
+                    .post(`${endpoint}/auth/signUp`)
+                    .send(signUpInput)
+                    .set(X_TENANT_ID, tenant.id)
+                    .expect(httpStatus.OK);
+                userDto = body.userDto;
+                done();
+            })
+            .catch(done);
     });
 
     it("should get all the tenants but without the deleted ones", async () => {
@@ -81,6 +87,7 @@ describe("Tenant Repository", () => {
             emailOrUsername: signUpInput.email,
             password: signUpInput.password
         });
+
         const createTenantInput: CreateTenantDto = {
             name: "NewTenant",
             description: "New tenant description"
@@ -91,6 +98,7 @@ describe("Tenant Repository", () => {
             .set(tokenHeaderKey, token)
             .send(createTenantInput)
             .expect(httpStatus.OK);
+
         expect(resp.body).to.contain.keys(
             "id",
             "name",

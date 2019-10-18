@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { bootstrap } from "./infrastructure/bootstrapping";
 import { config } from "./infrastructure/config";
 import { referenceDataIoCModule } from "./infrastructure/config/inversify.config";
