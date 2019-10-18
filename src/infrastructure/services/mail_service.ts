@@ -1,14 +1,12 @@
 import Agenda from "agenda";
-import { injectable } from "inversify";
 import Mailgun from "mailgun-js";
-
 import { TYPES } from "../../domain/constants/types";
 import { IMailService } from "../../domain/interfaces/services";
 import { config } from "../config";
+import { iocContainer, provideSingleton } from "../config/ioc";
 import { MailJobType } from "../jobs/mail_job";
-import { iocContainer } from "../config/ioc";
 
-@injectable()
+@provideSingleton(MailService)
 export class MailService implements IMailService {
     private readonly _mailgun: Mailgun.Mailgun = Mailgun({
         apiKey: config.emails.apiKey,

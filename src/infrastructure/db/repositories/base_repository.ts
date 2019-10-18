@@ -1,14 +1,14 @@
 import { plainToClassFromExist } from "class-transformer";
-import { injectable, unmanaged } from "inversify";
+import { unmanaged } from "inversify";
 import { Document, Model } from "mongoose";
-
 import {
     IBaseRepository,
     Query
 } from "../../../domain/interfaces/repositories";
 import { BaseEntity } from "../../../domain/model/base";
+import { provideSingleton } from "../../config/ioc";
 
-@injectable()
+@provideSingleton(BaseRepository)
 export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
     implements IBaseRepository<TEntity> {
     protected Model: Model<TModel>;
@@ -35,12 +35,12 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
 
     public async findById(id: string) {
         return new Promise<TEntity>((resolve, reject) => {
-            this.Model.findById(id, (err, res) => {
+            this.Model.findById(id, "-__v", (err, res) => {
                 if (err) return reject(err);
                 if (!res) return resolve();
 
                 const result = this.readMapper(res);
-                return resolve(result.isDeleted ? undefined : result);
+                resolve(result.isDeleted ? undefined : result);
             });
         });
     }
@@ -95,7 +95,7 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
 
     public findManyByQuery(query: Query<TEntity>) {
         return new Promise<TEntity[]>((resolve, reject) => {
-            this.Model.find(query as any, (err, res) => {
+            this.Model.find(query, "-__v", (err, res) => {
                 if (err) return reject(err);
                 if (!res) return resolve();
                 let result = res.map(r => this.readMapper(r));
@@ -104,9 +104,9 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
             });
         });
     }
-    public findOneByQuery(query: Query<TEntity>) {
+    public async findOneByQuery(query: Query<TEntity>) {
         return new Promise<TEntity>((resolve, reject) => {
-            this.Model.findOne(query as any, (err, res) => {
+            this.Model.findOne(query, "-__v", (err, res) => {
                 if (err) return reject(err);
                 if (!res) return resolve();
                 const result = this.readMapper(res);
@@ -117,6 +117,7 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
     async deleteById(id: string): Promise<boolean> {
         const item = await this.findById(id);
         if (!item) return false;
+
         item.delete();
         await this.insertOrUpdate(item);
         return true;

@@ -6,6 +6,94 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
+			"UserDto": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"firstName": {
+						"type": "string"
+					},
+					"lastName": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"username": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"id",
+					"firstName",
+					"lastName",
+					"email",
+					"username"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UserSignUpDto": {
+				"properties": {
+					"userDto": {
+						"$ref": "#/components/schemas/UserDto"
+					},
+					"token": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"userDto",
+					"token"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UserSignUpInput": {
+				"properties": {
+					"firstName": {
+						"type": "string"
+					},
+					"lastName": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"username": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"firstName",
+					"lastName",
+					"email",
+					"username",
+					"password"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UserSignInInput": {
+				"properties": {
+					"emailOrUsername": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"emailOrUsername",
+					"password"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"TenantDto": {
 				"properties": {
 					"id": {
@@ -30,7 +118,7 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"CreateTenantDto": {
+			"CreateTenantInput": {
 				"properties": {
 					"name": {
 						"type": "string"
@@ -48,15 +136,17 @@
 			}
 		},
 		"securitySchemes": {
-			"jwt": {
-				"scheme": "basic",
-				"type": "http"
-			},
 			"X-Tenant-Id": {
 				"type": "apiKey",
 				"in": "header",
 				"name": "X-Tenant-Id",
 				"description": "Tenant ID"
+			},
+			"X-Auth-Token": {
+				"type": "apiKey",
+				"in": "header",
+				"name": "X-Auth-Token",
+				"description": "JWT access token"
 			}
 		}
 	},
@@ -67,7 +157,85 @@
 	},
 	"openapi": "3.0.0",
 	"paths": {
-		"/foos": {
+		"/auth/signUp": {
+			"post": {
+				"operationId": "SignUp",
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserSignUpDto"
+								}
+							}
+						},
+						"description": "Ok"
+					}
+				},
+				"tags": [
+					"Auth"
+				],
+				"security": [
+					{
+						"X-Tenant-Id": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserSignUpInput"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/signIn": {
+			"post": {
+				"operationId": "SignIn",
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"token": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"token"
+									],
+									"type": "object"
+								}
+							}
+						},
+						"description": "Ok"
+					}
+				},
+				"tags": [
+					"Auth"
+				],
+				"security": [
+					{
+						"X-Tenant-Id": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserSignInInput"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/tenants/{tenantName}": {
 			"get": {
 				"operationId": "Get",
 				"responses": {
@@ -75,37 +243,30 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/TenantDto"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/TenantDto"
 								}
 							}
 						},
 						"description": "Ok"
-					},
-					"400": {
-						"content": {
-							"application/json": {}
-						},
-						"description": "Bad request"
 					}
 				},
 				"tags": [
-					"Foos"
+					"Tenants"
 				],
 				"security": [],
 				"parameters": [
 					{
-						"in": "query",
+						"in": "path",
 						"name": "tenantName",
-						"required": false,
+						"required": true,
 						"schema": {
 							"type": "string"
 						}
 					}
 				]
-			},
+			}
+		},
+		"/tenants": {
 			"post": {
 				"operationId": "Create",
 				"responses": {
@@ -121,14 +282,11 @@
 					}
 				},
 				"tags": [
-					"Foos"
+					"Tenants"
 				],
 				"security": [
 					{
-						"jwt": [
-							"admin"
-						],
-						"X-Tenant-Id": [
+						"X-Auth-Token": [
 							"admin"
 						]
 					}
@@ -138,11 +296,44 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/CreateTenantDto"
+								"$ref": "#/components/schemas/CreateTenantInput"
 							}
 						}
 					}
 				}
+			}
+		},
+		"/tenants/{id}": {
+			"delete": {
+				"operationId": "Delete",
+				"responses": {
+					"204": {
+						"content": {
+							"application/json": {}
+						},
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"Tenants"
+				],
+				"security": [
+					{
+						"X-Auth-Token": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
 			}
 		}
 	},

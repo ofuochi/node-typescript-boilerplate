@@ -1,10 +1,10 @@
+import httpStatus from "http-status-codes";
 import { validate, ValidationError } from "class-validator";
-import { BaseHttpController, interfaces } from "inversify-express-utils";
-
+import { Controller } from "tsoa";
 import { BaseCreateEntityDto } from "../../models/base_dto";
+import { HttpError } from "../../error";
 
-export abstract class BaseController extends BaseHttpController
-    implements interfaces.Controller {
+export abstract class BaseController extends Controller {
     protected async checkBadRequest(input: BaseCreateEntityDto) {
         const errors = await validate(input);
         if (errors.length > 0) {
@@ -12,7 +12,14 @@ export abstract class BaseController extends BaseHttpController
                 .map((error: ValidationError) => error.constraints)
                 .map(err => Object.values(err)[0])
                 .join(", ");
-            return this.badRequest(error);
+            this.setStatus(httpStatus.BAD_REQUEST);
+            throw new HttpError(httpStatus.BAD_REQUEST, error);
+        }
+    }
+    protected async checkConflict(input: any) {
+        if (input) {
+            this.setStatus(httpStatus.CONFLICT);
+            throw new HttpError(httpStatus.CONFLICT);
         }
     }
 }
