@@ -23,8 +23,7 @@ export class AuthController extends BaseController {
         @Body() input: UserSignUpInput
     ): Promise<UserSignUpDto> {
         await this.checkBadRequest(plainToClass(UserSignUpInput, input));
-        const { token, userDto } = await this._authService.signUp(input);
-        return { userDto, token };
+        return this._authService.signUp(input);
     }
 
     @Post("signIn")
