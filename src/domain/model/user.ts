@@ -51,6 +51,9 @@ export class User extends BaseEntity implements IMustHaveTenant {
     })
     readonly role: UserRole = UserRole.USER;
 
+    @prop({ required: true, default: false })
+    readonly isLockedOut: boolean;
+
     public constructor(arg?: {
         firstName: string;
         lastName: string;

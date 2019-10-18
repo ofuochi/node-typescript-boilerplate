@@ -13,7 +13,8 @@ import { X_TENANT_ID } from "../../../src/ui/constants/header_constants";
 import {
     UserSignInInput,
     UserSignUpDto,
-    UserSignUpInput
+    UserSignUpInput,
+    UserDto
 } from "../../../src/ui/models/user_dto";
 import { cleanupDb, req } from "../../setup";
 
@@ -21,14 +22,21 @@ const endpoint = `${config.api.prefix}/auth`;
 
 describe("AuthController", () => {
     let tenantRepository: ITenantRepository;
+    let userRepository: IUserRepository;
     let tenant: Tenant;
     let tenant1: Tenant;
     let tenant2: Tenant;
+    let signedUpUser: UserDto;
+    
     before(async () => {
         await cleanupDb();
 
         tenantRepository = iocContainer.get<ITenantRepository>(
             TenantRepository
+        );
+        
+        userRepository = iocContainer.get<IUserRepository>(
+            UserRepository
         );
         // Get first tenant because it already exists from the setup.ts file
         tenant1 = await tenantRepository.insertOrUpdate(
@@ -71,6 +79,8 @@ describe("AuthController", () => {
             const userRecord = await userRepository.findById(userDto.id);
 
             expect(userDto.id).to.equal(userRecord.createdBy.toString());
+            
+            signedUpUser = userDto;
         });
 
         it("should return conflict if email already exists on the same tenant", async () => {
@@ -127,43 +137,63 @@ describe("AuthController", () => {
             password: signUpInput.password,
             emailOrUsername: signUpInput.email
         };
-
-        it("should sign-in user with email and return token", async () => {
-            const res = await req
-                .post(`${endpoint}/signIn`)
-                .set(X_TENANT_ID, tenant.id)
-                .send(signInInput)
-                .expect(httpStatus.OK);
-            expect(res.body).to.contain.keys("token");
-        });
-        it("should sign-in user with username and return token", async () => {
-            signInInput.emailOrUsername = signUpInput.username;
-            const res = await req
-                .post(`${endpoint}/signIn`)
-                .set(X_TENANT_ID, tenant.id)
-                .send(signInInput)
-                .expect(httpStatus.OK);
-            expect(res.body).to.contain.keys("token");
-        });
-        it("should sign-in user that has same username on a different tenant using username and return token", async () => {
-            tenant = tenant2;
-            signInInput.emailOrUsername = signUpInput.username;
-            const res = await req
-                .post(`${endpoint}/signIn`)
-                .set(X_TENANT_ID, tenant.id)
-                .send(signInInput)
-                .expect(httpStatus.OK);
-            expect(res.body).to.contain.keys("token");
-        });
-        it("should sign-in user that has same email on a different tenant using email and return token", async () => {
-            tenant = tenant2;
-            signInInput.emailOrUsername = signUpInput.email;
-            const res = await req
-                .post(`${endpoint}/signIn`)
-                .set(X_TENANT_ID, tenant.id)
-                .send(signInInput)
-                .expect(httpStatus.OK);
-            expect(res.body).to.contain.keys("token");
-        });
+        
+        describe("Successsfull User Sign-in", () => {
+            it("should sign-in user with email and return token", async () => {
+                const res = await req
+                    .post(`${endpoint}/signIn`)
+                    .set(X_TENANT_ID, tenant.id)
+                    .send(signInInput)
+                    .expect(httpStatus.OK);
+                expect(res.body).to.contain.keys("token");
+            });
+            it("should sign-in user with username and return token", async () => {
+                signInInput.emailOrUsername = signUpInput.username;
+                const res = await req
+                    .post(`${endpoint}/signIn`)
+                    .set(X_TENANT_ID, tenant.id)
+                    .send(signInInput)
+                    .expect(httpStatus.OK);
+                expect(res.body).to.contain.keys("token");
+                
+            });
+            it("should sign-in user that has same username on a different tenant using username and return token", async () => {
+                tenant = tenant2;
+                signInInput.emailOrUsername = signUpInput.username;
+                const res = await req
+                    .post(`${endpoint}/signIn`)
+                    .set(X_TENANT_ID, tenant.id)
+                    .send(signInInput)
+                    .expect(httpStatus.OK);
+                expect(res.body).to.contain.keys("token");
+            });
+            it("should sign-in user that has same email on a different tenant using email and return token", async () => {
+                tenant = tenant2;
+                signInInput.emailOrUsername = signUpInput.email;
+                const res = await req
+                    .post(`${endpoint}/signIn`)
+                    .set(X_TENANT_ID, tenant.id)
+                    .send(signInInput)
+                    .expect(httpStatus.OK);
+                expect(res.body).to.contain.keys("token");
+            });
+        });  
+        
+        describe("User Lockout", () => {
+            it("should lockout user after making the maximum number of sign-in attempts", async () => {
+                const invalidSignInInput: UserSignInInput = { emailOrUsername: signedUpUser.email, password: "invalid_password"};
+                             
+                const { maxSignInAttempts } = config.userLockout;
+                Array.from(Array(maxSignInAttempts).keys()).forEach(async() => {                    
+                    await req
+                        .post(`${endpoint}/signIn`)
+                        .set(X_TENANT_ID, tenant.id)
+                        .send(invalidSignInInput);
+                });
+                              
+                const user = await userRepository.findOneByQuery({ tenant: tenant.id, email: invalidSignInInput.emailOrUsername });
+                expect(user.isLockedOut).to.be.true;
+            });
+        });       
     });
 });
