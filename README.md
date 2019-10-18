@@ -51,8 +51,8 @@ The first time the application runs, MongoDB is seeded with default Tenant and d
 
 1. Default tenant name is **Default** (that's obvious 😉)
 2. Default admin login detail;
-    - Username: **admin**
-    - Password: **123qwe**
+   - Username: **admin**
+   - Password: **123qwe**
 
 ### Swagger API Documentation
 
@@ -85,48 +85,48 @@ npm run test-watch
 
 The application exposes a few REST endpoints which requires you to pass `x-tenant-id` header. First call the tenant endpoint `/api/v1/tenant` to get all the available tenants. Use any of the tenant IDs as the value for `x-tenant-id`
 
--   `HTTP` `GET` `/api/v1/tenants`
--   `HTTP` `GET` `/api/v1/tenants/:query`
--   `HTTP` `GET` `/api/v1/secured` (Requires a valid `x-auth-token` header)
+- `HTTP` `GET` `/api/v1/tenants`
+- `HTTP` `GET` `/api/v1/tenants/:query`
+- `HTTP` `GET` `/api/v1/secured` (Requires a valid `x-auth-token` header)
 
 You can use the following code snippet to call the secured endpoint:
 
 ```js
 fetch("http://localhost:3000/api/v1/secure", {
-    method: "GET",
-    headers: {
-        "Content-Type": "application/json",
-        "x-tenant-id": "TENANT_ID",
-        "x-auth-token": "SOME_VALID_CREDENTIAL"
-    }
+	method: "GET",
+	headers: {
+		"Content-Type": "application/json",
+		"x-tenant-id": "TENANT_ID",
+		"x-auth-token": "SOME_VALID_CREDENTIAL"
+	}
 })
-    .then(r => {
-        if (r.status === 200) {
-            r.json().then(j => console.log(j));
-        } else {
-            console.log("ERROR", r.status);
-        }
-    })
-    .catch(e => console.log(e));
+	.then(r => {
+		if (r.status === 200) {
+			r.json().then(j => console.log(j));
+		} else {
+			console.log("ERROR", r.status);
+		}
+	})
+	.catch(e => console.log(e));
 ```
 
 You can use the following code snippet to call the secured endpoint with an invalid `x-auth-token` header:
 
 ```js
 fetch("http://localhost:3000/api/v1/secure", {
-    method: "GET",
-    headers: {
-        "Content-Type": "application/json",
-        "x-tenant-id": "TENANT_ID",
-        "x-auth-token": "SOME_WRONG_CREDENTIAL"
-    }
+	method: "GET",
+	headers: {
+		"Content-Type": "application/json",
+		"x-tenant-id": "TENANT_ID",
+		"x-auth-token": "SOME_WRONG_CREDENTIAL"
+	}
 })
-    .then(r => {
-        if (r.status === 200) {
-            r.json().then(j => console.log(j));
-        } else {
-            console.log("ERROR", r.status);
-        }
-    })
-    .catch(e => console.log(e));
+	.then(r => {
+		if (r.status === 200) {
+			r.json().then(j => console.log(j));
+		} else {
+			console.log("ERROR", r.status);
+		}
+	})
+	.catch(e => console.log(e));
 ```
