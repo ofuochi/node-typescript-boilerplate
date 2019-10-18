@@ -1,4 +1,3 @@
-import { Ref } from "@hasezoey/typegoose";
 import bcrypt from "bcrypt";
 import mongoose, { Mongoose } from "mongoose";
 import { Tenant } from "../../domain/model/tenant";
@@ -16,14 +15,14 @@ export async function seedDefaultTenant() {
     if (defaultTenant) return defaultTenant.id;
     return tenantModel.create(tenantInstance);
 }
-export async function seedDefaultAdmin(tenant: Ref<Tenant>) {
+export async function seedDefaultAdmin(tenantId: string) {
     const password = await bcrypt.hash("123qwe", 1);
     const userInstance = User.createInstance({
         firstName: "Admin",
         lastName: "Admin",
         username: "Admin",
         email: "defaultAdmin@email.com",
-        tenant,
+        tenantId,
         password
     });
     const tenantModel = userInstance.getModelForClass(User, {
@@ -31,13 +30,13 @@ export async function seedDefaultAdmin(tenant: Ref<Tenant>) {
     });
     const defaultAdminUser = await tenantModel.findOne({
         $or: [
-            { email: userInstance.email, tenant },
-            { username: userInstance.username, tenant }
+            { email: userInstance.email, tenant: tenantId },
+            { username: userInstance.username, tenant: tenantId }
         ]
     });
     if (!defaultAdminUser) {
         userInstance.setRole(UserRole.ADMIN);
-        userInstance.setTenant(tenant);
+        userInstance.setTenant(tenantId as any);
 
         await tenantModel.create(userInstance);
     }

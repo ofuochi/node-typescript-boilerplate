@@ -35,12 +35,12 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
 
     public async findById(id: string) {
         return new Promise<TEntity>((resolve, reject) => {
-            this.Model.findById(id, (err, res) => {
+            this.Model.findById(id, "-__v", (err, res) => {
                 if (err) return reject(err);
                 if (!res) return resolve();
 
                 const result = this.readMapper(res);
-                return resolve(result.isDeleted ? undefined : result);
+                resolve(result.isDeleted ? undefined : result);
             });
         });
     }
@@ -117,6 +117,7 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
     async deleteById(id: string): Promise<boolean> {
         const item = await this.findById(id);
         if (!item) return false;
+
         item.delete();
         await this.insertOrUpdate(item);
         return true;

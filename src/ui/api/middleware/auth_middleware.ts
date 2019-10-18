@@ -72,19 +72,17 @@ function authentication(iocContainer: Container) {
 
         switch (securityName.toLowerCase()) {
             case X_AUTH_TOKEN_KEY.toLowerCase(): {
-                const tenantId = req.headers[
-                    X_TENANT_ID.toLowerCase()
-                ] as string;
                 const token = req.headers[
                     X_AUTH_TOKEN_KEY.toLowerCase()
                 ] as string;
-                await assignTenantToReqAsync(tenantId, req);
                 if (!token)
                     throw new HttpError(
                         httpStatus.UNAUTHORIZED,
                         `Missing ${X_AUTH_TOKEN_KEY} token!`
                     );
+
                 await assignJwtAsync(token, scopes, iocContainer);
+
                 return token;
             }
             case X_TENANT_ID.toLowerCase(): {
@@ -107,9 +105,13 @@ async function assignJwtAsync(
 ) {
     try {
         const decodedJwt = jwt.verify(token, env.jwtSecret) as DecodedJwt;
-        const userRole = (UserRole as any)[scopes[0].toUpperCase()];
-        if (userRole !== UserRole.USER && !decodedJwt.role === userRole)
+        const expectedUserRole = (UserRole as any)[scopes[0].toUpperCase()];
+        if (
+            expectedUserRole !== UserRole.USER &&
+            decodedJwt.role !== expectedUserRole
+        )
             throw new HttpError(httpStatus.FORBIDDEN, "Access denied!");
+
         const tenantRepository = iocContainer.get<ITenantRepository>(
             TenantRepository
         );
@@ -117,12 +119,12 @@ async function assignJwtAsync(
 
         if (!tenant || !tenant.isActive)
             throw new HttpError(
-                httpStatus.FORBIDDEN,
+                httpStatus.UNAUTHORIZED,
                 "Tenant is not available!"
             );
         global.currentUser.setUserDetails(decodedJwt);
     } catch (error) {
-        throw new HttpError(httpStatus.UNAUTHORIZED, error.message);
+        throw new HttpError(error.status, error.message);
     }
 }
 async function assignTenantToReqAsync(tenantId: string, req: Request) {

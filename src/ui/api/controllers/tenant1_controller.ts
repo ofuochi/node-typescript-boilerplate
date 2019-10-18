@@ -19,7 +19,7 @@ import { TenantService } from "../../services/tenant_service";
 import { authMiddleware } from "../middleware/auth_middleware";
 import { BaseController } from "./base_controller";
 
-@controller("/tenants")
+@controller("/foos")
 export class TenantController extends BaseController {
     @inject(TenantService) private readonly _tenantService: ITenantService;
 

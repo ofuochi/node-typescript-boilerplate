@@ -25,4 +25,7 @@ export class CurrentUser {
     setTenant = (tenant: Tenant) => {
         (this as Writable<this>).tenant = tenant;
     };
+    setDecodedJwt = (decodedJwt: DecodedJwt) => {
+        (this as Writable<this>).decodedJwt = decodedJwt;
+    };
 }

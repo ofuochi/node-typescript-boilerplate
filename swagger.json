@@ -307,15 +307,11 @@
 			"delete": {
 				"operationId": "Delete",
 				"responses": {
-					"200": {
+					"204": {
 						"content": {
-							"application/json": {
-								"schema": {
-									"type": "boolean"
-								}
-							}
+							"application/json": {}
 						},
-						"description": "Ok"
+						"description": "No content"
 					}
 				},
 				"tags": [

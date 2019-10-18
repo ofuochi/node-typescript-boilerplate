@@ -89,7 +89,6 @@ export class AuthService implements IAuthService {
             dto.password,
             user.password
         );
-
         if (!isPasswordValid)
             throw new HttpError(
                 httpStatus.UNAUTHORIZED,
@@ -128,6 +127,7 @@ export class AuthService implements IAuthService {
             tenantId: user.tenant
         };
         global.currentUser.setUser(user);
+        global.currentUser.setDecodedJwt(payload);
         return jwt.sign(payload, config.jwtSecret, { expiresIn: "2 days" });
     }
 }

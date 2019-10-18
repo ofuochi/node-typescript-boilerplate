@@ -75,25 +75,27 @@ export class User extends BaseEntity implements IMustHaveTenant {
         email,
         username,
         password,
-        tenant
+        tenantId
     }: {
         firstName: string;
         lastName: string;
         email: string;
         username: string;
         password: string;
-        tenant?: Ref<Tenant>;
+        tenantId?: string;
     }) => {
-        const globalTenantId =
-            (global.currentUser && global.currentUser.tenant.id) || tenant;
-        if (!globalTenantId) throw new Error("Tenant Id is required");
+        const id =
+            tenantId || (global.currentUser && global.currentUser.tenant.id);
+
+        if (!id) throw new Error("Tenant Id is required");
+
         return new User({
             firstName,
             lastName,
             email,
             username,
             password,
-            tenant: globalTenantId
+            tenant: id
         });
     };
     public static get model() {

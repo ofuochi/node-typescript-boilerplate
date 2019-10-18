@@ -78,7 +78,7 @@
         "rimraf": "^3.0.0",
         "swagger-ui-express": "^4.1.2",
         "tsconfig-paths": "^3.9.0",
-        "tsoa": "^2.5.6",
+        "tsoa": "^2.5.7",
         "winston": "^3.2.1",
         "winston-transport": "^4.3.0"
     },

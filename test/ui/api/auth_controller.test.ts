@@ -65,13 +65,12 @@ describe("AuthController", () => {
             const userRepository = iocContainer.get<IUserRepository>(
                 UserRepository
             );
-            const result = res.body as UserSignUpDto;
-            expect(result).to.contain.keys("userDto", "token");
+            const { userDto, token } = res.body as UserSignUpDto;
+            expect(userDto).to.contain.keys("id");
+            expect(token).to.be.ok;
+            const userRecord = await userRepository.findById(userDto.id);
 
-            const userRecord = await userRepository.findById(result.userDto.id);
-            expect(result.userDto.id.toString()).to.equal(
-                userRecord.createdBy.toString()
-            );
+            expect(userDto.id).to.equal(userRecord.createdBy.toString());
         });
 
         it("should return conflict if email already exists on the same tenant", async () => {

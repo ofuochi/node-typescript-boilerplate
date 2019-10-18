@@ -43,12 +43,9 @@ export class RequestMiddleware extends BaseMiddleware {
         const tenantId = req.headers[X_TENANT_ID.toLocaleLowerCase()];
 
         if (!tenantId && !isPublicUrl)
-            return next(
-                new HttpError(
-                    httpStatus.BAD_REQUEST,
-                    `${X_TENANT_ID} header is missing`
-                )
-            );
+            return res
+                .status(httpStatus.BAD_REQUEST)
+                .end(`${X_TENANT_ID} header is missing`);
 
         if (!isIdValid(tenantId as string))
             return next(
@@ -77,12 +74,17 @@ export function exceptionLoggerMiddleware(
     // ${error.message}
     // ----------------------------------
     // `);
-    if (error instanceof HttpError)
-        return res.status(error.status).send(error.message);
+
+    if (error instanceof HttpError) {
+        return res
+            .status(error.status)
+            .json({ ...error, message: error.message });
+    }
+
     error =
         config.env === "development" || config.env === "test"
             ? new HttpError(httpStatus.INTERNAL_SERVER_ERROR, error.message)
             : new HttpError(httpStatus.INTERNAL_SERVER_ERROR);
 
-    res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error.message);
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).json(error);
 }
