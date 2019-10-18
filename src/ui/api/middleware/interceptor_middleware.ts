@@ -1,59 +1,48 @@
 import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status-codes";
-import { injectable } from "inversify";
 import { BaseMiddleware } from "inversify-express-utils";
-import mongoose from "mongoose";
-import { TYPES } from "../../../domain/constants/types";
-import { CurrentUser } from "../../../domain/utils/globals";
 import { config } from "../../../infrastructure/config";
-import { iocContainer } from "../../../infrastructure/config/ioc";
-import { getCurrentTenant } from "../../../infrastructure/helpers/tenant_helpers";
+import { provideSingleton } from "../../../infrastructure/config/ioc";
+import { isIdValid } from "../../../infrastructure/utils/server_utils";
+import { X_TENANT_ID } from "../../constants/header_constants";
 import { HttpError } from "../../error";
 
-@injectable()
+@provideSingleton(RequestMiddleware)
 export class RequestMiddleware extends BaseMiddleware {
     async handler(
         req: Request,
         res: Response,
         next: NextFunction
     ): Promise<void> {
-        // const log = iocContainer.get<ILoggerService>(TYPES.LoggerService);
+        // const log = iocContainer.get<ILoggerService>(LoggerService);
         // log.info(`
         //     ----------------------------------
         //     REQUEST MIDDLEWARE
         //     HTTP ${req.method} ${req.url}
         //     ----------------------------------
         //     `);
-        iocContainer
-            .bind<string>(TYPES.TenantId)
-            .toConstantValue(`${req.tenantId}`);
-        const isTenantUrl =
-            req.url.toLowerCase().startsWith("/api-docs") ||
-            req.url
-                .toLowerCase()
-                .startsWith(
-                    `${config.api.prefix}/tenants`.toLocaleLowerCase()
-                ) ||
-            req.url
-                .toLowerCase()
-                .startsWith(`${config.api.prefix}/foos`.toLocaleLowerCase());
+        if (req.url.toLowerCase().startsWith("/api-docs")) return next();
 
-        req.tenantId = req.header("X-Tenant-Id");
-        if (!req.tenantId && !isTenantUrl)
+        const isPublicUrl = req.url
+            .toLowerCase()
+            .startsWith(`${config.api.prefix}/tenants`.toLocaleLowerCase());
+
+        if (isPublicUrl) return next();
+
+        const tenantId = req.headers[X_TENANT_ID.toLocaleLowerCase()];
+
+        if (!tenantId && !isPublicUrl)
             return res
                 .status(httpStatus.BAD_REQUEST)
-                .end("x-tenant-id header is missing");
-        if (isTenantUrl) return next();
-        if (!mongoose.Types.ObjectId.isValid(req.tenantId as string))
+                .end(`${X_TENANT_ID} header is missing`);
+
+        if (!isIdValid(tenantId as string))
             return next(
                 new HttpError(
                     httpStatus.BAD_REQUEST,
-                    "Invalid header X-Tenant-Id value"
+                    `Invalid header ${X_TENANT_ID} value`
                 )
             );
-
-        const tenant = await getCurrentTenant(req.tenantId as string);
-        global.currentUser = CurrentUser.createInstance(tenant);
 
         next();
     }
@@ -74,11 +63,17 @@ export function exceptionLoggerMiddleware(
     // ${error.message}
     // ----------------------------------
     // `);
-    if (error instanceof HttpError) return res.status(error.status).send(error);
+
+    if (error instanceof HttpError) {
+        return res
+            .status(error.status)
+            .json({ ...error, message: error.message });
+    }
+
     error =
         config.env === "development" || config.env === "test"
             ? new HttpError(httpStatus.INTERNAL_SERVER_ERROR, error.message)
             : new HttpError(httpStatus.INTERNAL_SERVER_ERROR);
 
-    res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).json(error);
 }

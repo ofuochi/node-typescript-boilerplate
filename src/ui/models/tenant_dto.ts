@@ -4,7 +4,7 @@ import { Expose } from "class-transformer";
 import { MAX_NAME_LENGTH } from "../../domain/model/user";
 import { BaseCreateEntityDto, BaseEntityDto } from "./base_dto";
 
-export class CreateTenantDto extends BaseCreateEntityDto {
+export class CreateTenantInput extends BaseCreateEntityDto {
     @MaxLength(MAX_NAME_LENGTH)
     @IsNotEmpty()
     @IsString()

@@ -1,22 +1,18 @@
 import { EventSubscriber, On } from "event-dispatch";
 import mongoose from "mongoose";
-
 import { ILoggerService, IMailService } from "../../domain/interfaces/services";
 import { User } from "../../domain/model/user";
 import { iocContainer } from "../../infrastructure/config/ioc";
-import { TYPES } from "../../domain/constants/types";
-import { events } from "./events";
 import { MailJobType } from "../../infrastructure/jobs/mail_job";
+import { LoggerService } from "../../infrastructure/services/logger_service";
+import { MailService } from "../../infrastructure/services/mail_service";
 import { UserDto } from "../models/user_dto";
+import { events } from "./events";
 
 @EventSubscriber()
 export class UserSubscriber {
-    private readonly _logger = iocContainer.get<ILoggerService>(
-        TYPES.LoggerService
-    );
-    private readonly _mailService = iocContainer.get<IMailService>(
-        TYPES.MailService
-    );
+    private readonly _logger = iocContainer.get<ILoggerService>(LoggerService);
+    private readonly _mailService = iocContainer.get<IMailService>(MailService);
     /**
      * A great example of an event that you want to handle
      * save the last time a user sign-in, your boss will be pleased.

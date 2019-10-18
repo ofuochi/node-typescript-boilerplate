@@ -1,13 +1,13 @@
 import { Server } from "http";
-
+import { Types } from "mongoose";
 import { TYPES } from "../../domain/constants/types";
 import { App } from "../bootstrapping/loaders/express";
-import { winstonLoggerInstance } from "../bootstrapping/loaders/logger";
-import { iocContainer } from "../config/ioc";
+import { winstonLoggerInstance as log } from "../bootstrapping/loaders/logger";
 import { config } from "../config";
+import { iocContainer } from "../config/ioc";
 
 export function exitProcess(error: any): void {
-    winstonLoggerInstance.error(`❌  ${error}`);
+    log.error(`❌  ${error}`);
     process.exit(1);
 }
 export function startAppServer(app: App, serverPort?: number): Server {
@@ -15,6 +15,9 @@ export function startAppServer(app: App, serverPort?: number): Server {
     return app.listen(port, (error: any) => {
         if (error) exitProcess(error);
         iocContainer.bind<App>(TYPES.App).toConstantValue(app);
-        winstonLoggerInstance.info(`✔️  Server listening on port: ${port}`);
+        log.info(`✔️  Server listening on port: ${port}\n`);
     });
+}
+export function isIdValid(id: string): boolean {
+    return Types.ObjectId.isValid(id);
 }

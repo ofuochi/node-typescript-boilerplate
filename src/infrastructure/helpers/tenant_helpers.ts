@@ -1,11 +1,10 @@
-import { TYPES } from "../../domain/constants/types";
 import { Tenant } from "../../domain/model/tenant";
-import { TenantRepository } from "../db/repositories/tenant_repository";
 import { iocContainer } from "../config/ioc";
+import { TenantRepository } from "../db/repositories/tenant_repository";
 
 export async function getCurrentTenant(tenantId: string): Promise<Tenant> {
     const tenantRepository = iocContainer.get<TenantRepository>(
-        TYPES.TenantRepository
+        TenantRepository
     );
     const tenant = await tenantRepository.findById(tenantId);
     if (!tenant) throw new Error("Tenant not found");

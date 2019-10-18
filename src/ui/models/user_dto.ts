@@ -1,13 +1,7 @@
 import { Expose } from "class-transformer";
-import {
-    IsEmail,
-    IsNotEmpty,
-    IsString,
-    IsUUID,
-    MaxLength
-} from "class-validator";
-
+import { IsEmail, IsNotEmpty, IsString, MaxLength } from "class-validator";
 import { MAX_NAME_LENGTH } from "../../domain/model/user";
+import { BaseEntityDto } from "./base_dto";
 
 export class UserSignUpInput {
     @MaxLength(MAX_NAME_LENGTH)
@@ -40,9 +34,7 @@ export interface UserSignUpDto {
     userDto: UserDto;
     token: string;
 }
-export class UserDto {
-    @IsUUID()
-    id: string;
+export class UserDto extends BaseEntityDto {
     @MaxLength(MAX_NAME_LENGTH)
     @IsNotEmpty()
     @IsString()

@@ -1,7 +1,7 @@
-import { TYPES } from "../../domain/constants/types";
 import { ILoggerService } from "../../domain/interfaces/services";
 import { User } from "../../domain/model/user";
 import { iocContainer } from "../config/ioc";
+import { LoggerService } from "../services/logger_service";
 
 export enum MailJobType {
     SEND_WELCOME_MAIL
@@ -9,7 +9,7 @@ export enum MailJobType {
 
 export class MailJob {
     public async sendWelcomeEmail(job: any, done: Function): Promise<void> {
-        const logger = iocContainer.get<ILoggerService>(TYPES.LoggerService);
+        const logger = iocContainer.get<ILoggerService>(LoggerService);
         // const mailService = iocContainer.get<IMailService>(TYPES.MailService);
         try {
             const { email, firstName }: User = job.attrs.data;

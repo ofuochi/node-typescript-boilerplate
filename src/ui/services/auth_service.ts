@@ -1,17 +1,14 @@
-import { AutoMapper } from "automapper-nartc";
 import bcrypt from "bcrypt";
+import { plainToClass } from "class-transformer";
 import { EventDispatcher } from "event-dispatch";
 import httpStatus from "http-status-codes";
 import jwt from "jsonwebtoken";
-import {
-    autoMapper,
-    eventDispatcher,
-    userRepository
-} from "../../domain/constants/decorators";
+import { eventDispatcher } from "../../domain/constants/decorators";
 import { IUserRepository } from "../../domain/interfaces/repositories";
 import { User, UserRole } from "../../domain/model/user";
 import { config } from "../../infrastructure/config";
-import { provideSingleton } from "../../infrastructure/config/ioc";
+import { inject, provideSingleton } from "../../infrastructure/config/ioc";
+import { UserRepository } from "../../infrastructure/db/repositories/user_repository";
 import { HttpError } from "../error";
 import { IAuthService } from "../interfaces/auth_service";
 import { UserDto, UserSignInInput, UserSignUpInput } from "../models/user_dto";
@@ -27,26 +24,40 @@ export interface DecodedJwt {
 }
 @provideSingleton(AuthService)
 export class AuthService implements IAuthService {
-    @userRepository private _userRepository: IUserRepository;
+    @inject(UserRepository) private _userRepository: IUserRepository;
     @eventDispatcher private _eventDispatcher: EventDispatcher;
-    @autoMapper private _autoMapper: AutoMapper;
-    // @inject(TYPES.TenantId) private readonly _tenantId: string;
 
     public async signUp(
         dto: UserSignUpInput
     ): Promise<{ userDto: UserDto; token: string }> {
+        // Check that user is not already signed in
+        if (global.currentUser && global.currentUser.decodedJwt)
+            throw new HttpError(httpStatus.CONFLICT, "You are still signed in");
+
         // Use less salt round for faster hashing on test and development but stronger hashing on production
         const hashedPassword =
             config.env === "development" || config.env === "test"
                 ? await bcrypt.hash(dto.password, 1)
                 : await bcrypt.hash(dto.password, 12);
-
+        const tenantId = global.currentUser.tenant.id;
         let user = await this._userRepository.findOneByQuery({
             email: dto.email,
-            tenant: global.currentUser.tenant.id
+            tenant: tenantId
         });
-        if (user) throw new HttpError(httpStatus.CONFLICT);
-        //   console.log(iocContainer.get<string>(TYPES.TenantId));
+        if (user)
+            throw new HttpError(
+                httpStatus.CONFLICT,
+                `Email "${dto.email.toLowerCase()}" is already taken`
+            );
+        user = await this._userRepository.findOneByQuery({
+            username: dto.username,
+            tenant: tenantId
+        });
+        if (user)
+            throw new HttpError(
+                httpStatus.CONFLICT,
+                `Username "${dto.username.toLowerCase()}" is already taken`
+            );
         user = await this._userRepository.insertOrUpdate(
             User.createInstance({
                 ...dto,
@@ -54,11 +65,14 @@ export class AuthService implements IAuthService {
             })
         );
 
-        global.currentUser.setUser(user);
         this._eventDispatcher.dispatch(events.user.signUp, { ...dto });
 
+        global.currentUser.setUser(user);
         const token = await this.generateToken(user);
-        const userDto = this._autoMapper.map(user, UserDto);
+        const userDto = plainToClass(UserDto, user, {
+            enableImplicitConversion: true,
+            excludeExtraneousValues: true
+        });
         return { userDto, token };
     }
 
@@ -67,7 +81,7 @@ export class AuthService implements IAuthService {
 
         if (!user)
             throw new HttpError(
-                httpStatus.BAD_REQUEST,
+                httpStatus.UNAUTHORIZED,
                 "Invalid login attempt!"
             );
 
@@ -75,10 +89,9 @@ export class AuthService implements IAuthService {
             dto.password,
             user.password
         );
-
         if (!isPasswordValid)
             throw new HttpError(
-                httpStatus.BAD_REQUEST,
+                httpStatus.UNAUTHORIZED,
                 "Invalid login attempt!"
             );
 
@@ -87,15 +100,16 @@ export class AuthService implements IAuthService {
     }
 
     private async getUserRecord(emailOrUsername: string): Promise<User> {
+        const tenantId = global.currentUser.tenant.id;
         if (emailOrUsername.includes("@"))
             return this._userRepository.findOneByQuery({
                 email: emailOrUsername,
-                tenant: global.currentUser.tenant.id
+                tenant: tenantId
             });
 
         return this._userRepository.findOneByQuery({
             username: emailOrUsername,
-            tenant: global.currentUser.tenant.id
+            tenant: tenantId
         });
     }
 
@@ -113,6 +127,7 @@ export class AuthService implements IAuthService {
             tenantId: user.tenant
         };
         global.currentUser.setUser(user);
+        global.currentUser.setDecodedJwt(payload);
         return jwt.sign(payload, config.jwtSecret, { expiresIn: "2 days" });
     }
 }

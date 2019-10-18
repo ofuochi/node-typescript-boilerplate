@@ -4,13 +4,57 @@
 import { Controller, ValidationService, FieldErrors, ValidateError, TsoaRoute } from 'tsoa';
 import { iocContainer } from './../../infrastructure/config/ioc';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import { FooController } from './controllers/foo_controller';
+import { AuthController } from './controllers/auth_controller';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { TenantController } from './controllers/tenant_controller';
 import { expressAuthentication } from './middleware/auth_middleware';
 import * as express from 'express';
 
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
 const models: TsoaRoute.Models = {
+    "UserDto": {
+        "dataType": "refObject",
+        "properties": {
+            "id": { "dataType": "string", "required": true },
+            "firstName": { "dataType": "string", "required": true },
+            "lastName": { "dataType": "string", "required": true },
+            "email": { "dataType": "string", "required": true },
+            "username": { "dataType": "string", "required": true },
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "UserSignUpDto": {
+        "dataType": "refObject",
+        "properties": {
+            "userDto": { "ref": "UserDto", "required": true },
+            "token": { "dataType": "string", "required": true },
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "UserSignUpInput": {
+        "dataType": "refObject",
+        "properties": {
+            "firstName": { "dataType": "string", "required": true },
+            "lastName": { "dataType": "string", "required": true },
+            "email": { "dataType": "string", "required": true },
+            "username": { "dataType": "string", "required": true },
+            "password": { "dataType": "string", "required": true },
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "UserSignInInput": {
+        "dataType": "refObject",
+        "properties": {
+            "emailOrUsername": { "dataType": "string", "required": true },
+            "password": { "dataType": "string", "required": true },
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "TenantDto": {
         "dataType": "refObject",
         "properties": {
@@ -22,7 +66,7 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "CreateTenantDto": {
+    "CreateTenantInput": {
         "dataType": "refObject",
         "properties": {
             "name": { "dataType": "string", "required": true },
@@ -41,10 +85,11 @@ export function RegisterRoutes(app: express.Express) {
     //  NOTE: If you do not see routes for all of your controllers in this file, then you might not have informed tsoa of where to look
     //      Please look into the "controllerPathGlobs" config option described in the readme: https://github.com/lukeautry/tsoa
     // ###########################################################################################################
-    app.get('/api/v1/foos',
+    app.post('/api/v1/auth/signUp',
+        authenticateMiddleware([{ "X-Tenant-Id": [] }]),
         function(request: any, response: any, next: any) {
             const args = {
-                tenantName: { "in": "query", "name": "tenantName", "dataType": "string" },
+                input: { "in": "body", "name": "input", "required": true, "ref": "UserSignUpInput" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -56,7 +101,58 @@ export function RegisterRoutes(app: express.Express) {
                 return next(err);
             }
 
-            const controller = iocContainer.get<FooController>(FooController);
+            const controller = iocContainer.get<AuthController>(AuthController);
+            if (typeof controller['setStatus'] === 'function') {
+                (<any>controller).setStatus(undefined);
+            }
+
+
+            const promise = controller.signUp.apply(controller, validatedArgs as any);
+            promiseHandler(controller, promise, response, next);
+        });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.post('/api/v1/auth/signIn',
+        authenticateMiddleware([{ "X-Tenant-Id": [] }]),
+        function(request: any, response: any, next: any) {
+            const args = {
+                input: { "in": "body", "name": "input", "required": true, "ref": "UserSignInInput" },
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request);
+            } catch (err) {
+                return next(err);
+            }
+
+            const controller = iocContainer.get<AuthController>(AuthController);
+            if (typeof controller['setStatus'] === 'function') {
+                (<any>controller).setStatus(undefined);
+            }
+
+
+            const promise = controller.signIn.apply(controller, validatedArgs as any);
+            promiseHandler(controller, promise, response, next);
+        });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.get('/api/v1/tenants/:tenantName',
+        function(request: any, response: any, next: any) {
+            const args = {
+                tenantName: { "in": "path", "name": "tenantName", "required": true, "dataType": "string" },
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request);
+            } catch (err) {
+                return next(err);
+            }
+
+            const controller = iocContainer.get<TenantController>(TenantController);
             if (typeof controller['setStatus'] === 'function') {
                 (<any>controller).setStatus(undefined);
             }
@@ -66,11 +162,11 @@ export function RegisterRoutes(app: express.Express) {
             promiseHandler(controller, promise, response, next);
         });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    app.post('/api/v1/foos',
-        authenticateMiddleware([{ "jwt": ["admin"], "X-Tenant-Id": ["admin"] }]),
+    app.post('/api/v1/tenants',
+        authenticateMiddleware([{ "X-Auth-Token": ["admin"] }]),
         function(request: any, response: any, next: any) {
             const args = {
-                input: { "in": "body", "name": "input", "required": true, "ref": "CreateTenantDto" },
+                input: { "in": "body", "name": "input", "required": true, "ref": "CreateTenantInput" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -82,13 +178,39 @@ export function RegisterRoutes(app: express.Express) {
                 return next(err);
             }
 
-            const controller = iocContainer.get<FooController>(FooController);
+            const controller = iocContainer.get<TenantController>(TenantController);
             if (typeof controller['setStatus'] === 'function') {
                 (<any>controller).setStatus(undefined);
             }
 
 
             const promise = controller.create.apply(controller, validatedArgs as any);
+            promiseHandler(controller, promise, response, next);
+        });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.delete('/api/v1/tenants/:id',
+        authenticateMiddleware([{ "X-Auth-Token": ["admin"] }]),
+        function(request: any, response: any, next: any) {
+            const args = {
+                id: { "in": "path", "name": "id", "required": true, "dataType": "string" },
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request);
+            } catch (err) {
+                return next(err);
+            }
+
+            const controller = iocContainer.get<TenantController>(TenantController);
+            if (typeof controller['setStatus'] === 'function') {
+                (<any>controller).setStatus(undefined);
+            }
+
+
+            const promise = controller.delete.apply(controller, validatedArgs as any);
             promiseHandler(controller, promise, response, next);
         });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -114,7 +236,7 @@ export function RegisterRoutes(app: express.Express) {
             const fail = function(error: any) {
                 responded++;
                 if (responded == security.length && !success) {
-                    error.status = 401;
+                    error.status = error.status || 401;
                     next(error)
                 }
             }
