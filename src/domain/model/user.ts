@@ -4,6 +4,7 @@ import { Writable } from "../utils/writable";
 import { BaseEntity } from "./base";
 import { IMustHaveTenant } from "./interfaces/entity";
 import { Tenant } from "./tenant";
+import { config } from "../../infrastructure/config";
 
 export const MAX_NAME_LENGTH = 225;
 export enum UserRole {
@@ -51,8 +52,19 @@ export class User extends BaseEntity implements IMustHaveTenant {
     })
     readonly role: UserRole = UserRole.USER;
 
-    @prop({ required: true, default: false })
-    readonly isLockedOut: boolean;
+    @prop({ required: true, default: 0 })
+    readonly signInAttempts: number;
+
+    @prop({ default: undefined })
+    readonly lockOutEndDate?: Date;
+
+    get isLockedOut(): boolean {
+        return (
+            this.signInAttempts >= config.userLockout.maxSignInAttempts &&
+            this.lockOutEndDate !== undefined &&
+            this.lockOutEndDate > new Date()
+        );
+    }
 
     public constructor(arg?: {
         firstName: string;
@@ -140,5 +152,23 @@ export class User extends BaseEntity implements IMustHaveTenant {
     @instanceMethod
     setPassword(password: string) {
         (this as Writable<User>).password = password;
+    }
+
+    static getAttemptUpdate(): { [key: string]: object } {
+        const increamentCommand = { $inc: { signInAttempts: 1 } };
+        const endDate = new Date();
+        endDate.setMinutes(
+            endDate.getMinutes() + config.userLockout.initialLockoutTime
+        );
+        const lockoutCommand = {
+            $set: { isLockedOut: true, lockOutEndDate: endDate }
+        };
+        return { ...increamentCommand, ...lockoutCommand };
+    }
+
+    @instanceMethod
+    clearLockOut() {
+        (this as Writable<User>).lockOutEndDate = undefined;
+        (this as Writable<User>).signInAttempts = 0;
     }
 }

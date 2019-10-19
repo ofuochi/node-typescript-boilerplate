@@ -13,8 +13,7 @@ import { X_TENANT_ID } from "../../../src/ui/constants/header_constants";
 import {
     UserSignInInput,
     UserSignUpDto,
-    UserSignUpInput,
-    UserDto
+    UserSignUpInput
 } from "../../../src/ui/models/user_dto";
 import { cleanupDb, req } from "../../setup";
 
@@ -26,18 +25,15 @@ describe("AuthController", () => {
     let tenant: Tenant;
     let tenant1: Tenant;
     let tenant2: Tenant;
-    let signedUpUser: UserDto;
-    
+
     before(async () => {
         await cleanupDb();
 
         tenantRepository = iocContainer.get<ITenantRepository>(
             TenantRepository
         );
-        
-        userRepository = iocContainer.get<IUserRepository>(
-            UserRepository
-        );
+        userRepository = iocContainer.get<IUserRepository>(UserRepository);
+
         // Get first tenant because it already exists from the setup.ts file
         tenant1 = await tenantRepository.insertOrUpdate(
             Tenant.createInstance("Tenant1", "Second tenant")
@@ -79,8 +75,6 @@ describe("AuthController", () => {
             const userRecord = await userRepository.findById(userDto.id);
 
             expect(userDto.id).to.equal(userRecord.createdBy.toString());
-            
-            signedUpUser = userDto;
         });
 
         it("should return conflict if email already exists on the same tenant", async () => {
@@ -133,12 +127,12 @@ describe("AuthController", () => {
     });
 
     describe("User sign-in", () => {
-        const signInInput: UserSignInInput = {
-            password: signUpInput.password,
-            emailOrUsername: signUpInput.email
-        };
-        
-        describe("Successsfull User Sign-in", () => {
+        describe("Valid User Signin", () => {
+            const signInInput: UserSignInInput = {
+                password: signUpInput.password,
+                emailOrUsername: signUpInput.email
+            };
+
             it("should sign-in user with email and return token", async () => {
                 const res = await req
                     .post(`${endpoint}/signIn`)
@@ -155,7 +149,6 @@ describe("AuthController", () => {
                     .send(signInInput)
                     .expect(httpStatus.OK);
                 expect(res.body).to.contain.keys("token");
-                
             });
             it("should sign-in user that has same username on a different tenant using username and return token", async () => {
                 tenant = tenant2;
@@ -177,23 +170,83 @@ describe("AuthController", () => {
                     .expect(httpStatus.OK);
                 expect(res.body).to.contain.keys("token");
             });
-        });  
-        
-        describe("User Lockout", () => {
-            it("should lockout user after making the maximum number of sign-in attempts", async () => {
-                const invalidSignInInput: UserSignInInput = { emailOrUsername: signedUpUser.email, password: "invalid_password"};
-                             
-                const { maxSignInAttempts } = config.userLockout;
-                Array.from(Array(maxSignInAttempts).keys()).forEach(async() => {                    
-                    await req
-                        .post(`${endpoint}/signIn`)
-                        .set(X_TENANT_ID, tenant.id)
-                        .send(invalidSignInInput);
+        });
+
+        describe("Invalid User Signin", () => {
+            let invalidSignInInput: UserSignInInput;
+            const { maxSignInAttempts } = config.userLockout;
+
+            beforeEach(async () => {
+                const userInDb = await userRepository.findOneByQuery({});
+                invalidSignInInput = {
+                    emailOrUsername: userInDb.email,
+                    password: "invalid_password"
+                };
+                userInDb.clearLockOut();
+                await userRepository.insertOrUpdate(userInDb);
+            });
+
+            it("should increase user sign-in attempts by 1 when use sign-in fails due to invalid password", async () => {
+                const userInitial = await userRepository.findOneByQuery({
+                    tenant: tenant.id,
+                    email: invalidSignInInput.emailOrUsername
                 });
-                              
-                const user = await userRepository.findOneByQuery({ tenant: tenant.id, email: invalidSignInInput.emailOrUsername });
+
+                await req
+                    .post(`${endpoint}/signIn`)
+                    .set(X_TENANT_ID, tenant.id)
+                    .send(invalidSignInInput);
+
+                const userFinal = await userRepository.findOneByQuery({
+                    tenant: tenant.id,
+                    email: invalidSignInInput.emailOrUsername
+                });
+
+                expect(userFinal.signInAttempts).to.be.equal(
+                    userInitial.signInAttempts + 1
+                );
+            });
+            it("should lockout user immediately after making the maximum allowed consecutive sign-in attempts", async () => {
+                const signIns = [];
+                const array = Array.from(Array(maxSignInAttempts).keys());
+
+                array.forEach(() => {
+                    signIns.push(
+                        req
+                            .post(`${endpoint}/signIn`)
+                            .set(X_TENANT_ID, tenant.id)
+                            .send(invalidSignInInput)
+                    );
+                });
+                await Promise.all(signIns);
+
+                const user = await userRepository.findOneByQuery({
+                    tenant: tenant.id,
+                    email: invalidSignInInput.emailOrUsername
+                });
                 expect(user.isLockedOut).to.be.true;
             });
-        });       
+
+            it("should NOT increase sign-in attempts when user is on lockout", async () => {
+                const signIns = [];
+                const array = Array.from(Array(maxSignInAttempts + 3).keys());
+
+                array.forEach(() => {
+                    signIns.push(
+                        req
+                            .post(`${endpoint}/signIn`)
+                            .set(X_TENANT_ID, tenant.id)
+                            .send(invalidSignInInput)
+                    );
+                });
+                await Promise.all(signIns);
+
+                const userFinal = await userRepository.findOneByQuery({
+                    tenant: tenant.id,
+                    email: invalidSignInInput.emailOrUsername
+                });
+                expect(userFinal.signInAttempts).to.be.equal(maxSignInAttempts);
+            });
+        });
     });
 });

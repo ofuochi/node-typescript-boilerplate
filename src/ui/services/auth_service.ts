@@ -79,6 +79,13 @@ export class AuthService implements IAuthService {
     public async signIn(dto: UserSignInInput): Promise<{ token: string }> {
         const user = await this.getUserRecord(dto.emailOrUsername);
 
+        await this.processSignInAttempt(dto, user);
+
+        const token = await this.generateToken(user);
+        return { token };
+    }
+
+    private async processSignInAttempt(dto: UserSignInInput, user: User) {
         if (!user)
             throw new HttpError(
                 httpStatus.UNAUTHORIZED,
@@ -89,28 +96,47 @@ export class AuthService implements IAuthService {
             dto.password,
             user.password
         );
-        if (!isPasswordValid)
+        if (user.isLockedOut || !isPasswordValid) {
             throw new HttpError(
-                httpStatus.UNAUTHORIZED,
+                httpStatus.BAD_REQUEST,
                 "Invalid login attempt!"
             );
+        }
 
-        const token = await this.generateToken(user);
-        return { token };
+        user.clearLockOut();
+        await this._userRepository.insertOrUpdate(user);
     }
 
     private async getUserRecord(emailOrUsername: string): Promise<User> {
         const tenantId = global.currentUser.tenant.id;
-        if (emailOrUsername.includes("@"))
-            return this._userRepository.findOneByQuery({
-                email: emailOrUsername,
-                tenant: tenantId
-            });
-
-        return this._userRepository.findOneByQuery({
-            username: emailOrUsername,
-            tenant: tenantId
-        });
+        return this._userRepository.findOneByQueryAndUpdate(
+            {
+                $and: [
+                    { tenant: tenantId },
+                    {
+                        $or: [
+                            { email: emailOrUsername },
+                            { username: emailOrUsername }
+                        ]
+                    },
+                    {
+                        $or: [
+                            {
+                                signInAttempts: {
+                                    $lt: config.userLockout.maxSignInAttempts
+                                }
+                            },
+                            {
+                                lockOutEndDate: {
+                                    $lt: new Date()
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            User.getAttemptUpdate()
+        );
     }
 
     private async generateToken(user: User) {
