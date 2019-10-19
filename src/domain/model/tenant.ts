@@ -49,4 +49,10 @@ export class Tenant extends BaseEntity {
     setDescription(description: string) {
         (this as Writable<Tenant>).description = description;
     }
+
+    @instanceMethod
+    update(tenant: Partial<this>): void {
+        if (this.name) this.setName(tenant.name as string);
+        if (this.description) this.setDescription(tenant.description as string);
+    }
 }

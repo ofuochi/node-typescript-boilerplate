@@ -6,24 +6,26 @@ import { TenantRepository } from "../../../../src/infrastructure/db/repositories
 import { cleanupDb } from "../../../setup";
 
 describe("Tenant Repository", () => {
-	const tenants: Tenant[] = [
-		Tenant.createInstance("T0", "T0"),
-		Tenant.createInstance("T1", "T1"),
-		Tenant.createInstance("T2", "T2")
-	];
-	let tenantRepository: ITenantRepository;
-	before("Create seed tenants", async () => {
-		await cleanupDb();
+    const tenants: Tenant[] = [
+        Tenant.createInstance("T0", "T0"),
+        Tenant.createInstance("T1", "T1")
+    ];
+    let tenantRepository: ITenantRepository;
+    before("Create seed tenants", async () => {
+        await cleanupDb();
 
-		tenantRepository = iocContainer.get<ITenantRepository>(TenantRepository);
-		tenants.forEach(async tenant => {
-			tenants[0].delete();
-			await tenantRepository.insertOrUpdate(tenant);
-		});
-	});
+        tenants[0].delete();
 
-	it("should get all the tenants but without the deleted ones", async () => {
-		const res = await tenantRepository.findAll();
-		expect(res.length).to.equal(2);
-	});
+        tenantRepository = iocContainer.get<ITenantRepository>(
+            TenantRepository
+        );
+        tenants.forEach(async tenant => {
+            await tenantRepository.insertOrUpdate(tenant);
+        });
+    });
+
+    it("should get all the tenants but without the deleted ones", async () => {
+        const res = await tenantRepository.findAll();
+        expect(res.length).to.equal(1);
+    });
 });

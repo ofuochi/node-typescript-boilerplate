@@ -3,8 +3,6 @@ import httpStatus from "http-status-codes";
 import { BaseMiddleware } from "inversify-express-utils";
 import { config } from "../../../infrastructure/config";
 import { provideSingleton } from "../../../infrastructure/config/ioc";
-import { isIdValid } from "../../../infrastructure/utils/server_utils";
-import { X_TENANT_ID } from "../../constants/header_constants";
 import { HttpError } from "../../error";
 
 @provideSingleton(RequestMiddleware)
@@ -21,29 +19,6 @@ export class RequestMiddleware extends BaseMiddleware {
         //     HTTP ${req.method} ${req.url}
         //     ----------------------------------
         //     `);
-        if (req.url.toLowerCase().startsWith("/api-docs")) return next();
-
-        const isPublicUrl = req.url
-            .toLowerCase()
-            .startsWith(`${config.api.prefix}/tenants`.toLocaleLowerCase());
-
-        if (isPublicUrl) return next();
-
-        const tenantId = req.headers[X_TENANT_ID.toLocaleLowerCase()];
-
-        if (!tenantId && !isPublicUrl)
-            return res
-                .status(httpStatus.BAD_REQUEST)
-                .end(`${X_TENANT_ID} header is missing`);
-
-        if (!isIdValid(tenantId as string))
-            return next(
-                new HttpError(
-                    httpStatus.BAD_REQUEST,
-                    `Invalid header ${X_TENANT_ID} value`
-                )
-            );
-
         next();
     }
 }
@@ -52,9 +27,9 @@ export function exceptionLoggerMiddleware(
     error: Error,
     req: Request,
     res: Response,
-    _next: NextFunction
+    next: NextFunction
 ) {
-    // const log = iocContainer.get<ILoggerService>(TYPES.LoggerService);
+    // const log = iocContainer.get<ILoggerService>(LoggerService);
 
     // log.error(`
     // ----------------------------------
@@ -65,6 +40,7 @@ export function exceptionLoggerMiddleware(
     // `);
 
     if (error instanceof HttpError) {
+        //   sendHttpErrorModule(req, res, next);
         return res
             .status(error.status)
             .json({ ...error, message: error.message });
@@ -74,6 +50,8 @@ export function exceptionLoggerMiddleware(
         config.env === "development" || config.env === "test"
             ? new HttpError(httpStatus.INTERNAL_SERVER_ERROR, error.message)
             : new HttpError(httpStatus.INTERNAL_SERVER_ERROR);
-
-    res.status(httpStatus.INTERNAL_SERVER_ERROR).json(error);
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+        ...error,
+        message: error.message
+    });
 }

@@ -36,8 +36,6 @@ export async function seedDefaultAdmin(tenantId: string) {
     });
     if (!defaultAdminUser) {
         userInstance.setRole(UserRole.ADMIN);
-        userInstance.setTenant(tenantId as any);
-
         await tenantModel.create(userInstance);
     }
 }

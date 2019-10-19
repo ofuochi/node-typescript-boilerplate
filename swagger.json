@@ -243,7 +243,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/TenantDto"
+									"oneOf": [
+										{},
+										{
+											"$ref": "#/components/schemas/TenantDto"
+										}
+									]
 								}
 							}
 						},
@@ -334,6 +339,43 @@
 						}
 					}
 				]
+			}
+		},
+		"/users": {
+			"post": {
+				"operationId": "Create",
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserDto"
+								}
+							}
+						},
+						"description": "Ok"
+					}
+				},
+				"tags": [
+					"Users"
+				],
+				"security": [
+					{
+						"X-Auth-Token": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserSignUpInput"
+							}
+						}
+					}
+				}
 			}
 		}
 	},
