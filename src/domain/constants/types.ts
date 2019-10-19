@@ -5,5 +5,6 @@ export const TYPES = {
 
     EventDispatcher: Symbol("EventDispatcher"),
     Agenda: Symbol("Agenda"),
-    TenantId: Symbol("TenantId")
+    TenantId: Symbol("TenantId"),
+    DecodedJwt: Symbol("DecodedJwt")
 };

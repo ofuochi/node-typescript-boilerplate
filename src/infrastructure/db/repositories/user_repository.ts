@@ -4,7 +4,7 @@ import { User } from "../../../domain/model/user";
 import { provideSingleton } from "../../config/ioc";
 import { BaseRepository } from "./base_repository";
 
-export interface UserModel extends User, Document {}
+export type UserModel = User & Document;
 
 @provideSingleton(UserRepository)
 export class UserRepository extends BaseRepository<User, UserModel>

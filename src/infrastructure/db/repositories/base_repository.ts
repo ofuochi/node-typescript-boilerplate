@@ -12,8 +12,7 @@ import { provideSingleton } from "../../config/ioc";
 export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
     implements IBaseRepository<TEntity> {
     protected Model: Model<TModel>;
-    protected CurrentTenantId?: string =
-        global.currentUser && global.currentUser.tenant.id;
+
     protected _constructor: () => TEntity;
     public constructor(
         @unmanaged() model: Model<TModel>,
