@@ -6,6 +6,6 @@ export abstract class BaseCreateEntityDto {}
 export abstract class BaseEntityDto {
     @IsUUID()
     @Expose()
-    id: string;
+    id!: string;
 }
 export abstract class BaseUpdateDto extends BaseEntityDto {}

@@ -133,6 +133,28 @@
 				],
 				"type": "object",
 				"additionalProperties": false
+			},
+			"UserUpdateInput": {
+				"properties": {
+					"firstName": {
+						"type": "string",
+						"nullable": true
+					},
+					"lastName": {
+						"type": "string",
+						"nullable": true
+					},
+					"email": {
+						"type": "string",
+						"nullable": true
+					},
+					"username": {
+						"type": "string",
+						"nullable": true
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
 			}
 		},
 		"securitySchemes": {
@@ -243,12 +265,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"oneOf": [
-										{},
-										{
-											"$ref": "#/components/schemas/TenantDto"
-										}
-									]
+									"$ref": "#/components/schemas/TenantDto"
 								}
 							}
 						},
@@ -376,6 +393,79 @@
 						}
 					}
 				}
+			}
+		},
+		"/users/{id}": {
+			"put": {
+				"operationId": "Update",
+				"responses": {
+					"204": {
+						"content": {
+							"application/json": {}
+						},
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"Users"
+				],
+				"security": [
+					{
+						"X-Auth-Token": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserUpdateInput"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "Delete",
+				"responses": {
+					"204": {
+						"content": {
+							"application/json": {}
+						},
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"Users"
+				],
+				"security": [
+					{
+						"X-Auth-Token": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
 			}
 		}
 	},
