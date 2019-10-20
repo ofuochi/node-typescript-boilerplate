@@ -25,7 +25,9 @@ const envConfigSchema = Joi.object({
     AGENDA_CONCURRENCY: Joi.number().default(20),
     MONGODB_URI: Joi.string().default(
         "mongodb://localhost:27017/node-typescript-boilerplate"
-    )
+    ),
+    APP_MAX_SIGNIN_ATTEMPTS: Joi.number().default(5),
+    APP_INITIAL_LOCKOUT_TIME: Joi.number().default(5)
 })
     .unknown()
     .required();
@@ -34,12 +36,16 @@ const { error, value: envConfig } = envConfigSchema.validate(process.env);
 if (error) throw new Error(`Config validation error: ${error.message}`);
 
 export const config = {
-    // eslint-disable-next-line
-    port: parseInt(envConfig.PORT as string),
+    port: parseInt(envConfig.PORT as string, 10),
     host: envConfig.HOST as string,
     env: envConfig.NODE_ENV as string,
     mongoDbConnection: envConfig.MONGODB_URI as string,
     jwtSecret: envConfig.JWT_SECRET as string,
+    
+    userLockout: {
+      maxSignInAttempts: parseInt(envConfig.APP_MAX_SIGNIN_ATTEMPTS as string, 10),
+      initialLockoutTime: parseInt(envConfig.APP_INITIAL_LOCKOUT_TIME as string, 10)
+    },
 
     /**
      * Used by winston logger

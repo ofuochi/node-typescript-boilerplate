@@ -121,6 +121,26 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
         await this.insertOrUpdate(item);
         return true;
     }
+
+    findOneByQueryAndUpdate(
+        query: Query<any>,
+        update: { [key: string]: object }
+    ): Promise<TEntity> {
+        return new Promise<TEntity>((resolve, reject) => {
+            this.Model.findOneAndUpdate(
+                query,
+                update,
+                { new: true },
+                (err, res) => {
+                    if (err) return reject(err);
+                    if (!res) return resolve();
+                    const result = this.readMapper(res);
+                    return resolve(result);
+                }
+            );
+        });
+    }
+
     // deleteOneByQuery(query: Query<TEntity>): Promise<number> {
     //     throw new Error("Method not implemented.");
     // }
