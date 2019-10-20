@@ -4,19 +4,23 @@ import { Query } from "mongoose";
 
 import { Writable } from "../utils/writable";
 import { User } from "./user";
+import { iocContainer } from "../../infrastructure/config/ioc";
+import { TYPES } from "../constants/types";
+import { DecodedJwt } from "../../ui/services/auth_service";
 
 // eslint-disable-next-line
 @pre<BaseEntity>("findOneAndUpdate", function(this: Query<BaseEntity>, next) {
     try {
         const entity = this.getUpdate();
-        const user = (global.currentUser && global.currentUser.user) as User;
-        if (user) {
-            entity.updatedBy = user.id;
+        if (iocContainer.isBound(TYPES.DecodedJwt)) {
+            const currentUser = iocContainer.get<DecodedJwt>(TYPES.DecodedJwt);
+            entity.updatedBy = currentUser.userId;
             if (entity.isDeleted) {
-                entity.deletedBy = user.id;
+                entity.deletedBy = currentUser.userId;
                 entity.deletionTime = new Date();
             }
         }
+
         next();
     } catch (error) {
         next(error);
@@ -25,9 +29,12 @@ import { User } from "./user";
 // eslint-disable-next-line
 @pre<BaseEntity>("save", function(next) {
     try {
-        const user = global.currentUser && global.currentUser.user;
-        const creator = user || this.type === "User" ? this : undefined;
-        if (creator) this.setCreatedBy(creator);
+        if (iocContainer.isBound(TYPES.DecodedJwt)) {
+            const currentUser = iocContainer.get<DecodedJwt>(TYPES.DecodedJwt);
+            this.setCreatedBy(currentUser.userId);
+        } else if (this.type === "User") {
+            this.setCreatedBy(this);
+        }
         next();
     } catch (error) {
         next(error);
@@ -35,6 +42,8 @@ import { User } from "./user";
 })
 export abstract class BaseEntity extends Typegoose {
     abstract type: string;
+    abstract update(entity: Partial<BaseEntity>): void;
+
     @Expose()
     id?: any;
 
@@ -84,7 +93,7 @@ export abstract class BaseEntity extends Typegoose {
     }
 
     @instanceMethod
-    private setCreatedBy(user: BaseEntity) {
-        (this as Writable<BaseEntity>).createdBy = user.id;
+    private setCreatedBy(user: any) {
+        (this as Writable<BaseEntity>).createdBy = user;
     }
 }

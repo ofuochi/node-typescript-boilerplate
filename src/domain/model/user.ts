@@ -1,5 +1,6 @@
 import { index, instanceMethod, prop, Ref } from "@hasezoey/typegoose";
-
+import { iocContainer } from "../../infrastructure/config/ioc";
+import { TYPES } from "../constants/types";
 import { Writable } from "../utils/writable";
 import { BaseEntity } from "./base";
 import { IMustHaveTenant } from "./interfaces/entity";
@@ -7,6 +8,8 @@ import { Tenant } from "./tenant";
 import { config } from "../../infrastructure/config";
 
 export const MAX_NAME_LENGTH = 225;
+export const PASSWORD_SALT_ROUND = 12;
+
 export enum UserRole {
     USER = "user",
     ADMIN = "admin"
@@ -99,8 +102,7 @@ export class User extends BaseEntity implements IMustHaveTenant {
         password: string;
         tenantId?: string;
     }) => {
-        const id =
-            tenantId || (global.currentUser && global.currentUser.tenant.id);
+        const id = tenantId || iocContainer.get<any>(TYPES.TenantId);
 
         if (!id) throw new Error("Tenant Id is required");
 
@@ -119,6 +121,18 @@ export class User extends BaseEntity implements IMustHaveTenant {
         });
     }
 
+    static getSignInAttemptUpdate(): { [key: string]: object } {
+        const increamentCommand = { $inc: { signInAttempts: 1 } };
+        const endDate = new Date();
+        endDate.setMinutes(
+            endDate.getMinutes() + config.userLockout.initialLockoutTime
+        );
+        const lockoutCommand = {
+            $set: { isLockedOut: true, lockOutEndDate: endDate }
+        };
+        return { ...increamentCommand, ...lockoutCommand };
+    }
+
     @instanceMethod
     setRole(role: UserRole) {
         (this as Writable<User>).role = role;
@@ -132,11 +146,6 @@ export class User extends BaseEntity implements IMustHaveTenant {
     @instanceMethod
     setUsername(username: string) {
         (this as Writable<User>).username = username;
-    }
-
-    @instanceMethod
-    setTenant(tenant: Ref<Tenant>) {
-        (this as Writable<User>).tenant = tenant;
     }
 
     @instanceMethod
@@ -154,16 +163,14 @@ export class User extends BaseEntity implements IMustHaveTenant {
         (this as Writable<User>).password = password;
     }
 
-    static getAttemptUpdate(): { [key: string]: object } {
-        const increamentCommand = { $inc: { signInAttempts: 1 } };
-        const endDate = new Date();
-        endDate.setMinutes(
-            endDate.getMinutes() + config.userLockout.initialLockoutTime
-        );
-        const lockoutCommand = {
-            $set: { isLockedOut: true, lockOutEndDate: endDate }
-        };
-        return { ...increamentCommand, ...lockoutCommand };
+    @instanceMethod
+    update(user: Partial<this>): void {
+        if (this.firstName) this.setFirstName(user.firstName as string);
+        if (this.lastName) this.setLastName(user.lastName as string);
+        if (this.password) this.setPassword(user.password as string);
+        if (this.username) this.setUsername(user.username as string);
+        if (this.email) this.setEmail(user.email as string);
+        if (this.role) this.setRole(user.role as UserRole);
     }
 
     @instanceMethod

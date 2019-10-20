@@ -4,10 +4,15 @@ import { EventDispatcher } from "event-dispatch";
 import httpStatus from "http-status-codes";
 import jwt from "jsonwebtoken";
 import { eventDispatcher } from "../../domain/constants/decorators";
+import { TYPES } from "../../domain/constants/types";
 import { IUserRepository } from "../../domain/interfaces/repositories";
-import { User, UserRole } from "../../domain/model/user";
+import { PASSWORD_SALT_ROUND, User, UserRole } from "../../domain/model/user";
 import { config } from "../../infrastructure/config";
-import { inject, provideSingleton } from "../../infrastructure/config/ioc";
+import {
+    inject,
+    iocContainer,
+    provideSingleton
+} from "../../infrastructure/config/ioc";
 import { UserRepository } from "../../infrastructure/db/repositories/user_repository";
 import { HttpError } from "../error";
 import { IAuthService } from "../interfaces/auth_service";
@@ -30,16 +35,14 @@ export class AuthService implements IAuthService {
     public async signUp(
         dto: UserSignUpInput
     ): Promise<{ userDto: UserDto; token: string }> {
-        // Check that user is not already signed in
-        if (global.currentUser && global.currentUser.decodedJwt)
-            throw new HttpError(httpStatus.CONFLICT, "You are still signed in");
-
         // Use less salt round for faster hashing on test and development but stronger hashing on production
-        const hashedPassword =
+        const saltRound =
             config.env === "development" || config.env === "test"
-                ? await bcrypt.hash(dto.password, 1)
-                : await bcrypt.hash(dto.password, 12);
-        const tenantId = global.currentUser.tenant.id;
+                ? 1
+                : PASSWORD_SALT_ROUND;
+        const hashedPassword = await bcrypt.hash(dto.password, saltRound);
+
+        const tenantId = iocContainer.get<any>(TYPES.TenantId);
         let user = await this._userRepository.findOneByQuery({
             email: dto.email,
             tenant: tenantId
@@ -53,6 +56,7 @@ export class AuthService implements IAuthService {
             username: dto.username,
             tenant: tenantId
         });
+
         if (user)
             throw new HttpError(
                 httpStatus.CONFLICT,
@@ -67,7 +71,6 @@ export class AuthService implements IAuthService {
 
         this._eventDispatcher.dispatch(events.user.signUp, { ...dto });
 
-        global.currentUser.setUser(user);
         const token = await this.generateToken(user);
         const userDto = plainToClass(UserDto, user, {
             enableImplicitConversion: true,
@@ -108,7 +111,7 @@ export class AuthService implements IAuthService {
     }
 
     private async getUserRecord(emailOrUsername: string): Promise<User> {
-        const tenantId = global.currentUser.tenant.id;
+        const tenantId = iocContainer.get<any>(TYPES.TenantId);
         return this._userRepository.findOneByQueryAndUpdate(
             {
                 $and: [
@@ -135,7 +138,7 @@ export class AuthService implements IAuthService {
                     }
                 ]
             },
-            User.getAttemptUpdate()
+            User.getSignInAttemptUpdate()
         );
     }
 
@@ -152,8 +155,6 @@ export class AuthService implements IAuthService {
             firstName: user.firstName,
             tenantId: user.tenant
         };
-        global.currentUser.setUser(user);
-        global.currentUser.setDecodedJwt(payload);
         return jwt.sign(payload, config.jwtSecret, { expiresIn: "2 days" });
     }
 }

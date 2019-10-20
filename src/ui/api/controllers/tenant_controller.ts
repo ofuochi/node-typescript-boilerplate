@@ -19,7 +19,8 @@ export class TenantController extends BaseController {
 
     @Get("{tenantName}")
     public async get(tenantName: string) {
-        return this._tenantService.get(tenantName);
+        const tenant = await this._tenantService.get(tenantName);
+        return tenant || this.setStatus(httpStatus.NOT_FOUND);
     }
     @Post()
     @Security("X-Auth-Token", ["admin"])
