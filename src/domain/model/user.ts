@@ -5,6 +5,7 @@ import { Writable } from "../utils/writable";
 import { BaseEntity } from "./base";
 import { IMustHaveTenant } from "./interfaces/entity";
 import { Tenant } from "./tenant";
+import { config } from "../../infrastructure/config";
 
 export const MAX_NAME_LENGTH = 225;
 export const PASSWORD_SALT_ROUND = 12;
@@ -53,6 +54,20 @@ export class User extends BaseEntity implements IMustHaveTenant {
         default: UserRole.USER
     })
     readonly role: UserRole = UserRole.USER;
+
+    @prop({ required: true, default: 0 })
+    readonly signInAttempts: number;
+
+    @prop({ default: undefined })
+    readonly lockOutEndDate?: Date;
+
+    get isLockedOut(): boolean {
+        return (
+            this.signInAttempts >= config.userLockout.maxSignInAttempts &&
+            this.lockOutEndDate !== undefined &&
+            this.lockOutEndDate > new Date()
+        );
+    }
 
     public constructor(arg?: {
         firstName: string;
@@ -106,6 +121,18 @@ export class User extends BaseEntity implements IMustHaveTenant {
         });
     }
 
+    static getSignInAttemptUpdate(): { [key: string]: object } {
+        const increamentCommand = { $inc: { signInAttempts: 1 } };
+        const endDate = new Date();
+        endDate.setMinutes(
+            endDate.getMinutes() + config.userLockout.initialLockoutTime
+        );
+        const lockoutCommand = {
+            $set: { isLockedOut: true, lockOutEndDate: endDate }
+        };
+        return { ...increamentCommand, ...lockoutCommand };
+    }
+
     @instanceMethod
     setRole(role: UserRole) {
         (this as Writable<User>).role = role;
@@ -143,5 +170,11 @@ export class User extends BaseEntity implements IMustHaveTenant {
         if (this.username) this.setUsername(user.username as string);
         if (this.email) this.setEmail(user.email as string);
         if (this.role) this.setRole(user.role as UserRole);
+    }
+
+    @instanceMethod
+    clearLockOut() {
+        (this as Writable<User>).lockOutEndDate = undefined;
+        (this as Writable<User>).signInAttempts = 0;
     }
 }
