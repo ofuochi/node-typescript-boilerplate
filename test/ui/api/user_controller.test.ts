@@ -107,9 +107,10 @@ describe("User controller", () => {
                 .get(endpoint)
                 .set(X_AUTH_TOKEN_KEY, adminJwt)
                 .expect(httpStatus.OK);
-
-            expect(body).to.be.an("array");
-            expect(body).to.deep.include(createdUser);
+            const { totalCount, items } = body;
+            expect(items).to.be.an("array");
+            expect(totalCount).to.be.greaterThan(0);
+            expect(items).to.deep.include(createdUser);
         });
         it("should get a user by ID if signed-in user is an admin", async () => {
             const { body } = await req

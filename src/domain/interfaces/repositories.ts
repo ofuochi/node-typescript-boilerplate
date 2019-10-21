@@ -13,6 +13,20 @@ export interface IBaseRepository<T> {
     findManyById(ids: string[]): Promise<T[]>;
     findOneByQuery(query: Query<T>): Promise<T>;
     findManyByQuery(query?: Query<T>): Promise<T[]>;
+    pagedFindAll({
+        limit,
+        skip,
+        searchStr,
+        isDeleted
+    }: {
+        limit?: number;
+        skip?: number;
+        searchStr?: string;
+        isDeleted?: boolean;
+    }): Promise<{
+        count: number;
+        items: T[];
+    }>;
     deleteById(id: string): Promise<boolean>;
     findOneByQueryAndUpdate(
         query: Query<any>,
