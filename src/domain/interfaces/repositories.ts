@@ -2,7 +2,7 @@ import { Tenant } from "../model/tenant";
 import { User } from "../model/user";
 
 export type Query<T> = {
-    [P in keyof T]?: T[P] | { $regex: RegExp };
+    [P in keyof T]?: T[P] | { $regex: RegExp } | { [key: string]: any };
 };
 
 export interface IBaseRepository<T> {

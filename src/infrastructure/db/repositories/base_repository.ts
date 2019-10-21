@@ -1,12 +1,13 @@
 import { plainToClassFromExist } from "class-transformer";
 import { unmanaged } from "inversify";
 import { Document, Model } from "mongoose";
+import { TYPES } from "../../../domain/constants/types";
 import {
     IBaseRepository,
     Query
 } from "../../../domain/interfaces/repositories";
 import { BaseEntity } from "../../../domain/model/base";
-import { provideSingleton } from "../../config/ioc";
+import { iocContainer, provideSingleton } from "../../config/ioc";
 
 @provideSingleton(BaseRepository)
 export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
@@ -14,6 +15,7 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
     protected Model: Model<TModel>;
 
     protected _constructor: () => TEntity;
+
     public constructor(
         @unmanaged() model: Model<TModel>,
         @unmanaged() constructor: () => TEntity
@@ -24,7 +26,13 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
 
     public async findAll() {
         return new Promise<TEntity[]>((resolve, reject) => {
-            this.Model.find({ isDeleted: { $ne: true } }, (err, res) => {
+            const query = JSON.parse(
+                JSON.stringify({
+                    isDeleted: { $ne: true },
+                    tenant: this.getCurrentTenant()
+                })
+            );
+            this.Model.find(query, "-__v", (err, res) => {
                 if (err) return reject(err);
                 const results = res.map(r => this.readMapper(r));
                 return resolve(results);
@@ -33,13 +41,19 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
     }
 
     public async findById(id: string) {
+        const query = JSON.parse(
+            JSON.stringify({
+                _id: id,
+                isDeleted: { $ne: true },
+                tenant: this.getCurrentTenant()
+            })
+        );
+
         return new Promise<TEntity>((resolve, reject) => {
-            this.Model.findById(id, "-__v", (err, res) => {
+            this.Model.findOne(query, "-__v", (err, res) => {
                 if (err) return reject(err);
                 if (!res) return resolve();
-
-                const result = this.readMapper(res);
-                resolve(result.isDeleted ? undefined : result);
+                resolve(this.readMapper(res));
             });
         });
     }
@@ -58,8 +72,15 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
     public async insertOrUpdate(doc: TEntity): Promise<TEntity> {
         return new Promise<TEntity>((resolve, reject) => {
             if (doc.id) {
+                const query = JSON.parse(
+                    JSON.stringify({
+                        _id: doc.id,
+                        isDeleted: { $ne: true },
+                        tenant: this.getCurrentTenant()
+                    })
+                );
                 this.Model.findByIdAndUpdate(
-                    { _id: doc.id },
+                    query,
                     doc,
                     { new: true },
                     (err, res) => {
@@ -81,35 +102,52 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
     }
 
     public findManyById(ids: string[]) {
+        const query = JSON.parse(
+            JSON.stringify({
+                _id: { $in: ids },
+                isDeleted: { $ne: true },
+                tenant: this.getCurrentTenant()
+            })
+        );
         return new Promise<TEntity[]>((resolve, reject) => {
-            const query = { _id: { $in: ids } };
             this.Model.find(query, (err, res) => {
                 if (err) return reject(err);
-                let results = res.map(r => this.readMapper(r));
-                results = results.filter(r => !r.isDeleted);
+                const results = res.map(r => this.readMapper(r));
                 resolve(results);
             });
         });
     }
 
     public findManyByQuery(query: Query<TEntity>) {
+        query = JSON.parse(
+            JSON.stringify({
+                ...query,
+                isDeleted: { $ne: true },
+                tenant: this.getCurrentTenant()
+            })
+        );
         return new Promise<TEntity[]>((resolve, reject) => {
             this.Model.find(query, "-__v", (err, res) => {
                 if (err) return reject(err);
                 if (!res) return resolve();
-                let result = res.map(r => this.readMapper(r));
-                result = result.filter(r => !r.isDeleted);
+                const result = res.map(r => this.readMapper(r));
                 resolve(result);
             });
         });
     }
     public async findOneByQuery(query: Query<TEntity>) {
+        query = JSON.parse(
+            JSON.stringify({
+                ...query,
+                isDeleted: { $ne: true },
+                tenant: this.getCurrentTenant()
+            })
+        );
         return new Promise<TEntity>((resolve, reject) => {
             this.Model.findOne(query, "-__v", (err, res) => {
                 if (err) return reject(err);
                 if (!res) return resolve();
-                const result = this.readMapper(res);
-                resolve(result.isDeleted ? undefined : result);
+                resolve(this.readMapper(res));
             });
         });
     }
@@ -148,6 +186,7 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
     //     throw new Error("Method not implemented.");
     // }
 
+    // #region Helper methods
     /**
      * Maps '_id' from mongodb to 'id' of TEntity
      *
@@ -167,4 +206,10 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
         delete obj._id;
         return plainToClassFromExist(entity, obj);
     }
+    private getCurrentTenant() {
+        return this._constructor().type !== "Tenant"
+            ? iocContainer.get<any>(TYPES.TenantId)
+            : undefined;
+    }
+    // #endregion
 }

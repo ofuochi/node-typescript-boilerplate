@@ -4,20 +4,20 @@ import { EventDispatcher } from "event-dispatch";
 import httpStatus from "http-status-codes";
 import jwt from "jsonwebtoken";
 import { eventDispatcher } from "../../domain/constants/decorators";
-import { TYPES } from "../../domain/constants/types";
 import { IUserRepository } from "../../domain/interfaces/repositories";
 import { PASSWORD_SALT_ROUND, User, UserRole } from "../../domain/model/user";
 import { config } from "../../infrastructure/config";
 import {
     inject,
-    iocContainer,
-    provideSingleton
+    provideSingleton,
+    iocContainer
 } from "../../infrastructure/config/ioc";
 import { UserRepository } from "../../infrastructure/db/repositories/user_repository";
 import { HttpError } from "../error";
 import { IAuthService } from "../interfaces/auth_service";
 import { UserDto, UserSignInInput, UserSignUpInput } from "../models/user_dto";
 import { events } from "../subscribers/events";
+import { TYPES } from "../../domain/constants/types";
 
 export interface DecodedJwt {
     userId: string;
@@ -42,10 +42,8 @@ export class AuthService implements IAuthService {
                 : PASSWORD_SALT_ROUND;
         const hashedPassword = await bcrypt.hash(dto.password, saltRound);
 
-        const tenantId = iocContainer.get<any>(TYPES.TenantId);
         let user = await this._userRepository.findOneByQuery({
-            email: dto.email,
-            tenant: tenantId
+            email: dto.email
         });
         if (user)
             throw new HttpError(
@@ -53,8 +51,7 @@ export class AuthService implements IAuthService {
                 `Email "${dto.email.toLowerCase()}" is already taken`
             );
         user = await this._userRepository.findOneByQuery({
-            username: dto.username,
-            tenant: tenantId
+            username: dto.username
         });
 
         if (user)

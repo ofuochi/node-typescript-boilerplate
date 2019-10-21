@@ -7,7 +7,7 @@ import { provideSingleton } from "../../../infrastructure/config/ioc";
 import { isIdValid } from "../../../infrastructure/utils/server_utils";
 import { HttpError } from "../../error";
 import { ITenantService } from "../../interfaces/tenant_service";
-import { CreateTenantInput } from "../../models/tenant_dto";
+import { CreateTenantInput, TenantDto } from "../../models/tenant_dto";
 import { TenantService } from "../../services/tenant_service";
 import { BaseController } from "./base_controller";
 
@@ -18,9 +18,10 @@ export class TenantController extends BaseController {
     @inject(TenantService) private readonly _tenantService: ITenantService;
 
     @Get("{tenantName}")
-    public async get(tenantName: string) {
+    public async get(tenantName: string): Promise<TenantDto> {
         const tenant = await this._tenantService.get(tenantName);
-        return tenant || this.setStatus(httpStatus.NOT_FOUND);
+        if (!tenant) throw new HttpError(httpStatus.NOT_FOUND);
+        return tenant;
     }
     @Post()
     @Security("X-Auth-Token", ["admin"])

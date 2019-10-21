@@ -49,17 +49,17 @@ npm run dev
 
 The first time the application runs, MongoDB is seeded with default Tenant and default Admin User.
 
-1. Default tenant name is **Default** (that's obvious 😉)
+1. Default tenant name is **Default** (obvioulsy)
 2. Default admin login detail;
    - Username: **admin**
    - Password: **123qwe**
 
 ### Swagger API Documentation
 
-Open the URL `http://localhost:3000/api-docs` to view the the swagger documentation of the endpoints 👌.
+Open the URL `http://localhost:3000/api-docs` to view the the swagger documentation of the endpoints.
 
 This will contain all the endpoints you expose to the client. Once you add a new endpoint, this endpoint will automatically be added! How cool is that?😎.
-Concentrate on building the functionality and business logic of your application. Swagger will do the documentation for you! 🙂.
+Concentrate on building the functionality and business logic of your application. Swagger will do the documentation for you!.
 
 Since this is a multi-tenant application, to authenticate (sign-in or sign-up), you need to pass a tenant ID in the header so that the application will know which tenant
 you are referencing during authentication.

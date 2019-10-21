@@ -25,7 +25,6 @@ function authentication(iocContainer: Container) {
         switch (securityName) {
             case X_AUTH_TOKEN_KEY: {
                 const token = req.header(X_AUTH_TOKEN_KEY);
-
                 // Check if X-Auth-Token header was passed in sign-up endpoint
                 if (!token)
                     throw new HttpError(
@@ -45,9 +44,11 @@ function authentication(iocContainer: Container) {
                 await assignTenantToReqAsync(iocContainer, tenantId);
                 return tenantId;
             }
-
             default:
-                throw new Error("Invalid security name");
+                throw new HttpError(
+                    httpStatus.INTERNAL_SERVER_ERROR,
+                    "Invalid security name"
+                );
         }
     };
 }
@@ -59,7 +60,6 @@ async function assignJwt(
 ) {
     try {
         const decodedJwt = jwt.verify(token, env.jwtSecret) as DecodedJwt;
-
         const expectedUserRole = (UserRole as any)[scopes[0].toUpperCase()];
         if (
             expectedUserRole !== UserRole.USER &&
@@ -77,6 +77,11 @@ async function assignJwt(
                 httpStatus.UNAUTHORIZED,
                 "Tenant is not available!"
             );
+        if (!iocContainer.isBound(TYPES.TenantId))
+            iocContainer
+                .bind<string>(TYPES.TenantId)
+                .toConstantValue(decodedJwt.tenantId);
+
         if (iocContainer.isBound(TYPES.DecodedJwt))
             iocContainer.unbind(TYPES.DecodedJwt);
         iocContainer
