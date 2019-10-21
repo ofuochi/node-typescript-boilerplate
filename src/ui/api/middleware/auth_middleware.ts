@@ -45,7 +45,10 @@ function authentication(iocContainer: Container) {
                 return tenantId;
             }
             default:
-                throw new Error("Invalid security name");
+                throw new HttpError(
+                    httpStatus.INTERNAL_SERVER_ERROR,
+                    "Invalid security name"
+                );
         }
     };
 }
@@ -57,7 +60,6 @@ async function assignJwt(
 ) {
     try {
         const decodedJwt = jwt.verify(token, env.jwtSecret) as DecodedJwt;
-
         const expectedUserRole = (UserRole as any)[scopes[0].toUpperCase()];
         if (
             expectedUserRole !== UserRole.USER &&

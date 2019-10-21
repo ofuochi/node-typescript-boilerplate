@@ -51,11 +51,19 @@ export class UserService implements IUserService {
     }
     async get(id: string): Promise<UserDto> {
         const user = await this._userRepository.findById(id);
-        return plainToClass(UserDto, user, {
+        return plainToClass<UserDto, User>(UserDto, user, {
             enableImplicitConversion: true,
             excludeExtraneousValues: true
         });
     }
+    async getAll(): Promise<UserDto[]> {
+        const users = await this._userRepository.findAll();
+        return plainToClass<UserDto, User>(UserDto, users, {
+            enableImplicitConversion: true,
+            excludeExtraneousValues: true
+        });
+    }
+
     async update(user: Partial<User>): Promise<void> {
         const userToUpdate = await this._userRepository.findById(user.id);
         if (!userToUpdate)

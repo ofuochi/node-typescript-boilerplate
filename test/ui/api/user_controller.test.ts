@@ -102,6 +102,23 @@ describe("User controller", () => {
             createdUser = body;
             userRecord = userRecordFromDb;
         });
+        it("should get all users if signed-in user is an admin", async () => {
+            const { body } = await req
+                .get(endpoint)
+                .set(X_AUTH_TOKEN_KEY, adminJwt)
+                .expect(httpStatus.OK);
+
+            expect(body).to.be.an("array");
+            expect(body).to.deep.include(createdUser);
+        });
+        it("should get a user by ID if signed-in user is an admin", async () => {
+            const { body } = await req
+                .get(`${endpoint}/${createdUser.id}`)
+                .set(X_AUTH_TOKEN_KEY, adminJwt)
+                .expect(httpStatus.OK);
+
+            expect(body.id).to.equal(createdUser.id);
+        });
         it("should return email conflict if admin user tries to create user with the same email", async () => {
             const newUser = { ...userSignUpInput };
             newUser.username += "nonConflictUsername";

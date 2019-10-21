@@ -1,7 +1,8 @@
 import { plainToClass } from "class-transformer";
 import httpStatus from "http-status-codes";
-import { Body, Delete, Post, Put, Route, Security, Tags } from "tsoa";
+import { Body, Delete, Get, Post, Put, Route, Security, Tags } from "tsoa";
 import { inject, provideSingleton } from "../../../infrastructure/config/ioc";
+import { HttpError } from "../../error";
 import { IUserService } from "../../interfaces/user_service";
 import {
     UserDto,
@@ -34,6 +35,19 @@ export class UserController extends BaseController {
         await this.checkBadRequest(plainToClass(UserUpdateInput, input));
         input = JSON.parse(JSON.stringify(input));
         await this._userService.update({ ...input, id });
+    }
+    @Get("{id}")
+    @Security("X-Auth-Token", ["admin"])
+    public async get(id: string): Promise<UserDto> {
+        this.checkUUID(id);
+        const userDto = await this._userService.get(id);
+        if (userDto) return userDto;
+        throw new HttpError(httpStatus.NOT_FOUND);
+    }
+    @Get()
+    @Security("X-Auth-Token", ["admin"])
+    public async getAll(): Promise<UserDto[]> {
+        return this._userService.getAll();
     }
     @Delete("{id}")
     @Security("X-Auth-Token", ["admin"])
