@@ -8,6 +8,7 @@ import {
 } from "../../../domain/interfaces/repositories";
 import { BaseEntity } from "../../../domain/model/base";
 import { iocContainer, provideSingleton } from "../../config/ioc";
+import { winstonLoggerInstance } from "../../bootstrapping/loaders/logger";
 
 @provideSingleton(BaseRepository)
 export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
@@ -25,13 +26,13 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
     }
 
     public async findAll() {
+        const query = JSON.parse(
+            JSON.stringify({
+                isDeleted: { $ne: true },
+                tenant: this.getCurrentTenant()
+            })
+        );
         return new Promise<TEntity[]>((resolve, reject) => {
-            const query = JSON.parse(
-                JSON.stringify({
-                    isDeleted: { $ne: true },
-                    tenant: this.getCurrentTenant()
-                })
-            );
             this.Model.find(query, "-__v", (err, res) => {
                 if (err) return reject(err);
                 const results = res.map(r => this.readMapper(r));
@@ -39,7 +40,39 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
             });
         });
     }
-
+    public async pagedFindAll({
+        limit,
+        skip,
+        isDeleted = false
+    }: {
+        limit?: number;
+        skip?: number;
+        isDeleted?: boolean;
+    }) {
+        const query = JSON.parse(
+            JSON.stringify({
+                isDeleted: { $eq: isDeleted },
+                tenant: this.getCurrentTenant()
+            })
+        );
+        try {
+            const [count, res] = await Promise.all([
+                this.Model.find()
+                    .countDocuments()
+                    .exec(),
+                this.Model.find(query, "-__v")
+                    .limit(limit || 50)
+                    .skip(skip || 0)
+                    .sort("-createdAt")
+                    .exec()
+            ]);
+            const items = res.map(r => this.readMapper(r));
+            return { count, items };
+        } catch (error) {
+            winstonLoggerInstance.error(error);
+            throw new Error(error);
+        }
+    }
     public async findById(id: string) {
         const query = JSON.parse(
             JSON.stringify({

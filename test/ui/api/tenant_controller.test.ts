@@ -99,9 +99,11 @@ describe("Tenant controller", async () => {
             .get(endpoint)
             .set(X_AUTH_TOKEN_KEY, jwtToken)
             .expect(httpStatus.OK);
+        const { totalCount, items } = body;
 
-        expect(body).to.be.an("array");
-        expect(body).to.deep.include(createdTenant);
+        expect(items).to.be.an("array");
+        expect(totalCount).to.be.greaterThan(0);
+        expect(items).to.deep.include(createdTenant);
     });
     it("should update a tenant if signed-in user is admin", async () => {
         const tenantUpdateInput: TenantUpdateInput = {

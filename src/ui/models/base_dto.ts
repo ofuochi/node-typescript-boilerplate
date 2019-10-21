@@ -10,6 +10,6 @@ export abstract class BaseEntityDto {
 }
 export abstract class PagedResultDto<T> {
     totalCount: number;
-    items: [T];
+    items: T[];
 }
 export abstract class BaseUpdateDto extends BaseEntityDto {}
