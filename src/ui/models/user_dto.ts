@@ -1,5 +1,11 @@
 import { Expose } from "class-transformer";
-import { IsEmail, IsNotEmpty, IsString, MaxLength } from "class-validator";
+import {
+    IsEmail,
+    IsNotEmpty,
+    IsString,
+    MaxLength,
+    IsOptional
+} from "class-validator";
 import { MAX_NAME_LENGTH } from "../../domain/model/user";
 import { BaseEntityDto } from "./base_dto";
 
@@ -37,21 +43,50 @@ export interface UserSignUpDto {
 export class UserDto extends BaseEntityDto {
     @MaxLength(MAX_NAME_LENGTH)
     @IsNotEmpty()
+    @IsOptional()
     @IsString()
     @Expose()
     firstName: string;
     @MaxLength(MAX_NAME_LENGTH)
     @IsNotEmpty()
+    @IsOptional()
     @IsString()
     @Expose()
     lastName: string;
     @MaxLength(MAX_NAME_LENGTH)
     @IsEmail()
+    @IsOptional()
     @Expose()
     email: string;
     @MaxLength(MAX_NAME_LENGTH)
     @IsNotEmpty()
+    @IsOptional()
     @IsString()
     @Expose()
     username: string;
+}
+export class UserUpdateInput {
+    @MaxLength(MAX_NAME_LENGTH)
+    @IsNotEmpty()
+    @IsOptional()
+    @IsString()
+    @Expose()
+    firstName?: string;
+    @MaxLength(MAX_NAME_LENGTH)
+    @IsNotEmpty()
+    @IsOptional()
+    @IsString()
+    @Expose()
+    lastName?: string;
+    @MaxLength(MAX_NAME_LENGTH)
+    @IsEmail()
+    @IsOptional()
+    @Expose()
+    email?: string;
+    @MaxLength(MAX_NAME_LENGTH)
+    @IsNotEmpty()
+    @IsOptional()
+    @IsString()
+    @Expose()
+    username?: string;
 }

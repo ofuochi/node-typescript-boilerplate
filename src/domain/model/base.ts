@@ -1,12 +1,11 @@
 import { instanceMethod, pre, prop, Ref, Typegoose } from "@hasezoey/typegoose";
 import { Expose } from "class-transformer";
 import { Query } from "mongoose";
-
+import { iocContainer } from "../../infrastructure/config/ioc";
+import { DecodedJwt } from "../../ui/services/auth_service";
+import { TYPES } from "../constants/types";
 import { Writable } from "../utils/writable";
 import { User } from "./user";
-import { iocContainer } from "../../infrastructure/config/ioc";
-import { TYPES } from "../constants/types";
-import { DecodedJwt } from "../../ui/services/auth_service";
 
 // eslint-disable-next-line
 @pre<BaseEntity>("findOneAndUpdate", function(this: Query<BaseEntity>, next) {
@@ -27,13 +26,17 @@ import { DecodedJwt } from "../../ui/services/auth_service";
     }
 })
 // eslint-disable-next-line
-@pre<BaseEntity>("save", function(next) {
+@pre<any>("save", function(next) {
     try {
         if (iocContainer.isBound(TYPES.DecodedJwt)) {
             const currentUser = iocContainer.get<DecodedJwt>(TYPES.DecodedJwt);
-            this.setCreatedBy(currentUser.userId);
+            (this as Writable<
+                BaseEntity
+            >).createdBy = currentUser.userId as any;
+            if (this.type === "User" && !this.tenant)
+                this.setTenant(currentUser.tenantId);
         } else if (this.type === "User") {
-            this.setCreatedBy(this);
+            (this as Writable<BaseEntity>).createdBy = this;
         }
         next();
     } catch (error) {
@@ -90,10 +93,5 @@ export abstract class BaseEntity extends Typegoose {
     @instanceMethod
     activate(): void {
         (this as Writable<BaseEntity>).isActive = true;
-    }
-
-    @instanceMethod
-    private setCreatedBy(user: any) {
-        (this as Writable<BaseEntity>).createdBy = user;
     }
 }

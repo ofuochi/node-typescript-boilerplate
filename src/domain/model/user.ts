@@ -103,7 +103,6 @@ export class User extends BaseEntity implements IMustHaveTenant {
         tenantId?: string;
     }) => {
         const id = tenantId || iocContainer.get<any>(TYPES.TenantId);
-
         if (!id) throw new Error("Tenant Id is required");
 
         return new User({
@@ -162,15 +161,18 @@ export class User extends BaseEntity implements IMustHaveTenant {
     setPassword(password: string) {
         (this as Writable<User>).password = password;
     }
-
+    @instanceMethod
+    setTenant(tenant: any) {
+        (this as Writable<this>).tenant = tenant;
+    }
     @instanceMethod
     update(user: Partial<this>): void {
-        if (this.firstName) this.setFirstName(user.firstName as string);
-        if (this.lastName) this.setLastName(user.lastName as string);
-        if (this.password) this.setPassword(user.password as string);
-        if (this.username) this.setUsername(user.username as string);
-        if (this.email) this.setEmail(user.email as string);
-        if (this.role) this.setRole(user.role as UserRole);
+        if (user.firstName) this.setFirstName(user.firstName as string);
+        if (user.lastName) this.setLastName(user.lastName as string);
+        if (user.password) this.setPassword(user.password as string);
+        if (user.username) this.setUsername(user.username as string);
+        if (user.email) this.setEmail(user.email as string);
+        if (user.role) this.setRole(user.role as UserRole);
     }
 
     @instanceMethod
