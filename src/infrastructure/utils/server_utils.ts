@@ -15,7 +15,6 @@ export function startAppServer(app: App, serverPort?: number): Server {
     return app.listen(port, (error: any) => {
         if (error) exitProcess(error);
         iocContainer.bind<App>(TYPES.App).toConstantValue(app);
-        log.info(`✔️  Server listening on port: ${port}\n`);
     });
 }
 export function isIdValid(id: string): boolean {

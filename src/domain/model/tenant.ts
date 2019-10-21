@@ -52,7 +52,11 @@ export class Tenant extends BaseEntity {
 
     @instanceMethod
     update(tenant: Partial<this>): void {
-        if (this.name) this.setName(tenant.name as string);
-        if (this.description) this.setDescription(tenant.description as string);
+        if (tenant.name)
+            this.setName(tenant.name
+                .replace(/\s/g, "")
+                .toUpperCase() as string);
+        if (tenant.description)
+            this.setDescription(tenant.description as string);
     }
 }
