@@ -72,28 +72,6 @@ export class UserService implements IUserService {
                 `User with ID "${user.id}" does not exist`
             );
 
-        // check that userToUpdate does not overwrite an existing email or username
-        let existingUser: User;
-        if (user.email) {
-            existingUser = await this._userRepository.findOneByQuery({
-                email: user.email
-            });
-            if (existingUser)
-                throw new HttpError(
-                    httpStatus.CONFLICT,
-                    `User with email "${user.email}" already exist`
-                );
-        }
-        if (user.username) {
-            existingUser = await this._userRepository.findOneByQuery({
-                username: user.username
-            });
-            if (existingUser)
-                throw new HttpError(
-                    httpStatus.CONFLICT,
-                    `User with username "${user.username}" already exist`
-                );
-        }
         userToUpdate.update(user);
         await this._userRepository.insertOrUpdate(userToUpdate);
     }
