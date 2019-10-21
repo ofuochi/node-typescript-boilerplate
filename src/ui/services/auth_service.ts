@@ -106,12 +106,14 @@ export class AuthService implements IAuthService {
             );
         }
 
+        // clear the signin attempts of the user and lockout end date
         user.clearLockOut();
         await this._userRepository.insertOrUpdate(user);
     }
 
     private async getUserRecord(emailOrUsername: string): Promise<User> {
         const tenantId = iocContainer.get<any>(TYPES.TenantId);
+        // increase the user's signin attempt for every of this call if the user is not yet locked
         return this._userRepository.findOneByQueryAndUpdate(
             {
                 $and: [
