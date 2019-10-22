@@ -72,7 +72,7 @@ describe("User controller", () => {
 
         adminJwt = body.token;
     });
-    describe.only("Admin User CRUD Operations", () => {
+    describe("Admin User CRUD Operations", () => {
         let createdUser: UserDto;
         let userRecord: User;
         it("should create a new user if signed-in user is admin", async () => {
