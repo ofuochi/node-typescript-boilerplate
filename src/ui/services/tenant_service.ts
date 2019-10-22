@@ -34,13 +34,19 @@ export class TenantService implements ITenantService {
         tenantToUpdate.update(tenant);
         await this._tenantRepository.insertOrUpdate(tenantToUpdate);
     }
-    async pagedGetAll(
-        skipCount?: number,
-        maxResultCount?: number
-    ): Promise<{ count: number; items: Tenant[] }> {
+    async pagedGetAll({
+        searchStr,
+        skip,
+        limit
+    }: {
+        searchStr?: string;
+        skip?: number;
+        limit?: number;
+    }): Promise<{ totalCount: number; items: Tenant[] }> {
         return this._tenantRepository.pagedFindAll({
-            limit: maxResultCount,
-            skip: skipCount
+            searchStr,
+            skip,
+            limit
         });
     }
     async getAll(): Promise<TenantDto[]> {

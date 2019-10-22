@@ -1,6 +1,11 @@
 export interface IBaseService<T> {
-    pagedGetAll(
-        skipCount?: number,
-        maxResultCount?: number
-    ): Promise<{ count: number; items: T[] }>;
+    pagedGetAll({
+        searchStr,
+        skip,
+        limit
+    }: {
+        searchStr?: string;
+        skip?: number;
+        limit?: number;
+    }): Promise<{ totalCount: number; items: T[] }>;
 }

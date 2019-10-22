@@ -66,19 +66,21 @@ export class UserController extends BaseController {
     @Get()
     @Security("X-Auth-Token", ["admin"])
     public async getUsers(
-        @Query() skipCount?: number,
-        @Query() maxResultCount?: number
+        @Query() searchStr?: string,
+        @Query() skip?: number,
+        @Query() limit?: number
     ): Promise<PagedResultDto<UserDto>> {
-        const { count, items } = await this._userService.pagedGetAll(
-            skipCount,
-            maxResultCount
-        );
+        const { totalCount, items } = await this._userService.pagedGetAll({
+            searchStr,
+            skip,
+            limit
+        });
         const users = plainToClass(UserDto, items, {
             enableImplicitConversion: true,
             excludeExtraneousValues: true
         });
         return {
-            totalCount: count,
+            totalCount,
             items: users
         };
     }

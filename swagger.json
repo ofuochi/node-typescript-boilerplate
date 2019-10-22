@@ -370,7 +370,15 @@
 				"parameters": [
 					{
 						"in": "query",
-						"name": "skipCount",
+						"name": "searchStr",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "skip",
 						"required": false,
 						"schema": {
 							"format": "double",
@@ -379,7 +387,7 @@
 					},
 					{
 						"in": "query",
-						"name": "maxResultCount",
+						"name": "limit",
 						"required": false,
 						"schema": {
 							"format": "double",
@@ -560,7 +568,15 @@
 				"parameters": [
 					{
 						"in": "query",
-						"name": "skipCount",
+						"name": "searchStr",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "skip",
 						"required": false,
 						"schema": {
 							"format": "double",
@@ -569,7 +585,7 @@
 					},
 					{
 						"in": "query",
-						"name": "maxResultCount",
+						"name": "limit",
 						"required": false,
 						"schema": {
 							"format": "double",

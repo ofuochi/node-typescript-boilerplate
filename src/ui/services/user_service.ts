@@ -49,13 +49,19 @@ export class UserService implements IUserService {
     async getAll(): Promise<User[]> {
         return this._userRepository.findAll();
     }
-    async pagedGetAll(
-        skipCount?: number,
-        maxResultCount?: number
-    ): Promise<{ count: number; items: User[] }> {
+    async pagedGetAll({
+        searchStr,
+        skip,
+        limit
+    }: {
+        searchStr?: string;
+        skip?: number;
+        limit?: number;
+    }): Promise<{ totalCount: number; items: User[] }> {
         return this._userRepository.pagedFindAll({
-            limit: maxResultCount,
-            skip: skipCount
+            searchStr,
+            limit,
+            skip
         });
     }
     async update(user: Partial<User>): Promise<void> {

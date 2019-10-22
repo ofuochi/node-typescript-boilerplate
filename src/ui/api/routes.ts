@@ -206,8 +206,9 @@ export function RegisterRoutes(app: express.Express) {
         authenticateMiddleware([{ "X-Auth-Token": ["admin"] }]),
         function(request: any, response: any, next: any) {
             const args = {
-                skipCount: { "in": "query", "name": "skipCount", "dataType": "double" },
-                maxResultCount: { "in": "query", "name": "maxResultCount", "dataType": "double" },
+                searchStr: { "in": "query", "name": "searchStr", "dataType": "string" },
+                skip: { "in": "query", "name": "skip", "dataType": "double" },
+                limit: { "in": "query", "name": "limit", "dataType": "double" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -391,8 +392,9 @@ export function RegisterRoutes(app: express.Express) {
         authenticateMiddleware([{ "X-Auth-Token": ["admin"] }]),
         function(request: any, response: any, next: any) {
             const args = {
-                skipCount: { "in": "query", "name": "skipCount", "dataType": "double" },
-                maxResultCount: { "in": "query", "name": "maxResultCount", "dataType": "double" },
+                searchStr: { "in": "query", "name": "searchStr", "dataType": "string" },
+                skip: { "in": "query", "name": "skip", "dataType": "double" },
+                limit: { "in": "query", "name": "limit", "dataType": "double" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
