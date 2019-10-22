@@ -16,17 +16,15 @@ export interface IBaseRepository<T> {
     findManyByQuery(query?: Query<{ [key: string]: any }>): Promise<T[]>;
     findManyByQuery(query?: Query<T>): Promise<T[]>;
     pagedFindAll({
-        limit,
-        skip,
         searchStr,
-        isDeleted
+        skip,
+        limit
     }: {
-        limit?: number;
-        skip?: number;
         searchStr?: string;
-        isDeleted?: boolean;
+        skip?: number;
+        limit?: number;
     }): Promise<{
-        count: number;
+        totalCount: number;
         items: T[];
     }>;
     deleteById(id: string): Promise<boolean>;

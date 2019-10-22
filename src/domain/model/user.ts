@@ -1,11 +1,11 @@
 import { index, instanceMethod, prop, Ref } from "@hasezoey/typegoose";
+import { config } from "../../infrastructure/config";
 import { iocContainer } from "../../infrastructure/config/ioc";
 import { TYPES } from "../constants/types";
 import { Writable } from "../utils/writable";
 import { BaseEntity } from "./base";
 import { IMustHaveTenant } from "./interfaces/entity";
 import { Tenant } from "./tenant";
-import { config } from "../../infrastructure/config";
 
 export const MAX_NAME_LENGTH = 225;
 export const PASSWORD_SALT_ROUND = 12;
@@ -104,7 +104,6 @@ export class User extends BaseEntity implements IMustHaveTenant {
     }) => {
         const id = tenantId || iocContainer.get<any>(TYPES.TenantId);
         if (!id) throw new Error("Tenant Id is required");
-
         return new User({
             firstName,
             lastName,
@@ -115,9 +114,17 @@ export class User extends BaseEntity implements IMustHaveTenant {
         });
     };
     public static get model() {
-        return new User().getModelForClass(User, {
+        const model = new User().getModelForClass(User, {
             schemaOptions: { collection: "Users", timestamps: true }
         });
+
+        model.collection.createIndex({
+            firstName: "text",
+            lastName: "text",
+            email: "text",
+            username: "text"
+        });
+        return model;
     }
 
     static getSignInAttemptUpdate(): { [key: string]: object } {

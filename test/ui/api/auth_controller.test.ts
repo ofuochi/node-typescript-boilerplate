@@ -1,5 +1,6 @@
 import { expect } from "chai";
 import httpStatus from "http-status-codes";
+import { Test } from "supertest";
 import {
     ITenantRepository,
     IUserRepository
@@ -12,8 +13,8 @@ import { UserRepository } from "../../../src/infrastructure/db/repositories/user
 import { X_TENANT_ID } from "../../../src/ui/constants/header_constants";
 import {
     UserSignInInput,
-    UserSignUpDto,
-    UserSignUpInput
+    UserSignUpInput,
+    UserSignUpDto
 } from "../../../src/ui/models/user_dto";
 import { cleanupDb, req } from "../../setup";
 
@@ -70,10 +71,12 @@ describe("AuthController", () => {
                 UserRepository
             );
             const { userDto, token } = res.body as UserSignUpDto;
-            expect(userDto).to.contain.keys("id");
-            expect(token).to.be.ok;
+            if (!userDto) throw new Error("User DTO cannot be null");
             const userRecord = await userRepository.findById(userDto.id);
 
+            expect(userDto).to.be.ok;
+            expect(userDto).to.contain.keys("id");
+            expect(token).to.be.ok;
             expect(userDto.id).to.equal(userRecord.createdBy.toString());
         });
 
@@ -111,7 +114,7 @@ describe("AuthController", () => {
             input.username = `${input.username}2`;
             await req
                 .post(`${endpoint}/signUp`)
-                .set(X_TENANT_ID, "invalid_tenatId")
+                .set(X_TENANT_ID, "invalid_tenantId")
                 .send(input)
                 .expect(httpStatus.BAD_REQUEST);
         });
@@ -207,7 +210,7 @@ describe("AuthController", () => {
                 );
             });
             it("should lockout user immediately after making the maximum allowed consecutive sign-in attempts", async () => {
-                const signIns = [];
+                const signIns: Test[] = [];
                 const array = Array.from(Array(maxSignInAttempts).keys());
 
                 array.forEach(() => {
@@ -228,7 +231,7 @@ describe("AuthController", () => {
             });
 
             it("should NOT increase sign-in attempts when user is on lockout", async () => {
-                const signIns = [];
+                const signIns: Test[] = [];
                 const array = Array.from(Array(maxSignInAttempts + 3).keys());
 
                 array.forEach(() => {

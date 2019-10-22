@@ -41,33 +41,41 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
         });
     }
     public async pagedFindAll({
-        limit,
+        searchStr,
         skip,
-        isDeleted = false
+        limit
     }: {
-        limit?: number;
+        searchStr?: string;
         skip?: number;
-        isDeleted?: boolean;
+        limit?: number;
     }) {
         const query = JSON.parse(
             JSON.stringify({
-                isDeleted: { $eq: isDeleted },
+                $text: { $search: searchStr },
+                isDeleted: { $ne: true },
                 tenant: this.getCurrentTenant()
             })
         );
+        if (!Object.keys(query.$text).length) delete query.$text;
+
+        skip = !skip || skip < 0 ? 0 : Math.floor(skip);
+        limit = !limit || limit < 0 ? 0 : Math.floor(limit);
         try {
-            const [count, res] = await Promise.all([
+            const [totalCount, res] = await Promise.all([
                 this.Model.find()
                     .countDocuments()
                     .exec(),
                 this.Model.find(query, "-__v")
-                    .limit(limit || 50)
-                    .skip(skip || 0)
                     .sort("-createdAt")
+                    .skip(skip)
+                    .limit(limit || 50)
+                    .$where((res: any) => {
+                        console.log(res);
+                    })
                     .exec()
             ]);
             const items = res.map(r => this.readMapper(r));
-            return { count, items };
+            return { totalCount, items };
         } catch (error) {
             winstonLoggerInstance.error(error);
             throw new Error(error);

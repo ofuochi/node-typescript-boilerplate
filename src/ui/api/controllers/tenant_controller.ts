@@ -42,13 +42,18 @@ export class TenantController extends BaseController {
     @Get()
     @Security("X-Auth-Token", ["admin"])
     public async getTenants(
-        @Query() skipCount?: number,
-        @Query() maxResultCount?: number
+        @Query() searchStr?: string,
+        @Query() skip?: number,
+        @Query() limit?: number
     ): Promise<PagedResultDto<TenantDto>> {
-        const { count, items } = await this._tenantService.pagedGetAll(
-            skipCount,
-            maxResultCount
-        );
+        const {
+            totalCount: count,
+            items
+        } = await this._tenantService.pagedGetAll({
+            searchStr,
+            skip,
+            limit
+        });
         const users = plainToClass(TenantDto, items, {
             enableImplicitConversion: true,
             excludeExtraneousValues: true
