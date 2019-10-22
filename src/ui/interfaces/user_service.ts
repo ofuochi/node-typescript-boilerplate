@@ -1,12 +1,19 @@
-import { UserDto, UserSignUpInput } from "../models/user_dto";
+import { UserSignUpInput } from "../models/user_dto";
 import { User } from "../../domain/model/user";
-import { IBaseService } from "./base_service";
 
-export interface IUserService extends IBaseService<User> {
+export interface IUserService {
     create(user: UserSignUpInput): Promise<User>;
-    get(id: string): Promise<User>;
+    get(query: { id?: string; emailOrUsername?: string }): Promise<User>;
     getAll(): Promise<User[]>;
-
-    update(user: Partial<UserDto>): Promise<void>;
+    pagedGetAll({
+        searchStr,
+        skip,
+        limit
+    }: {
+        searchStr?: string;
+        skip?: number;
+        limit?: number;
+    }): Promise<{ totalCount: number; items: User[] }>;
+    update(user: Partial<User>): Promise<void>;
     delete(id: string): Promise<boolean>;
 }

@@ -55,7 +55,7 @@ export class UserController extends BaseController {
     @Security("X-Auth-Token", ["admin"])
     public async getUser(id: string): Promise<UserDto> {
         this.checkUUID(id);
-        const user = await this._userService.get(id);
+        const user = await this._userService.get({ id });
         if (user)
             return plainToClass(UserDto, user, {
                 enableImplicitConversion: true,

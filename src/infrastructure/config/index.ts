@@ -27,7 +27,7 @@ const envConfigSchema = Joi.object({
         "mongodb://localhost:27017/node-typescript-boilerplate"
     ),
     APP_MAX_SIGNIN_ATTEMPTS: Joi.number().default(5),
-    APP_INITIAL_LOCKOUT_TIME: Joi.number().default(5)
+    APP_LOCKOUT_TIME: Joi.number().default(5)
 })
     .unknown()
     .required();
@@ -41,10 +41,13 @@ export const config = {
     env: envConfig.NODE_ENV as string,
     mongoDbConnection: envConfig.MONGODB_URI as string,
     jwtSecret: envConfig.JWT_SECRET as string,
-    
+
     userLockout: {
-      maxSignInAttempts: parseInt(envConfig.APP_MAX_SIGNIN_ATTEMPTS as string, 10),
-      initialLockoutTime: parseInt(envConfig.APP_INITIAL_LOCKOUT_TIME as string, 10)
+        maxSignInAttempts: parseInt(
+            envConfig.APP_MAX_SIGNIN_ATTEMPTS as string,
+            10
+        ),
+        lockoutTime: parseInt(envConfig.APP_LOCKOUT_TIME as string, 10)
     },
 
     /**

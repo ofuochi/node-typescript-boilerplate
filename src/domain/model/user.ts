@@ -128,15 +128,14 @@ export class User extends BaseEntity implements IMustHaveTenant {
     }
 
     static getSignInAttemptUpdate(): { [key: string]: object } {
-        const incrementCommand = { $inc: { signInAttempts: 1 } };
         const endDate = new Date();
         endDate.setMinutes(
-            endDate.getMinutes() + config.userLockout.initialLockoutTime
+            endDate.getMinutes() + config.userLockout.lockoutTime
         );
-        const lockoutCommand = {
-            $set: { isLockedOut: true, lockOutEndDate: endDate }
+        return {
+            $inc: { signInAttempts: 1 },
+            $set: { lockOutEndDate: endDate }
         };
-        return { ...incrementCommand, ...lockoutCommand };
     }
 
     @instanceMethod
@@ -168,6 +167,7 @@ export class User extends BaseEntity implements IMustHaveTenant {
     setPassword(password: string) {
         (this as Writable<User>).password = password;
     }
+
     @instanceMethod
     setTenant(tenant: any) {
         (this as Writable<this>).tenant = tenant;

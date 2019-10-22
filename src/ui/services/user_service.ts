@@ -41,11 +41,39 @@ export class UserService implements IUserService {
 
         newUser = User.createInstance({ ...user });
 
-        return this._userRepository.insertOrUpdate(newUser);
+        await this._userRepository.insertOrUpdate(newUser);
+
+        return newUser;
     }
-    async get(id: string): Promise<User> {
-        return this._userRepository.findById(id);
+
+    async get(query: { id?: string; emailOrUsername?: string }): Promise<User> {
+        if (!query.id && !query.emailOrUsername)
+            return Promise.reject(
+                Error("One or more arguments must be passed")
+            );
+
+        let user: User;
+        if (query.id && query.emailOrUsername) {
+            user = await this._userRepository.findOneByQuery({
+                _id: query.id,
+                $or: [
+                    { email: query.emailOrUsername },
+                    { username: query.emailOrUsername }
+                ]
+            });
+        } else if (query.id) {
+            user = await this._userRepository.findById(query.id);
+        } else {
+            user = await this._userRepository.findOneByQuery({
+                $or: [
+                    { email: query.emailOrUsername },
+                    { username: query.emailOrUsername }
+                ]
+            });
+        }
+        return user;
     }
+
     async getAll(): Promise<User[]> {
         return this._userRepository.findAll();
     }
@@ -64,6 +92,7 @@ export class UserService implements IUserService {
             skip
         });
     }
+
     async update(user: Partial<User>): Promise<void> {
         const userToUpdate = await this._userRepository.findById(user.id);
         if (!userToUpdate)
@@ -75,6 +104,7 @@ export class UserService implements IUserService {
         userToUpdate.update(user);
         await this._userRepository.insertOrUpdate(userToUpdate);
     }
+
     async delete(id: string): Promise<boolean> {
         return this._userRepository.deleteById(id);
     }
