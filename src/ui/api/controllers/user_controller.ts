@@ -21,7 +21,6 @@ import {
 } from "../../models/user_dto";
 import { UserService } from "../../services/user_service";
 import { BaseController } from "./base_controller";
-import { User } from "../../../domain/model/user";
 import { PagedResultDto } from "../../models/base_dto";
 
 @Tags("Users")
@@ -57,23 +56,31 @@ export class UserController extends BaseController {
     public async getUser(id: string): Promise<UserDto> {
         this.checkUUID(id);
         const user = await this._userService.get({ id });
-        if (!user) {
-            throw new HttpError(httpStatus.NOT_FOUND);
-        }
-
-        return plainToClass(UserDto, user, {
-            enableImplicitConversion: true,
-            excludeExtraneousValues: true
-        });
+        if (user)
+            return plainToClass(UserDto, user, {
+                enableImplicitConversion: true,
+                excludeExtraneousValues: true
+            });
+        throw new HttpError(httpStatus.NOT_FOUND);
     }
     @Get()
     @Security("X-Auth-Token", ["admin"])
-    public async getAll(): Promise<UserDto[]> {
-        const users = await this._userService.getAll();
-        return plainToClass<UserDto, User>(UserDto, users, {
+    public async getUsers(
+        @Query() skipCount?: number,
+        @Query() maxResultCount?: number
+    ): Promise<PagedResultDto<UserDto>> {
+        const { count, items } = await this._userService.pagedGetAll(
+            skipCount,
+            maxResultCount
+        );
+        const users = plainToClass(UserDto, items, {
             enableImplicitConversion: true,
             excludeExtraneousValues: true
         });
+        return {
+            totalCount: count,
+            items: users
+        };
     }
     @Delete("{id}")
     @Security("X-Auth-Token", ["admin"])

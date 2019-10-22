@@ -77,7 +77,7 @@ export class UserService implements IUserService {
     async getAll(): Promise<User[]> {
         return this._userRepository.findAll();
     }
-    
+
     async pagedGetAll(
         skipCount?: number,
         maxResultCount?: number
@@ -87,7 +87,7 @@ export class UserService implements IUserService {
             skip: skipCount
         });
     }
-    
+
     async update(user: Partial<User>): Promise<void> {
         const userToUpdate = await this._userRepository.findById(user.id);
         if (!userToUpdate)
