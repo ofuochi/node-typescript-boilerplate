@@ -56,7 +56,7 @@ export abstract class BaseEntity extends Typegoose {
     abstract update(entity: Partial<BaseEntity>): void;
 
     /**
-     * Primary key
+     * Gets the primary key
      *
      * @type {*}
      * @memberof BaseEntity
@@ -65,7 +65,7 @@ export abstract class BaseEntity extends Typegoose {
     id?: any;
 
     /**
-     * Specifies the date and time the entity was created
+     * Gets the date and time the entity was created
      *
      * @type {Date}
      * @memberof BaseEntity
@@ -74,7 +74,7 @@ export abstract class BaseEntity extends Typegoose {
     @prop({ required: true, default: new Date() })
     readonly createdAt: Date = new Date();
     /**
-     * This references the user who added this entity
+     * Gets a reference to the user who added this entity
      *
      * @type {(Ref<User | null>)}
      * @memberof BaseEntity
@@ -83,7 +83,7 @@ export abstract class BaseEntity extends Typegoose {
     @prop({ default: null, ref: BaseEntity })
     readonly createdBy: Ref<User | null> = null;
     /**
-     * Secifies the date and time the entity was last updated
+     * Gets the date and time the entity was last updated
      *
      * @type {Date}
      * @memberof BaseEntity
@@ -92,7 +92,7 @@ export abstract class BaseEntity extends Typegoose {
     @prop({ default: null })
     readonly updatedAt?: Date;
     /**
-     * This references the user who performed the last update on this entity
+     * Gets a reference to the user who performed the last update on this entity
      *
      * @type {(Ref<User | null>)}
      * @memberof BaseEntity
@@ -101,7 +101,7 @@ export abstract class BaseEntity extends Typegoose {
     @prop({ default: null, ref: BaseEntity })
     readonly updatedBy: Ref<User | null> = null;
     /**
-     * Specifies if the entity can be used in the application
+     * Gets the entity's active status
      *
      * @type {boolean}
      * @memberof BaseEntity
@@ -110,7 +110,7 @@ export abstract class BaseEntity extends Typegoose {
     @prop({ required: true, default: true })
     readonly isActive: boolean = true;
     /**
-     * Specifies if the entity has been soft-deleted
+     * Specifies whether the entity has been soft-deleted
      *
      * @type {boolean}
      * @memberof BaseEntity
@@ -119,7 +119,7 @@ export abstract class BaseEntity extends Typegoose {
     @prop({ required: true, default: false })
     readonly isDeleted: boolean = false;
     /**
-     * This references the user who deleted this entity if the entity has been soft-deleted
+     * Gets a reference to the user who deleted this entity if the entity has been soft-deleted
      *
      * @type {(Ref<User | null>)}
      * @memberof BaseEntity
@@ -128,7 +128,7 @@ export abstract class BaseEntity extends Typegoose {
     @prop({ default: null, ref: BaseEntity })
     readonly deletedBy: Ref<User | null> = null;
     /**
-     * The time the entity was deleted if it has been deleted
+     * Gets time the entity was deleted if it has been deleted
      *
      * @type {Date}
      * @memberof BaseEntity
@@ -138,7 +138,7 @@ export abstract class BaseEntity extends Typegoose {
     readonly deletionTime?: Date;
 
     /**
-     * sets {isDeleted} to true
+     * Sets {isDeleted} to true
      *
      * @memberof BaseEntity
      */
@@ -148,7 +148,7 @@ export abstract class BaseEntity extends Typegoose {
     }
 
     /**
-     * sets {isDeleted} to false
+     * Sets {isDeleted} to false
      *
      * @memberof BaseEntity
      */
@@ -158,7 +158,7 @@ export abstract class BaseEntity extends Typegoose {
     }
 
     /**
-     * sets {isActive} to true
+     * Sets {isActive} to true
      *
      * @memberof BaseEntity
      */
@@ -168,7 +168,7 @@ export abstract class BaseEntity extends Typegoose {
     }
 
     /**
-     * sets isActive to false
+     * Sets isActive to false
      *
      * @memberof BaseEntity
      */

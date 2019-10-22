@@ -4,9 +4,22 @@ import { Expose } from "class-transformer";
 import { BaseEntity } from "./base";
 import { Writable } from "../utils/writable";
 
+/**
+ *
+ *
+ * @export
+ * @class Tenant
+ * @extends {BaseEntity}
+ */
 export class Tenant extends BaseEntity {
     @prop({ required: true, default: "Tenant" })
     readonly type: string = "Tenant";
+    /**
+     * Gets the name of the tenant
+     *
+     * @type {string}
+     * @memberof Tenant
+     */
     @prop({
         required: true,
         uppercase: true,
@@ -15,6 +28,12 @@ export class Tenant extends BaseEntity {
     })
     @Expose()
     readonly name!: string;
+    /**
+     * Gets the description of the tenant
+     *
+     * @type {string}
+     * @memberof Tenant
+     */
     @prop({ required: true })
     @Expose()
     readonly description!: string;
@@ -28,6 +47,12 @@ export class Tenant extends BaseEntity {
         this.description = description;
     }
 
+    /**
+     * Creates and returns a new instance of tenant
+     *
+     * @static
+     * @memberof Tenant
+     */
     static createInstance = (name: string, description: string) =>
         new Tenant({
             name: name.replace(/\s/g, "").toUpperCase(),
@@ -40,16 +65,34 @@ export class Tenant extends BaseEntity {
         });
     }
 
+    /**
+     * Sets the name of the tenant
+     *
+     * @param {string} name
+     * @memberof Tenant
+     */
     @instanceMethod
     setName(name: string) {
         (this as Writable<Tenant>).name = name;
     }
 
+    /**
+     * Sets the description of the tenant
+     *
+     * @param {string} description
+     * @memberof Tenant
+     */
     @instanceMethod
     setDescription(description: string) {
         (this as Writable<Tenant>).description = description;
     }
 
+    /**
+     * Sets an update on the tenant's name and/or description
+     *
+     * @param {Partial<this>} tenant
+     * @memberof Tenant
+     */
     @instanceMethod
     update(tenant: Partial<this>): void {
         if (tenant.name)
