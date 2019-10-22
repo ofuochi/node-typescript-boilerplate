@@ -197,6 +197,13 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
         query: Query<any>,
         update: { [key: string]: object }
     ): Promise<TEntity> {
+        query = JSON.parse(
+            JSON.stringify({
+                ...query,
+                isDeleted: { $ne: true },
+                tenant: this.getCurrentTenant()
+            })
+        );
         return new Promise<TEntity>((resolve, reject) => {
             this.Model.findOneAndUpdate(
                 query,
