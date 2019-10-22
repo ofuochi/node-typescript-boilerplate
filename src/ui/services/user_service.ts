@@ -1,5 +1,4 @@
 import bcrypt from "bcrypt";
-import { plainToClass } from "class-transformer";
 import httpStatus from "http-status-codes";
 import { IUserRepository } from "../../domain/interfaces/repositories";
 import { PASSWORD_SALT_ROUND, User } from "../../domain/model/user";
@@ -8,13 +7,13 @@ import { inject, provideSingleton } from "../../infrastructure/config/ioc";
 import { UserRepository } from "../../infrastructure/db/repositories/user_repository";
 import { HttpError } from "../error";
 import { IUserService } from "../interfaces/user_service";
-import { UserDto, UserSignUpInput } from "../models/user_dto";
+import { UserSignUpInput } from "../models/user_dto";
 
 @provideSingleton(UserService)
 export class UserService implements IUserService {
     @inject(UserRepository) private readonly _userRepository: IUserRepository;
 
-    async create(user: UserSignUpInput): Promise<UserDto> {
+    async create(user: UserSignUpInput): Promise<User> {
         let newUser = await this._userRepository.findOneByQuery({
             email: user.email
         });
@@ -44,24 +43,39 @@ export class UserService implements IUserService {
 
         await this._userRepository.insertOrUpdate(newUser);
 
-        return plainToClass(UserDto, newUser, {
-            enableImplicitConversion: true,
-            excludeExtraneousValues: true
-        });
+        return newUser;
     }
-    async get(id: string): Promise<UserDto> {
-        const user = await this._userRepository.findById(id);
-        return plainToClass<UserDto, User>(UserDto, user, {
-            enableImplicitConversion: true,
-            excludeExtraneousValues: true
-        });
+
+    async get(query: { id?: string; emailOrUsername?: string }): Promise<User> {
+        if (!query.id && !query.emailOrUsername)
+            return Promise.reject(
+                Error("One or more arguments must be passed")
+            );
+
+        let user: User;
+        if (query.id && query.emailOrUsername) {
+            user = await this._userRepository.findOneByQuery({
+                _id: query.id,
+                $or: [
+                    { email: query.emailOrUsername },
+                    { username: query.emailOrUsername }
+                ]
+            });
+        } else if (query.id) {
+            user = await this._userRepository.findById(query.id);
+        } else {
+            user = await this._userRepository.findOneByQuery({
+                $or: [
+                    { email: query.emailOrUsername },
+                    { username: query.emailOrUsername }
+                ]
+            });
+        }
+        return user;
     }
-    async getAll(): Promise<UserDto[]> {
-        const users = await this._userRepository.findAll();
-        return plainToClass<UserDto, User>(UserDto, users, {
-            enableImplicitConversion: true,
-            excludeExtraneousValues: true
-        });
+
+    async getAll(): Promise<User[]> {
+        return this._userRepository.findAll();
     }
 
     async update(user: Partial<User>): Promise<void> {
@@ -72,31 +86,10 @@ export class UserService implements IUserService {
                 `User with ID "${user.id}" does not exist`
             );
 
-        // check that userToUpdate does not overwrite an existing email or username
-        let existingUser: User;
-        if (user.email) {
-            existingUser = await this._userRepository.findOneByQuery({
-                email: user.email
-            });
-            if (existingUser)
-                throw new HttpError(
-                    httpStatus.CONFLICT,
-                    `User with email "${user.email}" already exist`
-                );
-        }
-        if (user.username) {
-            existingUser = await this._userRepository.findOneByQuery({
-                username: user.username
-            });
-            if (existingUser)
-                throw new HttpError(
-                    httpStatus.CONFLICT,
-                    `User with username "${user.username}" already exist`
-                );
-        }
         userToUpdate.update(user);
         await this._userRepository.insertOrUpdate(userToUpdate);
     }
+
     async delete(id: string): Promise<boolean> {
         return this._userRepository.deleteById(id);
     }

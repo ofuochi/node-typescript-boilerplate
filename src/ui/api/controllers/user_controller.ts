@@ -11,6 +11,7 @@ import {
 } from "../../models/user_dto";
 import { UserService } from "../../services/user_service";
 import { BaseController } from "./base_controller";
+import { User } from "../../../domain/model/user";
 
 @Tags("Users")
 @Route("users")
@@ -22,7 +23,11 @@ export class UserController extends BaseController {
     @Security("X-Auth-Token", ["admin"])
     public async create(@Body() input: UserSignUpInput): Promise<UserDto> {
         await this.checkBadRequest(plainToClass(UserSignUpInput, input));
-        return this._userService.create(input);
+        const user = await this._userService.create(input);
+        return plainToClass<UserDto, User>(UserDto, user, {
+            enableImplicitConversion: true,
+            excludeExtraneousValues: true
+        });
     }
     @Put("{id}")
     @Security("X-Auth-Token", ["admin"])
@@ -40,14 +45,24 @@ export class UserController extends BaseController {
     @Security("X-Auth-Token", ["admin"])
     public async get(id: string): Promise<UserDto> {
         this.checkUUID(id);
-        const userDto = await this._userService.get(id);
-        if (userDto) return userDto;
-        throw new HttpError(httpStatus.NOT_FOUND);
+        const user = await this._userService.get({ id });
+        if (!user) {
+            throw new HttpError(httpStatus.NOT_FOUND);
+        }
+
+        return plainToClass<UserDto, User>(UserDto, user, {
+            enableImplicitConversion: true,
+            excludeExtraneousValues: true
+        });
     }
     @Get()
     @Security("X-Auth-Token", ["admin"])
     public async getAll(): Promise<UserDto[]> {
-        return this._userService.getAll();
+        const users = await this._userService.getAll();
+        return plainToClass<UserDto, User>(UserDto, users, {
+            enableImplicitConversion: true,
+            excludeExtraneousValues: true
+        });
     }
     @Delete("{id}")
     @Security("X-Auth-Token", ["admin"])

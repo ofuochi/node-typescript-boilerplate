@@ -4,20 +4,15 @@ import { EventDispatcher } from "event-dispatch";
 import httpStatus from "http-status-codes";
 import jwt from "jsonwebtoken";
 import { eventDispatcher } from "../../domain/constants/decorators";
-import { IUserRepository } from "../../domain/interfaces/repositories";
+import { IUserRepository, Query } from "../../domain/interfaces/repositories";
 import { PASSWORD_SALT_ROUND, User, UserRole } from "../../domain/model/user";
 import { config } from "../../infrastructure/config";
-import {
-    inject,
-    provideSingleton,
-    iocContainer
-} from "../../infrastructure/config/ioc";
+import { inject, provideSingleton } from "../../infrastructure/config/ioc";
 import { UserRepository } from "../../infrastructure/db/repositories/user_repository";
 import { HttpError } from "../error";
 import { IAuthService } from "../interfaces/auth_service";
 import { UserDto, UserSignInInput, UserSignUpInput } from "../models/user_dto";
 import { events } from "../subscribers/events";
-import { TYPES } from "../../domain/constants/types";
 
 export interface DecodedJwt {
     userId: string;
@@ -109,36 +104,40 @@ export class AuthService implements IAuthService {
     }
 
     private async getUserRecord(emailOrUsername: string): Promise<User> {
-        const tenantId = iocContainer.get<any>(TYPES.TenantId);
         // increase the user's signin attempt for every of this call if the user is not yet locked
         return this._userRepository.findOneByQueryAndUpdate(
-            {
-                $and: [
-                    { tenant: tenantId },
-                    {
-                        $or: [
-                            { email: emailOrUsername },
-                            { username: emailOrUsername }
-                        ]
-                    },
-                    {
-                        $or: [
-                            {
-                                signInAttempts: {
-                                    $lt: config.userLockout.maxSignInAttempts
-                                }
-                            },
-                            {
-                                lockOutEndDate: {
-                                    $lt: new Date()
-                                }
-                            }
-                        ]
-                    }
-                ]
-            },
+            this.getSignInQuery(emailOrUsername),
             User.getSignInAttemptUpdate()
         );
+    }
+
+    private getSignInQuery(
+        emailOrUsername: string
+    ): Query<{ [key: string]: object }> {
+        return {
+            $and: [
+                {
+                    $or: [
+                        { email: emailOrUsername },
+                        { username: emailOrUsername }
+                    ]
+                },
+                {
+                    $or: [
+                        {
+                            signInAttempts: {
+                                $lt: config.userLockout.maxSignInAttempts
+                            }
+                        },
+                        {
+                            lockOutEndDate: {
+                                $lt: new Date()
+                            }
+                        }
+                    ]
+                }
+            ]
+        };
     }
 
     private async generateToken(user: User) {
