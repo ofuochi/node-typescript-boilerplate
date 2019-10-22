@@ -67,7 +67,7 @@ For example, x => x + x is incorrect but (x: string) => x + x is correct.
 
 ## Bug Report
 
-If you would like to report a bug, please [create an issue on the GitHub repository](https://github.com/ofuochi/node-typescript-boilerplate/issues/new)
+If you would like to report a bug, please [create an issue on the GitHub repository](https://github.com/ofuochi/node-typescript-boilerplate/issues/new/choose)
 
 ## Generated files
 
