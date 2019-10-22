@@ -68,11 +68,29 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "PagedResultDtoTenantDto": {
+        "dataType": "refObject",
+        "properties": {
+            "totalCount": { "dataType": "double", "required": true },
+            "items": { "dataType": "array", "array": { "ref": "TenantDto" }, "required": true },
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "CreateTenantInput": {
         "dataType": "refObject",
         "properties": {
             "name": { "dataType": "string", "required": true },
             "description": { "dataType": "string", "required": true },
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "TenantUpdateInput": {
+        "dataType": "refObject",
+        "properties": {
+            "name": { "dataType": "string" },
+            "description": { "dataType": "string" },
         },
         "additionalProperties": false,
     },
@@ -84,6 +102,15 @@ const models: TsoaRoute.Models = {
             "lastName": { "dataType": "string" },
             "email": { "dataType": "string" },
             "username": { "dataType": "string" },
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "PagedResultDtoUserDto": {
+        "dataType": "refObject",
+        "properties": {
+            "totalCount": { "dataType": "double", "required": true },
+            "items": { "dataType": "array", "array": { "ref": "UserDto" }, "required": true },
         },
         "additionalProperties": false,
     },
@@ -171,7 +198,34 @@ export function RegisterRoutes(app: express.Express) {
             }
 
 
-            const promise = controller.get.apply(controller, validatedArgs as any);
+            const promise = controller.getTenant.apply(controller, validatedArgs as any);
+            promiseHandler(controller, promise, response, next);
+        });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.get('/api/v1/tenants',
+        authenticateMiddleware([{ "X-Auth-Token": ["admin"] }]),
+        function(request: any, response: any, next: any) {
+            const args = {
+                skipCount: { "in": "query", "name": "skipCount", "dataType": "double" },
+                maxResultCount: { "in": "query", "name": "maxResultCount", "dataType": "double" },
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request);
+            } catch (err) {
+                return next(err);
+            }
+
+            const controller = iocContainer.get<TenantController>(TenantController);
+            if (typeof controller['setStatus'] === 'function') {
+                (<any>controller).setStatus(undefined);
+            }
+
+
+            const promise = controller.getTenants.apply(controller, validatedArgs as any);
             promiseHandler(controller, promise, response, next);
         });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -197,7 +251,34 @@ export function RegisterRoutes(app: express.Express) {
             }
 
 
-            const promise = controller.create.apply(controller, validatedArgs as any);
+            const promise = controller.createTenant.apply(controller, validatedArgs as any);
+            promiseHandler(controller, promise, response, next);
+        });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.put('/api/v1/tenants/:id',
+        authenticateMiddleware([{ "X-Auth-Token": ["admin"] }]),
+        function(request: any, response: any, next: any) {
+            const args = {
+                id: { "in": "path", "name": "id", "required": true, "dataType": "string" },
+                input: { "in": "body", "name": "input", "required": true, "ref": "TenantUpdateInput" },
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request);
+            } catch (err) {
+                return next(err);
+            }
+
+            const controller = iocContainer.get<TenantController>(TenantController);
+            if (typeof controller['setStatus'] === 'function') {
+                (<any>controller).setStatus(undefined);
+            }
+
+
+            const promise = controller.updateTenant.apply(controller, validatedArgs as any);
             promiseHandler(controller, promise, response, next);
         });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -223,7 +304,7 @@ export function RegisterRoutes(app: express.Express) {
             }
 
 
-            const promise = controller.delete.apply(controller, validatedArgs as any);
+            const promise = controller.deleteTenant.apply(controller, validatedArgs as any);
             promiseHandler(controller, promise, response, next);
         });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -249,7 +330,7 @@ export function RegisterRoutes(app: express.Express) {
             }
 
 
-            const promise = controller.create.apply(controller, validatedArgs as any);
+            const promise = controller.createUser.apply(controller, validatedArgs as any);
             promiseHandler(controller, promise, response, next);
         });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -276,7 +357,7 @@ export function RegisterRoutes(app: express.Express) {
             }
 
 
-            const promise = controller.update.apply(controller, validatedArgs as any);
+            const promise = controller.updateUser.apply(controller, validatedArgs as any);
             promiseHandler(controller, promise, response, next);
         });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -302,7 +383,7 @@ export function RegisterRoutes(app: express.Express) {
             }
 
 
-            const promise = controller.get.apply(controller, validatedArgs as any);
+            const promise = controller.getUser.apply(controller, validatedArgs as any);
             promiseHandler(controller, promise, response, next);
         });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -310,6 +391,8 @@ export function RegisterRoutes(app: express.Express) {
         authenticateMiddleware([{ "X-Auth-Token": ["admin"] }]),
         function(request: any, response: any, next: any) {
             const args = {
+                skipCount: { "in": "query", "name": "skipCount", "dataType": "double" },
+                maxResultCount: { "in": "query", "name": "maxResultCount", "dataType": "double" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -327,7 +410,7 @@ export function RegisterRoutes(app: express.Express) {
             }
 
 
-            const promise = controller.getAll.apply(controller, validatedArgs as any);
+            const promise = controller.getUsers.apply(controller, validatedArgs as any);
             promiseHandler(controller, promise, response, next);
         });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -353,7 +436,7 @@ export function RegisterRoutes(app: express.Express) {
             }
 
 
-            const promise = controller.delete.apply(controller, validatedArgs as any);
+            const promise = controller.deleteUser.apply(controller, validatedArgs as any);
             promiseHandler(controller, promise, response, next);
         });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa

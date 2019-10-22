@@ -16,7 +16,11 @@ import {
     X_TENANT_ID
 } from "../../../src/ui/constants/header_constants";
 import { IAuthService } from "../../../src/ui/interfaces/auth_service";
-import { CreateTenantInput } from "../../../src/ui/models/tenant_dto";
+import {
+    CreateTenantInput,
+    TenantDto,
+    TenantUpdateInput
+} from "../../../src/ui/models/tenant_dto";
 import { UserSignInInput } from "../../../src/ui/models/user_dto";
 import { AuthService } from "../../../src/ui/services/auth_service";
 import { cleanupDb, req } from "../../setup";
@@ -79,13 +83,44 @@ describe("Tenant controller", async () => {
         name: "NewTenant",
         description: "New tenant"
     };
+    let createdTenant: TenantDto;
     it("should create new tenant and return tenant DTO object if user is an admin", async () => {
-        const res = await req
+        const { body } = await req
             .post(endpoint)
             .set(X_AUTH_TOKEN_KEY, jwtToken)
             .send(createTenantInput)
             .expect(httpStatus.OK);
-        expect(res.body).to.contain.keys("name", "id", "description");
+        expect(body).to.contain.keys("name", "id", "description");
+        createdTenant = body;
+    });
+
+    it("should return all tenant if signed-in user is an admin", async () => {
+        const { body } = await req
+            .get(endpoint)
+            .set(X_AUTH_TOKEN_KEY, jwtToken)
+            .expect(httpStatus.OK);
+        const { totalCount, items } = body;
+
+        expect(items).to.be.an("array");
+        expect(totalCount).to.be.greaterThan(0);
+        expect(items).to.deep.include(createdTenant);
+    });
+    it("should update a tenant if signed-in user is admin", async () => {
+        const tenantUpdateInput: TenantUpdateInput = {
+            name: "Updated"
+        };
+        await req
+            .put(`${endpoint}/${createdTenant.id}`)
+            .set(X_AUTH_TOKEN_KEY, jwtToken)
+            .send(tenantUpdateInput)
+            .expect(httpStatus.NO_CONTENT);
+
+        const tenantRecord = await tenantRepository.findById(createdTenant.id);
+
+        expect(tenantUpdateInput.name.toUpperCase()).to.equal(
+            tenantRecord.name
+        );
+        expect(tenantRecord.updatedBy.toString()).to.equal(user.id.toString());
     });
     it("should return unauthorized request if jwt token is not set for tenant creation", async () => {
         await req
@@ -113,6 +148,7 @@ describe("Tenant controller", async () => {
             .expect(httpStatus.OK);
         expect(res.body).to.contain.keys("isActive", "id", "name");
     });
+
     it("should soft delete tenant by admin", async () => {
         user.setRole(UserRole.ADMIN);
         await userRepository.insertOrUpdate(user);
@@ -123,13 +159,13 @@ describe("Tenant controller", async () => {
         });
 
         await req
-            .delete(`${endpoint}/${tenant.id}`)
+            .delete(`${endpoint}/${createdTenant.id}`)
             .set(X_AUTH_TOKEN_KEY, token)
             .expect(httpStatus.NO_CONTENT);
 
-        const tenantRecord = await tenantRepository.findById(tenant.id);
+        const tenantRecord = await tenantRepository.findById(createdTenant.id);
         const deletedTenantRecord = await tenantRepository.hardFindById(
-            tenant.id
+            createdTenant.id
         );
 
         expect(tenantRecord).to.be.undefined;
@@ -138,7 +174,19 @@ describe("Tenant controller", async () => {
         );
         jwtToken = token;
     });
-    it("should return unauthorized while trying to perform an action with an already deleted tenant", async () => {
+    it("should return not found while trying to update a deleted tenant", async () => {
+        const tenantUpdateInput: TenantUpdateInput = {
+            name: "Updated"
+        };
+        await req
+            .put(`${endpoint}/${createdTenant.id}`)
+            .set(X_AUTH_TOKEN_KEY, jwtToken)
+            .send(tenantUpdateInput)
+            .expect(httpStatus.NOT_FOUND);
+    });
+    it("should return unauthorized while trying to perform an action with an already deleted tenant header", async () => {
+        tenant.delete();
+        await tenantRepository.deleteById(tenant.id);
         await req
             .delete(`${endpoint}/${tenant.id}`)
             .set(X_AUTH_TOKEN_KEY, jwtToken)

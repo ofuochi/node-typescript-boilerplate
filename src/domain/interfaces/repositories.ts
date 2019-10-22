@@ -14,6 +14,21 @@ export interface IBaseRepository<T> {
     findOneByQuery(query: Query<T>): Promise<T>;
     findOneByQuery(query: Query<{ [key: string]: any }>): Promise<T>;
     findManyByQuery(query?: Query<{ [key: string]: any }>): Promise<T[]>;
+    findManyByQuery(query?: Query<T>): Promise<T[]>;
+    pagedFindAll({
+        limit,
+        skip,
+        searchStr,
+        isDeleted
+    }: {
+        limit?: number;
+        skip?: number;
+        searchStr?: string;
+        isDeleted?: boolean;
+    }): Promise<{
+        count: number;
+        items: T[];
+    }>;
     deleteById(id: string): Promise<boolean>;
     // deleteOneByQuery(query: Query<T>): Promise<number>;
     // deleteManyByQuery(query?: Query<T>): Promise<number>;

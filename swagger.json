@@ -118,6 +118,26 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"PagedResultDtoTenantDto": {
+				"properties": {
+					"totalCount": {
+						"type": "number",
+						"format": "double"
+					},
+					"items": {
+						"items": {
+							"$ref": "#/components/schemas/TenantDto"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"totalCount",
+					"items"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"CreateTenantInput": {
 				"properties": {
 					"name": {
@@ -131,6 +151,20 @@
 					"name",
 					"description"
 				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"TenantUpdateInput": {
+				"properties": {
+					"name": {
+						"type": "string",
+						"nullable": true
+					},
+					"description": {
+						"type": "string",
+						"nullable": true
+					}
+				},
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -153,6 +187,26 @@
 						"nullable": true
 					}
 				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PagedResultDtoUserDto": {
+				"properties": {
+					"totalCount": {
+						"type": "number",
+						"format": "double"
+					},
+					"items": {
+						"items": {
+							"$ref": "#/components/schemas/UserDto"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"totalCount",
+					"items"
+				],
 				"type": "object",
 				"additionalProperties": false
 			}
@@ -259,7 +313,7 @@
 		},
 		"/tenants/{tenantName}": {
 			"get": {
-				"operationId": "Get",
+				"operationId": "GetTenant",
 				"responses": {
 					"200": {
 						"content": {
@@ -289,8 +343,53 @@
 			}
 		},
 		"/tenants": {
+			"get": {
+				"operationId": "GetTenants",
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PagedResultDtoTenantDto"
+								}
+							}
+						},
+						"description": "Ok"
+					}
+				},
+				"tags": [
+					"Tenants"
+				],
+				"security": [
+					{
+						"X-Auth-Token": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "skipCount",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "maxResultCount",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
 			"post": {
-				"operationId": "Create",
+				"operationId": "CreateTenant",
 				"responses": {
 					"200": {
 						"content": {
@@ -326,8 +425,48 @@
 			}
 		},
 		"/tenants/{id}": {
+			"put": {
+				"operationId": "UpdateTenant",
+				"responses": {
+					"204": {
+						"content": {
+							"application/json": {}
+						},
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"Tenants"
+				],
+				"security": [
+					{
+						"X-Auth-Token": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/TenantUpdateInput"
+							}
+						}
+					}
+				}
+			},
 			"delete": {
-				"operationId": "Delete",
+				"operationId": "DeleteTenant",
 				"responses": {
 					"204": {
 						"content": {
@@ -360,7 +499,7 @@
 		},
 		"/users": {
 			"post": {
-				"operationId": "Create",
+				"operationId": "CreateUser",
 				"responses": {
 					"200": {
 						"content": {
@@ -395,16 +534,13 @@
 				}
 			},
 			"get": {
-				"operationId": "GetAll",
+				"operationId": "GetUsers",
 				"responses": {
 					"200": {
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/UserDto"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/PagedResultDtoUserDto"
 								}
 							}
 						},
@@ -421,12 +557,31 @@
 						]
 					}
 				],
-				"parameters": []
+				"parameters": [
+					{
+						"in": "query",
+						"name": "skipCount",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "maxResultCount",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
 			}
 		},
 		"/users/{id}": {
 			"put": {
-				"operationId": "Update",
+				"operationId": "UpdateUser",
 				"responses": {
 					"204": {
 						"content": {
@@ -466,7 +621,7 @@
 				}
 			},
 			"get": {
-				"operationId": "Get",
+				"operationId": "GetUser",
 				"responses": {
 					"200": {
 						"content": {
@@ -501,7 +656,7 @@
 				]
 			},
 			"delete": {
-				"operationId": "Delete",
+				"operationId": "DeleteUser",
 				"responses": {
 					"204": {
 						"content": {
