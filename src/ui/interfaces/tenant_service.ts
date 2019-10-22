@@ -1,7 +1,8 @@
 import { TenantDto } from "../models/tenant_dto";
 import { Tenant } from "../../domain/model/tenant";
+import { IBaseService } from "./base_service";
 
-export interface ITenantService {
+export interface ITenantService extends IBaseService<Tenant> {
     update(tenant: Partial<Tenant>): Promise<void>;
     create(name: string, description: string): Promise<TenantDto>;
     get(name: string): Promise<TenantDto | undefined>;

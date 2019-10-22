@@ -11,7 +11,8 @@ import {
     Security,
     Tags,
     Response,
-    Put
+    Put,
+    Query
 } from "tsoa";
 import { provideSingleton } from "../../../infrastructure/config/ioc";
 import { isIdValid } from "../../../infrastructure/utils/server_utils";
@@ -24,6 +25,7 @@ import {
 } from "../../models/tenant_dto";
 import { TenantService } from "../../services/tenant_service";
 import { BaseController } from "./base_controller";
+import { PagedResultDto } from "../../models/base_dto";
 
 @Tags("Tenants")
 @Route("tenants")
@@ -32,27 +34,41 @@ export class TenantController extends BaseController {
     @inject(TenantService) private readonly _tenantService: ITenantService;
 
     @Get("{tenantName}")
-    public async get(tenantName: string): Promise<TenantDto> {
+    public async getTenant(tenantName: string): Promise<TenantDto> {
         const tenant = await this._tenantService.get(tenantName);
         if (!tenant) throw new HttpError(httpStatus.NOT_FOUND);
         return tenant;
     }
     @Get()
     @Security("X-Auth-Token", ["admin"])
-    public async getAll(): Promise<TenantDto[]> {
-        return this._tenantService.getAll();
+    public async getTenants(
+        @Query() skipCount?: number,
+        @Query() maxResultCount?: number
+    ): Promise<PagedResultDto<TenantDto>> {
+        const { count, items } = await this._tenantService.pagedGetAll(
+            skipCount,
+            maxResultCount
+        );
+        const users = plainToClass(TenantDto, items, {
+            enableImplicitConversion: true,
+            excludeExtraneousValues: true
+        });
+        return {
+            totalCount: count,
+            items: users
+        };
     }
     @Post()
     @Security("X-Auth-Token", ["admin"])
     @Response(httpStatus.FORBIDDEN, http.STATUS_CODES[httpStatus.FORBIDDEN])
-    public async create(@Body() input: CreateTenantInput) {
+    public async createTenant(@Body() input: CreateTenantInput) {
         await this.checkBadRequest(plainToClass(CreateTenantInput, input));
         await this.checkConflict(await this._tenantService.get(input.name));
         return this._tenantService.create(input.name, input.description);
     }
     @Put("{id}")
     @Security("X-Auth-Token", ["admin"])
-    public async update(
+    public async updateTenant(
         id: string,
         @Body() input: TenantUpdateInput
     ): Promise<void> {
@@ -65,7 +81,7 @@ export class TenantController extends BaseController {
     }
     @Delete("{id}")
     @Security("X-Auth-Token", ["admin"])
-    public async delete(id: string): Promise<void> {
+    public async deleteTenant(id: string): Promise<void> {
         if (!isIdValid(id))
             throw new HttpError(
                 httpStatus.BAD_REQUEST,

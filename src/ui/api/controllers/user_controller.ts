@@ -1,6 +1,16 @@
 import { plainToClass } from "class-transformer";
 import httpStatus from "http-status-codes";
-import { Body, Delete, Get, Post, Put, Route, Security, Tags } from "tsoa";
+import {
+    Body,
+    Delete,
+    Get,
+    Post,
+    Put,
+    Route,
+    Security,
+    Tags,
+    Query
+} from "tsoa";
 import { inject, provideSingleton } from "../../../infrastructure/config/ioc";
 import { HttpError } from "../../error";
 import { IUserService } from "../../interfaces/user_service";
@@ -11,6 +21,7 @@ import {
 } from "../../models/user_dto";
 import { UserService } from "../../services/user_service";
 import { BaseController } from "./base_controller";
+import { PagedResultDto } from "../../models/base_dto";
 
 @Tags("Users")
 @Route("users")
@@ -20,13 +31,17 @@ export class UserController extends BaseController {
 
     @Post()
     @Security("X-Auth-Token", ["admin"])
-    public async create(@Body() input: UserSignUpInput): Promise<UserDto> {
+    public async createUser(@Body() input: UserSignUpInput): Promise<UserDto> {
         await this.checkBadRequest(plainToClass(UserSignUpInput, input));
-        return this._userService.create(input);
+        const user = await this._userService.create(input);
+        return plainToClass(UserDto, user, {
+            enableImplicitConversion: true,
+            excludeExtraneousValues: true
+        });
     }
     @Put("{id}")
     @Security("X-Auth-Token", ["admin"])
-    public async update(
+    public async updateUser(
         id: string,
         @Body() input: UserUpdateInput
     ): Promise<void> {
@@ -38,20 +53,38 @@ export class UserController extends BaseController {
     }
     @Get("{id}")
     @Security("X-Auth-Token", ["admin"])
-    public async get(id: string): Promise<UserDto> {
+    public async getUser(id: string): Promise<UserDto> {
         this.checkUUID(id);
-        const userDto = await this._userService.get(id);
-        if (userDto) return userDto;
+        const user = await this._userService.get(id);
+        if (user)
+            return plainToClass(UserDto, user, {
+                enableImplicitConversion: true,
+                excludeExtraneousValues: true
+            });
         throw new HttpError(httpStatus.NOT_FOUND);
     }
     @Get()
     @Security("X-Auth-Token", ["admin"])
-    public async getAll(): Promise<UserDto[]> {
-        return this._userService.getAll();
+    public async getUsers(
+        @Query() skipCount?: number,
+        @Query() maxResultCount?: number
+    ): Promise<PagedResultDto<UserDto>> {
+        const { count, items } = await this._userService.pagedGetAll(
+            skipCount,
+            maxResultCount
+        );
+        const users = plainToClass(UserDto, items, {
+            enableImplicitConversion: true,
+            excludeExtraneousValues: true
+        });
+        return {
+            totalCount: count,
+            items: users
+        };
     }
     @Delete("{id}")
     @Security("X-Auth-Token", ["admin"])
-    public async delete(id: string) {
+    public async deleteUser(id: string) {
         this.checkUUID(id);
         const isDeleted = await this._userService.delete(id);
         if (!isDeleted) this.setStatus(httpStatus.NOT_FOUND);
