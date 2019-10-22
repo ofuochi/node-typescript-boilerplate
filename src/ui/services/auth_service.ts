@@ -125,7 +125,7 @@ export class AuthService implements IAuthService {
                 {
                     $or: [
                         {
-                            signInAttempts: {
+                            failedSignInAttempts: {
                                 $lt: config.userLockout.maxSignInAttempts
                             }
                         },

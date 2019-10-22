@@ -48,7 +48,7 @@ export class Tenant extends BaseEntity {
     }
 
     /**
-     * Creates and returns a new instance of tenant
+     * Creates and returns a new instance of Tenant
      *
      * @static
      * @memberof Tenant
@@ -59,6 +59,13 @@ export class Tenant extends BaseEntity {
             description
         });
 
+    /**
+     * Returns the Tenant Typegoose model
+     *
+     * @readonly
+     * @static
+     * @memberof Tenant
+     */
     public static get model() {
         return new Tenant().getModelForClass(Tenant, {
             schemaOptions: { collection: "Tenants", timestamps: true }
