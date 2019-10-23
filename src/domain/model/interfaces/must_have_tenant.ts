@@ -1,6 +1,6 @@
 export interface IMustHaveTenant {
     /**
-     * Gets a reference to the tenant the user belongs to
+     * A reference to the tenant the entity belongs
      *
      * @type {Ref<Tenant>}
      * @memberof User
