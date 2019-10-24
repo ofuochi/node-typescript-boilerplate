@@ -4,8 +4,8 @@ import { Test } from "supertest";
 import {
     ITenantRepository,
     IUserRepository
-} from "../../../src/domain/data/repositories";
-import { Tenant } from "../../../src/domain/model/tenant";
+} from "../../../src/core/domain/data/repositories";
+import { Tenant } from "../../../src/core/domain/models/tenant";
 import { config } from "../../../src/infrastructure/config";
 import { iocContainer } from "../../../src/infrastructure/config/ioc";
 import { TenantRepository } from "../../../src/infrastructure/db/repositories/tenant_repository";

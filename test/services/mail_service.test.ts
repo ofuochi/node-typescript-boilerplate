@@ -3,7 +3,7 @@
 
 // import { startServer } from "../../src";
 // import MailerService from "./../../src/infrastructure/services/mail_service";
-// import { IMailService } from "./../../src/domain/interfaces/services";
+// import { IMailService } from "./../../src/core/domain/interfaces/services";
 
 // let server: Server;
 // describe("Mail service", () => {

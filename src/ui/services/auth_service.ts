@@ -3,17 +3,21 @@ import { plainToClass } from "class-transformer";
 import { EventDispatcher } from "event-dispatch";
 import httpStatus from "http-status-codes";
 import jwt from "jsonwebtoken";
-import { eventDispatcher } from "../../domain/constants/decorators";
-import { IUserRepository, Query } from "../../domain/data/repositories";
-import { PASSWORD_SALT_ROUND, User, UserRole } from "../../domain/model/user";
+import { eventDispatcher } from "../../core/domain/constants/decorators";
+import { IUserRepository, Query } from "../../core/domain/data/repositories";
+import {
+    PASSWORD_SALT_ROUND,
+    User,
+    UserRole
+} from "../../core/domain/models/user";
 import { config } from "../../infrastructure/config";
 import { inject, provideSingleton } from "../../infrastructure/config/ioc";
 import { UserRepository } from "../../infrastructure/db/repositories/user_repository";
 import { HttpError } from "../error";
-import { IAuthService } from "../../domain/services/auth_service";
+import { IAuthService } from "../../core/domain/services/auth_service";
 import { UserDto, UserSignInInput, UserSignUpInput } from "../models/user_dto";
 import { events } from "../subscribers/events";
-import { and, or, lt } from "../../domain/data/db_operators";
+import { and, or, lt } from "../../core/domain/data/db_operators";
 
 export interface DecodedJwt {
     userId: string;

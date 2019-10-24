@@ -4,9 +4,9 @@ import httpStatus from "http-status-codes";
 import {
     ITenantRepository,
     IUserRepository
-} from "../../../src/domain/data/repositories";
-import { Tenant } from "../../../src/domain/model/tenant";
-import { User, UserRole } from "../../../src/domain/model/user";
+} from "../../../src/core/domain/data/repositories";
+import { Tenant } from "../../../src/core/domain/models/tenant";
+import { User, UserRole } from "../../../src/core/domain/models/user";
 import { config } from "../../../src/infrastructure/config";
 import { iocContainer } from "../../../src/infrastructure/config/ioc";
 import { TenantRepository } from "../../../src/infrastructure/db/repositories/tenant_repository";
@@ -15,7 +15,7 @@ import {
     X_AUTH_TOKEN_KEY,
     X_TENANT_ID
 } from "../../../src/ui/constants/header_constants";
-import { IAuthService } from "../../../src/domain/services/auth_service";
+import { IAuthService } from "../../../src/core/domain/services/auth_service";
 import {
     CreateTenantInput,
     TenantDto,

@@ -1,9 +1,9 @@
 import httpStatus from "http-status-codes";
 import { plainToClass } from "class-transformer";
-import { ITenantRepository } from "../../domain/data/repositories";
-import { Tenant } from "../../domain/model/tenant";
+import { ITenantRepository } from "../../core/domain/data/repositories";
+import { Tenant } from "../../core/domain/models/tenant";
 import { provideSingleton, inject } from "../../infrastructure/config/ioc";
-import { ITenantService } from "../../domain/services/tenant_service";
+import { ITenantService } from "../../core/domain/services/tenant_service";
 import { TenantDto } from "../models/tenant_dto";
 import { TenantRepository } from "../../infrastructure/db/repositories/tenant_repository";
 import { HttpError } from "../error";

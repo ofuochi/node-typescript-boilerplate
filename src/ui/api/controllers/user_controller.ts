@@ -13,7 +13,7 @@ import {
 } from "tsoa";
 import { inject, provideSingleton } from "../../../infrastructure/config/ioc";
 import { HttpError } from "../../error";
-import { IUserService } from "../../../domain/services/user_service";
+import { IUserService } from "../../../core/domain/services/user_service";
 import {
     UserDto,
     UserSignUpInput,

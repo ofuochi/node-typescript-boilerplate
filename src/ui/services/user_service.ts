@@ -1,12 +1,12 @@
 import bcrypt from "bcrypt";
 import httpStatus from "http-status-codes";
-import { IUserRepository } from "../../domain/data/repositories";
-import { PASSWORD_SALT_ROUND, User } from "../../domain/model/user";
+import { IUserRepository } from "../../core/domain/data/repositories";
+import { PASSWORD_SALT_ROUND, User } from "../../core/domain/models/user";
 import { config } from "../../infrastructure/config";
 import { inject, provideSingleton } from "../../infrastructure/config/ioc";
 import { UserRepository } from "../../infrastructure/db/repositories/user_repository";
 import { HttpError } from "../error";
-import { IUserService } from "../../domain/services/user_service";
+import { IUserService } from "../../core/domain/services/user_service";
 import { UserSignUpInput } from "../models/user_dto";
 
 @provideSingleton(UserService)

@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import mongoose, { Mongoose } from "mongoose";
-import { Tenant } from "../../domain/model/tenant";
-import { User, UserRole } from "../../domain/model/user";
+import { Tenant } from "../../core/domain/models/tenant";
+import { User, UserRole } from "../../core/domain/models/user";
 import { winstonLoggerInstance } from "../bootstrapping/loaders/logger";
 
 export type DbClient = Mongoose;

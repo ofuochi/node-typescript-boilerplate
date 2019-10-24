@@ -1,12 +1,9 @@
 import { plainToClassFromExist } from "class-transformer";
 import { unmanaged } from "inversify";
 import { Document, Model } from "mongoose";
-import { TYPES } from "../../../domain/constants/types";
-import {
-    IBaseRepository,
-    Query
-} from "../../../domain/data/repositories";
-import { BaseEntity } from "../../../domain/model/base";
+import { TYPES } from "../../../core/domain/constants/types";
+import { IBaseRepository, Query } from "../../../core/domain/data/repositories";
+import { BaseEntity } from "../../../core/domain/models/base";
 import { iocContainer, provideSingleton } from "../../config/ioc";
 import { winstonLoggerInstance } from "../../bootstrapping/loaders/logger";
 

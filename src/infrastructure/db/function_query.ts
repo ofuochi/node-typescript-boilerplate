@@ -1,4 +1,4 @@
-import { IFunctionQuery } from "../../domain/data/function_query";
+import { IFunctionQuery } from "../../core/domain/data/function_query";
 
 export class FunctionQuery implements IFunctionQuery {
     and(...operands: any[]): { [key: string]: object } {

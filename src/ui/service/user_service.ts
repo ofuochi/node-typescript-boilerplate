@@ -1,5 +1,5 @@
-import { UserSignUpInput } from "../../ui/models/user_dto";
-import { User } from "../model/user";
+import { UserSignUpInput } from "../models/user_dto";
+import { User } from "../../core/domain/models/user";
 
 export interface IUserService {
     create(user: UserSignUpInput): Promise<User>;

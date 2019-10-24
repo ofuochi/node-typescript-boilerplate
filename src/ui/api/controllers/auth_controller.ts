@@ -9,7 +9,7 @@ import {
 } from "../../models/user_dto";
 import { AuthService } from "../../services/auth_service";
 import { BaseController } from "./base_controller";
-import { IAuthService } from "../../../domain/services/auth_service";
+import { IAuthService } from "../../../core/domain/services/auth_service";
 
 @Tags("Auth")
 @Route("auth")

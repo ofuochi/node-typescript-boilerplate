@@ -1,4 +1,4 @@
-import { Tenant } from "../../domain/model/tenant";
+import { Tenant } from "../../core/domain/models/tenant";
 import { iocContainer } from "../config/ioc";
 import { TenantRepository } from "../db/repositories/tenant_repository";
 

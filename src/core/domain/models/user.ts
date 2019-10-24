@@ -1,6 +1,6 @@
 import { index, instanceMethod, prop, Ref } from "@hasezoey/typegoose";
-import { config } from "../../infrastructure/config";
-import { iocContainer } from "../../infrastructure/config/ioc";
+import { config } from "../../../infrastructure/config";
+import { iocContainer } from "../../../infrastructure/config/ioc";
 import { TYPES } from "../constants/types";
 import { Writable } from "../utils/writable";
 import { BaseEntity } from "./base";

@@ -1,8 +1,8 @@
 import { instanceMethod, pre, prop, Ref, Typegoose } from "@hasezoey/typegoose";
 import { Expose } from "class-transformer";
 import { Query } from "mongoose";
-import { iocContainer } from "../../infrastructure/config/ioc";
-import { DecodedJwt } from "../../ui/services/auth_service";
+import { iocContainer } from "../../../infrastructure/config/ioc";
+import { DecodedJwt } from "../../../ui/services/auth_service";
 import { TYPES } from "../constants/types";
 import { Writable } from "../utils/writable";
 import { User } from "./user";

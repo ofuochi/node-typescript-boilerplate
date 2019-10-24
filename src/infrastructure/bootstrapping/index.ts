@@ -5,7 +5,7 @@ import { InversifyExpressServer } from "inversify-express-utils";
 import swaggerUi from "swagger-ui-express";
 import { Controller } from "tsoa";
 import swaggerJsonDoc from "../../../swagger.json";
-import { TYPES } from "../../domain/constants/types";
+import { TYPES } from "../../core/domain/constants/types";
 import { exceptionLoggerMiddleware } from "../../ui/api/middleware/interceptor_middleware";
 import { RegisterRoutes } from "../../ui/api/routes";
 import { config } from "../config";

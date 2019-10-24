@@ -1,4 +1,4 @@
-import { iocContainer } from "../../infrastructure/config/ioc";
+import { iocContainer } from "../../../infrastructure/config/ioc";
 import { TYPES } from "../constants/types";
 import { IFunctionQuery } from "./function_query";
 
