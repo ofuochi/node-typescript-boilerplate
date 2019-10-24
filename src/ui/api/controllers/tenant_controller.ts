@@ -46,20 +46,17 @@ export class TenantController extends BaseController {
         @Query() skip?: number,
         @Query() limit?: number
     ): Promise<PagedResultDto<TenantDto>> {
-        const {
-            totalCount: count,
-            items
-        } = await this._tenantService.pagedGetAll({
+        const { totalCount, items } = await this._tenantService.pagedGetAll({
             searchStr,
-            skip,
-            limit
+            skip: skip || 0,
+            limit: limit || 50
         });
         const users = plainToClass(TenantDto, items, {
             enableImplicitConversion: true,
             excludeExtraneousValues: true
         });
         return {
-            totalCount: count,
+            totalCount,
             items: users
         };
     }
