@@ -7,25 +7,26 @@ import { cleanupDb } from "../../../setup";
 
 describe("Tenant Repository", () => {
     const tenants: Tenant[] = [
-        Tenant.createInstance("T0", "T0"),
-        Tenant.createInstance("T1", "T1")
+        Tenant.createInstance("T1", "T1"),
+        Tenant.createInstance("T2", "T2"),
+        Tenant.createInstance("T3", "T3"),
+        Tenant.createInstance("T4", "T4"),
+        Tenant.createInstance("T5", "T5")
     ];
     let tenantRepository: ITenantRepository;
     before("Create seed tenants", async () => {
         await cleanupDb();
 
-        tenants[0].delete();
-
         tenantRepository = iocContainer.get<ITenantRepository>(
             TenantRepository
         );
-        tenants.forEach(async tenant => {
-            await tenantRepository.insertOrUpdate(tenant);
-        });
+        await tenantRepository.insertMany(tenants);
     });
 
     it("should get all the tenants but without the deleted ones", async () => {
+        tenants[0].delete();
+        await tenantRepository.insertOrUpdate(tenants[0]);
         const res = await tenantRepository.findAll();
-        expect(res.length).to.equal(1);
+        expect(res.length).to.equal(4);
     });
 });

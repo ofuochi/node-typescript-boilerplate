@@ -72,8 +72,8 @@ export class UserController extends BaseController {
     ): Promise<PagedResultDto<UserDto>> {
         const { totalCount, items } = await this._userService.pagedGetAll({
             searchStr,
-            skip,
-            limit
+            skip: skip || 0,
+            limit: limit || 50
         });
         const users = plainToClass(UserDto, items, {
             enableImplicitConversion: true,

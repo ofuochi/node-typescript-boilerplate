@@ -6,18 +6,16 @@ import { winstonLoggerInstance } from "../bootstrapping/loaders/logger";
 
 export type DbClient = Mongoose;
 export async function seedDefaultTenant() {
-    const tenantInstance = Tenant.createInstance("Default", "Default tenant");
-    const tenantModel = tenantInstance.getModelForClass(Tenant, {
-        schemaOptions: { collection: "Tenants", timestamps: true }
-    });
+    const tenant = Tenant.createInstance("Default", "Default tenant");
+    const tenantModel = Tenant.getModel();
     const defaultTenant = await tenantModel.findOne({ name: "Default" });
 
     if (defaultTenant) return defaultTenant.id;
-    return tenantModel.create(tenantInstance);
+    return tenantModel.create(tenant);
 }
 export async function seedDefaultAdmin(tenantId: string) {
     const password = await bcrypt.hash("123qwe", 1);
-    const userInstance = User.createInstance({
+    const user = User.createInstance({
         firstName: "Admin",
         lastName: "Admin",
         username: "Admin",
@@ -25,18 +23,16 @@ export async function seedDefaultAdmin(tenantId: string) {
         tenantId,
         password
     });
-    const tenantModel = userInstance.getModelForClass(User, {
-        schemaOptions: { collection: "Users", timestamps: true }
-    });
-    const defaultAdminUser = await tenantModel.findOne({
+    const userModel = User.getModel();
+    const defaultAdminUser = await userModel.findOne({
         $or: [
-            { email: userInstance.email, tenant: tenantId },
-            { username: userInstance.username, tenant: tenantId }
+            { email: user.email, tenant: tenantId },
+            { username: user.username, tenant: tenantId }
         ]
     });
     if (!defaultAdminUser) {
-        userInstance.setRole(UserRole.ADMIN);
-        await tenantModel.create(userInstance);
+        user.setRole(UserRole.ADMIN);
+        await userModel.create(user);
     }
 }
 

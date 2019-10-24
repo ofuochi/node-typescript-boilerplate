@@ -83,8 +83,8 @@ export class UserService implements IUserService {
         limit
     }: {
         searchStr?: string;
-        skip?: number;
-        limit?: number;
+        skip: number;
+        limit: number;
     }): Promise<{ totalCount: number; items: User[] }> {
         return this._userRepository.pagedFindAll({
             searchStr,

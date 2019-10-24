@@ -71,12 +71,31 @@ export interface IBaseRepository<T> {
      * @memberof IBaseRepository
      */
     findManyByQuery(query?: Query<T>): Promise<T[]>;
+
     /**
-     * Returns a paginated list of all documents that matches the supplied search string, if any, in the collection
-     * as well as the total count in the database
+     * Inserts multiple entities at once.
      *
-     * @param {Query<{ [key: string]: any }>} query
-     * @returns {Promise<T[]>}
+     * @param {T[]} entities
+     * @returns {Promise<void>}
+     * @memberof IBaseRepository
+     */
+    insertMany(entities: T[]): Promise<void>;
+    /**
+     * Returns a paginated list of documents that satisfy the paged query.
+     *
+     * @param {{
+     *         searchStr?: string;
+     *         skip?: number;
+     *         limit?: number;
+     *     }} {
+     *         searchStr,
+     *         skip, [default 0]
+     *         limit [default 50]
+     *     }
+     * @returns {Promise<{
+     *         totalCount: number;
+     *         items: T[];
+     *     }>}
      * @memberof IBaseRepository
      */
     pagedFindAll({
@@ -85,8 +104,8 @@ export interface IBaseRepository<T> {
         limit
     }: {
         searchStr?: string;
-        skip?: number;
-        limit?: number;
+        skip: number;
+        limit: number;
     }): Promise<{
         totalCount: number;
         items: T[];

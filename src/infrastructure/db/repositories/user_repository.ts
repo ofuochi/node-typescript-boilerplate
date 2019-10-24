@@ -10,6 +10,6 @@ export type UserModel = User & Document;
 export class UserRepository extends BaseRepository<User, UserModel>
     implements IUserRepository {
     public constructor() {
-        super(User.model, () => new User());
+        super(User.getModel(), () => new User());
     }
 }
