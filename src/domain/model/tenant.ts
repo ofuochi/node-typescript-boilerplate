@@ -1,9 +1,9 @@
-import { prop, instanceMethod } from "@hasezoey/typegoose";
+import { getModelForClass, prop, modelOptions } from "@typegoose/typegoose";
 import { Expose } from "class-transformer";
-
-import { BaseEntity } from "./base";
 import { Writable } from "../utils/writable";
+import { BaseEntity } from "./base";
 
+@modelOptions({ options: { customName: "tenants" } })
 export class Tenant extends BaseEntity {
     @prop({ required: true, default: "Tenant" })
     readonly type: string = "Tenant";
@@ -34,23 +34,18 @@ export class Tenant extends BaseEntity {
             description
         });
 
-    public static get model() {
-        return new Tenant().getModelForClass(Tenant, {
-            schemaOptions: { collection: "Tenants", timestamps: true }
-        });
+    public static getModel() {
+        return getModelForClass(this);
     }
 
-    @instanceMethod
     setName(name: string) {
         (this as Writable<Tenant>).name = name;
     }
 
-    @instanceMethod
     setDescription(description: string) {
         (this as Writable<Tenant>).description = description;
     }
 
-    @instanceMethod
     update(tenant: Partial<this>): void {
         if (tenant.name)
             this.setName(tenant.name

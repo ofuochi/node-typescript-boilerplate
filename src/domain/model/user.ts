@@ -1,4 +1,10 @@
-import { index, instanceMethod, prop, Ref } from "@hasezoey/typegoose";
+import {
+    getModelForClass,
+    index,
+    prop,
+    Ref,
+    modelOptions
+} from "@typegoose/typegoose";
 import { config } from "../../infrastructure/config";
 import { iocContainer } from "../../infrastructure/config/ioc";
 import { TYPES } from "../constants/types";
@@ -14,15 +20,25 @@ export enum UserRole {
     USER = "user",
     ADMIN = "admin"
 }
-
+@modelOptions({ options: { customName: "users" } })
 @index({ email: 1, tenant: 1 }, { unique: true })
 @index({ username: 1, tenant: 1 }, { unique: true })
 export class User extends BaseEntity implements IMustHaveTenant {
     @prop({ required: true, default: "User" })
     readonly type: string = "User";
-    @prop({ required: true, maxlength: MAX_NAME_LENGTH, trim: true })
+    @prop({
+        required: true,
+        maxlength: MAX_NAME_LENGTH,
+        trim: true,
+        text: true
+    })
     readonly firstName!: string;
-    @prop({ required: true, maxlength: MAX_NAME_LENGTH, trim: true })
+    @prop({
+        required: true,
+        maxlength: MAX_NAME_LENGTH,
+        trim: true,
+        text: true
+    })
     readonly lastName!: string;
 
     @prop({ required: true, ref: Tenant, unique: false })
@@ -32,6 +48,7 @@ export class User extends BaseEntity implements IMustHaveTenant {
         maxlength: MAX_NAME_LENGTH,
         trim: true,
         lowercase: true,
+        text: true,
         unique: false
     })
     readonly username!: string;
@@ -41,6 +58,7 @@ export class User extends BaseEntity implements IMustHaveTenant {
         maxlength: MAX_NAME_LENGTH,
         trim: true,
         lowercase: true,
+        text: true,
         unique: false
     })
     readonly email!: string;
@@ -113,18 +131,8 @@ export class User extends BaseEntity implements IMustHaveTenant {
             tenant: id
         });
     };
-    public static get model() {
-        const model = new User().getModelForClass(User, {
-            schemaOptions: { collection: "Users", timestamps: true }
-        });
-
-        model.collection.createIndex({
-            firstName: "text",
-            lastName: "text",
-            email: "text",
-            username: "text"
-        });
-        return model;
+    public static getModel() {
+        return getModelForClass(this);
     }
 
     static getSignInAttemptUpdate(): { [key: string]: object } {
@@ -138,41 +146,34 @@ export class User extends BaseEntity implements IMustHaveTenant {
         };
     }
 
-    @instanceMethod
     setRole(role: UserRole) {
         (this as Writable<User>).role = role;
     }
 
-    @instanceMethod
     setEmail(email: string) {
         (this as Writable<User>).email = email;
     }
 
-    @instanceMethod
     setUsername(username: string) {
         (this as Writable<User>).username = username;
     }
 
-    @instanceMethod
     setFirstName(firstName: string) {
         (this as Writable<User>).firstName = firstName;
     }
 
-    @instanceMethod
     setLastName(lastName: string) {
         (this as Writable<User>).lastName = lastName;
     }
 
-    @instanceMethod
     setPassword(password: string) {
         (this as Writable<User>).password = password;
     }
 
-    @instanceMethod
     setTenant(tenant: any) {
         (this as Writable<this>).tenant = tenant;
     }
-    @instanceMethod
+
     update(user: Partial<this>): void {
         if (user.firstName) this.setFirstName(user.firstName as string);
         if (user.lastName) this.setLastName(user.lastName as string);
@@ -182,7 +183,6 @@ export class User extends BaseEntity implements IMustHaveTenant {
         if (user.role) this.setRole(user.role as UserRole);
     }
 
-    @instanceMethod
     clearLockOut() {
         (this as Writable<User>).lockOutEndDate = undefined;
         (this as Writable<User>).signInAttempts = 0;

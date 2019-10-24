@@ -75,6 +75,7 @@ export class UserController extends BaseController {
             skip,
             limit
         });
+
         const users = plainToClass(UserDto, items, {
             enableImplicitConversion: true,
             excludeExtraneousValues: true
