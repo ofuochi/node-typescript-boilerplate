@@ -1,8 +1,7 @@
-import { prop, instanceMethod } from "@hasezoey/typegoose";
+import { getModelForClass, prop, modelOptions } from "@typegoose/typegoose";
 import { Expose } from "class-transformer";
-
-import { BaseEntity } from "./base";
 import { Writable } from "../utils/writable";
+import { BaseEntity } from "./base";
 
 /**
  *
@@ -11,6 +10,7 @@ import { Writable } from "../utils/writable";
  * @class Tenant
  * @extends {BaseEntity}
  */
+@modelOptions({ options: { customName: "tenants" } })
 export class Tenant extends BaseEntity {
     @prop({ required: true, default: "Tenant" })
     readonly type: string = "Tenant";
@@ -59,26 +59,10 @@ export class Tenant extends BaseEntity {
             description
         });
 
-    /**
-     * Returns the Tenant Typegoose model
-     *
-     * @readonly
-     * @static
-     * @memberof Tenant
-     */
-    public static get model() {
-        return new Tenant().getModelForClass(Tenant, {
-            schemaOptions: { collection: "Tenants", timestamps: true }
-        });
+    public static getModel() {
+        return getModelForClass(this);
     }
 
-    /**
-     * Sets the name of the tenant
-     *
-     * @param {string} name
-     * @memberof Tenant
-     */
-    @instanceMethod
     setName(name: string) {
         (this as Writable<Tenant>).name = name;
     }
@@ -89,7 +73,6 @@ export class Tenant extends BaseEntity {
      * @param {string} description
      * @memberof Tenant
      */
-    @instanceMethod
     setDescription(description: string) {
         (this as Writable<Tenant>).description = description;
     }
@@ -100,7 +83,6 @@ export class Tenant extends BaseEntity {
      * @param {Partial<this>} tenant
      * @memberof Tenant
      */
-    @instanceMethod
     update(tenant: Partial<this>): void {
         if (tenant.name)
             this.setName(tenant.name

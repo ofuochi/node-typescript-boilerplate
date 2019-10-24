@@ -1,8 +1,10 @@
-import { instanceMethod, pre, prop, Ref, Typegoose } from "@hasezoey/typegoose";
+import { modelOptions, pre, prop, Ref } from "@typegoose/typegoose";
+import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { Expose } from "class-transformer";
 import { Query } from "mongoose";
 import { iocContainer } from "../../../infrastructure/config/ioc";
 import { DecodedJwt } from "../../../ui/services/auth_service";
+import { winstonLoggerInstance } from "../../../infrastructure/bootstrapping/loaders/logger";
 import { TYPES } from "../constants/types";
 import { Writable } from "../utils/writable";
 import { User } from "./user";
@@ -16,7 +18,7 @@ import { User } from "./user";
  * @extends {Typegoose}
  */
 // eslint-disable-next-line
-@pre<BaseEntity>("findOneAndUpdate", function(this: Query<BaseEntity>, next) {
+@pre<BaseEntity>("findOneAndUpdate", function(this: Query<BaseEntity>) {
     try {
         const entity = this.getUpdate();
         if (iocContainer.isBound(TYPES.DecodedJwt)) {
@@ -27,14 +29,13 @@ import { User } from "./user";
                 entity.deletionTime = new Date();
             }
         }
-
-        next();
     } catch (error) {
-        next(error);
+        winstonLoggerInstance.error(error);
+        throw new Error(error);
     }
 })
 // eslint-disable-next-line
-@pre<any>("save", function(next) {
+@pre<any>("save", function() {
     try {
         if (iocContainer.isBound(TYPES.DecodedJwt)) {
             const currentUser = iocContainer.get<DecodedJwt>(TYPES.DecodedJwt);
@@ -46,12 +47,23 @@ import { User } from "./user";
         } else if (this.type === "User") {
             (this as Writable<BaseEntity>).createdBy = this;
         }
-        next();
     } catch (error) {
-        next(error);
+        winstonLoggerInstance.error(error);
+        throw new Error(error);
     }
 })
-export abstract class BaseEntity extends Typegoose {
+@modelOptions({
+    schemaOptions: {
+        toJSON: {
+            virtuals: true,
+            transform: (doc, ret) => {
+                ret.id = ret._id;
+                delete ret._id;
+            }
+        }
+    }
+})
+export abstract class BaseEntity extends TimeStamps {
     abstract type: string;
     abstract update(entity: Partial<BaseEntity>): void;
 
@@ -86,15 +98,6 @@ export abstract class BaseEntity extends Typegoose {
      * Gets the date and time the entity was last updated
      *
      * @type {Date}
-     * @memberof BaseEntity
-     */
-    @Expose()
-    @prop({ default: null })
-    readonly updatedAt?: Date;
-    /**
-     * Gets a reference to the user who performed the last update on this entity
-     *
-     * @type {(Ref<User | null>)}
      * @memberof BaseEntity
      */
     @Expose()
@@ -142,7 +145,6 @@ export abstract class BaseEntity extends Typegoose {
      *
      * @memberof BaseEntity
      */
-    @instanceMethod
     delete(): void {
         (this as Writable<BaseEntity>).isDeleted = true;
     }
@@ -152,7 +154,6 @@ export abstract class BaseEntity extends Typegoose {
      *
      * @memberof BaseEntity
      */
-    @instanceMethod
     restore(): void {
         (this as Writable<BaseEntity>).isDeleted = false;
     }
@@ -162,7 +163,6 @@ export abstract class BaseEntity extends Typegoose {
      *
      * @memberof BaseEntity
      */
-    @instanceMethod
     deactivate(): void {
         (this as Writable<BaseEntity>).isActive = false;
     }
@@ -172,7 +172,6 @@ export abstract class BaseEntity extends Typegoose {
      *
      * @memberof BaseEntity
      */
-    @instanceMethod
     activate(): void {
         (this as Writable<BaseEntity>).isActive = true;
     }

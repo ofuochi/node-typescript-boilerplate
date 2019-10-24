@@ -71,7 +71,7 @@ export async function bootstrap({
     });
     const app = server.build() as App;
     await setupSwagger(app);
-    log.info(`✔️  Environment: ${config.port}`);
+    log.info(`✔️  Environment: ${config.env}`);
 
     return app;
 }

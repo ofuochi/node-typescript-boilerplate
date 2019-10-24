@@ -40,8 +40,8 @@ export class TenantService implements ITenantService {
         limit
     }: {
         searchStr?: string;
-        skip?: number;
-        limit?: number;
+        skip: number;
+        limit: number;
     }): Promise<{ totalCount: number; items: Tenant[] }> {
         return this._tenantRepository.pagedFindAll({
             searchStr,

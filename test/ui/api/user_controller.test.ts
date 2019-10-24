@@ -108,6 +108,7 @@ describe("User controller", () => {
                 .set(X_AUTH_TOKEN_KEY, adminJwt)
                 .expect(httpStatus.OK);
             const { totalCount, items } = body;
+
             expect(items).to.be.an("array");
             expect(totalCount).to.be.greaterThan(0);
             expect(items).to.deep.include(createdUser);

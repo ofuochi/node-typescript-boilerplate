@@ -8,6 +8,6 @@ export type TenantModel = Tenant & Document;
 @provideSingleton(TenantRepository)
 export class TenantRepository extends BaseRepository<Tenant, TenantModel> {
     constructor() {
-        super(Tenant.model, () => new Tenant());
+        super(Tenant.getModel(), () => new Tenant());
     }
 }
