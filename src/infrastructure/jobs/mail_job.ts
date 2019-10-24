@@ -1,4 +1,4 @@
-import { ILoggerService } from "../../domain/interfaces/services";
+import { ILoggerService } from "../../application/services";
 import { User } from "../../domain/model/user";
 import { iocContainer } from "../config/ioc";
 import { LoggerService } from "../services/logger_service";

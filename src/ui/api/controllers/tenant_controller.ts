@@ -17,7 +17,7 @@ import {
 import { provideSingleton } from "../../../infrastructure/config/ioc";
 import { isIdValid } from "../../../infrastructure/utils/server_utils";
 import { HttpError } from "../../error";
-import { ITenantService } from "../../interfaces/tenant_service";
+import { ITenantService } from "../../../domain/services/tenant_service";
 import {
     CreateTenantInput,
     TenantDto,

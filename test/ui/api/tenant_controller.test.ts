@@ -4,7 +4,7 @@ import httpStatus from "http-status-codes";
 import {
     ITenantRepository,
     IUserRepository
-} from "../../../src/domain/interfaces/repositories";
+} from "../../../src/domain/data/repositories";
 import { Tenant } from "../../../src/domain/model/tenant";
 import { User, UserRole } from "../../../src/domain/model/user";
 import { config } from "../../../src/infrastructure/config";
@@ -15,7 +15,7 @@ import {
     X_AUTH_TOKEN_KEY,
     X_TENANT_ID
 } from "../../../src/ui/constants/header_constants";
-import { IAuthService } from "../../../src/ui/interfaces/auth_service";
+import { IAuthService } from "../../../src/domain/services/auth_service";
 import {
     CreateTenantInput,
     TenantDto,

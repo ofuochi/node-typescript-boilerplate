@@ -5,7 +5,7 @@ import { TYPES } from "../../../domain/constants/types";
 import {
     IBaseRepository,
     Query
-} from "../../../domain/interfaces/repositories";
+} from "../../../domain/data/repositories";
 import { BaseEntity } from "../../../domain/model/base";
 import { iocContainer, provideSingleton } from "../../config/ioc";
 import { winstonLoggerInstance } from "../../bootstrapping/loaders/logger";

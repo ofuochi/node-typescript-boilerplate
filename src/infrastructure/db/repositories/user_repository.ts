@@ -1,5 +1,5 @@
 import { Document } from "mongoose";
-import { IUserRepository } from "../../../domain/interfaces/repositories";
+import { IUserRepository } from "../../../domain/data/repositories";
 import { User } from "../../../domain/model/user";
 import { provideSingleton } from "../../config/ioc";
 import { BaseRepository } from "./base_repository";

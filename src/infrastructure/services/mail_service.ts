@@ -1,7 +1,7 @@
 import Agenda from "agenda";
 import Mailgun from "mailgun-js";
 import { TYPES } from "../../domain/constants/types";
-import { IMailService } from "../../domain/interfaces/services";
+import { IMailService } from "../../application/services";
 import { config } from "../config";
 import { iocContainer, provideSingleton } from "../config/ioc";
 import { MailJobType } from "../jobs/mail_job";

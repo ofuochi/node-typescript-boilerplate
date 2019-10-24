@@ -1,5 +1,5 @@
-import { TenantDto } from "../models/tenant_dto";
-import { Tenant } from "../../domain/model/tenant";
+import { TenantDto } from "../../ui/models/tenant_dto";
+import { Tenant } from "../model/tenant";
 import { IBaseService } from "./base_service";
 
 export interface ITenantService extends IBaseService<Tenant> {

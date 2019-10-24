@@ -2,7 +2,6 @@ import { plainToClass } from "class-transformer";
 import { inject } from "inversify";
 import { Body, Post, Route, Security, Tags } from "tsoa";
 import { provideSingleton } from "../../../infrastructure/config/ioc";
-import { IAuthService } from "../../interfaces/auth_service";
 import {
     UserSignInInput,
     UserSignUpDto,
@@ -10,6 +9,7 @@ import {
 } from "../../models/user_dto";
 import { AuthService } from "../../services/auth_service";
 import { BaseController } from "./base_controller";
+import { IAuthService } from "../../../domain/services/auth_service";
 
 @Tags("Auth")
 @Route("auth")

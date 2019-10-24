@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { ITenantRepository } from "../../../../src/domain/interfaces/repositories";
+import { ITenantRepository } from "../../../../src/domain/data/repositories";
 import { Tenant } from "../../../../src/domain/model/tenant";
 import { iocContainer } from "../../../../src/infrastructure/config/ioc";
 import { TenantRepository } from "../../../../src/infrastructure/db/repositories/tenant_repository";

@@ -4,7 +4,7 @@ import httpStatus from "http-status-codes";
 import {
     ITenantRepository,
     IUserRepository
-} from "../../../src/domain/interfaces/repositories";
+} from "../../../src/domain/data/repositories";
 import { Tenant } from "../../../src/domain/model/tenant";
 import { User, UserRole } from "../../../src/domain/model/user";
 import { config } from "../../../src/infrastructure/config";

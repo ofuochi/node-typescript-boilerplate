@@ -3,7 +3,7 @@ import httpStatus from "http-status-codes";
 import { Container } from "inversify";
 import jwt from "jsonwebtoken";
 import { TYPES } from "../../../domain/constants/types";
-import { ITenantRepository } from "../../../domain/interfaces/repositories";
+import { ITenantRepository } from "../../../domain/data/repositories";
 import { UserRole } from "../../../domain/model/user";
 import { config as env } from "../../../infrastructure/config";
 import { iocContainer } from "../../../infrastructure/config/ioc";
