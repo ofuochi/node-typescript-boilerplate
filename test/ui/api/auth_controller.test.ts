@@ -205,8 +205,8 @@ describe("AuthController", () => {
                     email: invalidSignInInput.emailOrUsername
                 });
 
-                expect(userFinal.signInAttempts).to.be.equal(
-                    userInitial.signInAttempts + 1
+                expect(userFinal.failedSignInAttempts).to.be.equal(
+                    userInitial.failedSignInAttempts + 1
                 );
             });
             it("should lockout user immediately after making the maximum allowed consecutive sign-in attempts", async () => {
@@ -248,7 +248,9 @@ describe("AuthController", () => {
                     tenant: tenant.id,
                     email: invalidSignInInput.emailOrUsername
                 });
-                expect(userFinal.signInAttempts).to.be.equal(maxSignInAttempts);
+                expect(userFinal.failedSignInAttempts).to.be.equal(
+                    maxSignInAttempts
+                );
             });
         });
     });
