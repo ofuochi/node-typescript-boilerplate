@@ -1,4 +1,10 @@
-import { index, instanceMethod, prop, Ref } from "@hasezoey/typegoose";
+import {
+    getModelForClass,
+    index,
+    prop,
+    Ref,
+    modelOptions
+} from "@typegoose/typegoose";
 import { config } from "../../infrastructure/config";
 import { iocContainer } from "../../infrastructure/config/ioc";
 import { TYPES } from "../constants/types";
@@ -30,6 +36,7 @@ export enum UserRole {
  * @extends {BaseEntity}
  * @implements {IMustHaveTenant}
  */
+@modelOptions({ options: { customName: "users" } })
 @index({ email: 1, tenant: 1 }, { unique: true })
 @index({ username: 1, tenant: 1 }, { unique: true })
 export class User extends BaseEntity implements IMustHaveTenant {
@@ -71,6 +78,7 @@ export class User extends BaseEntity implements IMustHaveTenant {
         maxlength: MAX_NAME_LENGTH,
         trim: true,
         lowercase: true,
+        text: true,
         unique: false
     })
     readonly username!: string;
@@ -86,6 +94,7 @@ export class User extends BaseEntity implements IMustHaveTenant {
         maxlength: MAX_NAME_LENGTH,
         trim: true,
         lowercase: true,
+        text: true,
         unique: false
     })
     readonly email!: string;
@@ -196,26 +205,8 @@ export class User extends BaseEntity implements IMustHaveTenant {
             tenant: id
         });
     };
-
-    /**
-     * Returns the User Typegoose model
-     *
-     * @readonly
-     * @static
-     * @memberof User
-     */
-    public static get model() {
-        const model = new User().getModelForClass(User, {
-            schemaOptions: { collection: "Users", timestamps: true }
-        });
-
-        model.collection.createIndex({
-            firstName: "text",
-            lastName: "text",
-            email: "text",
-            username: "text"
-        });
-        return model;
+    public static getModel() {
+        return getModelForClass(this);
     }
 
     /**
@@ -242,7 +233,6 @@ export class User extends BaseEntity implements IMustHaveTenant {
      * @param {UserRole} role
      * @memberof User
      */
-    @instanceMethod
     setRole(role: UserRole) {
         (this as Writable<User>).role = role;
     }
@@ -253,7 +243,6 @@ export class User extends BaseEntity implements IMustHaveTenant {
      * @param {string} email
      * @memberof User
      */
-    @instanceMethod
     setEmail(email: string) {
         (this as Writable<User>).email = email;
     }
@@ -264,7 +253,6 @@ export class User extends BaseEntity implements IMustHaveTenant {
      * @param {string} username
      * @memberof User
      */
-    @instanceMethod
     setUsername(username: string) {
         (this as Writable<User>).username = username;
     }
@@ -275,7 +263,6 @@ export class User extends BaseEntity implements IMustHaveTenant {
      * @param {string} firstName
      * @memberof User
      */
-    @instanceMethod
     setFirstName(firstName: string) {
         (this as Writable<User>).firstName = firstName;
     }
@@ -286,7 +273,6 @@ export class User extends BaseEntity implements IMustHaveTenant {
      * @param {string} lastName
      * @memberof User
      */
-    @instanceMethod
     setLastName(lastName: string) {
         (this as Writable<User>).lastName = lastName;
     }
@@ -297,7 +283,6 @@ export class User extends BaseEntity implements IMustHaveTenant {
      * @param {string} password
      * @memberof User
      */
-    @instanceMethod
     setPassword(password: string) {
         (this as Writable<User>).password = password;
     }
@@ -308,7 +293,6 @@ export class User extends BaseEntity implements IMustHaveTenant {
      * @param {*} tenant
      * @memberof User
      */
-    @instanceMethod
     setTenant(tenant: any) {
         (this as Writable<this>).tenant = tenant;
     }
@@ -318,7 +302,6 @@ export class User extends BaseEntity implements IMustHaveTenant {
      * @param {Partial<this>} user
      * @memberof User
      */
-    @instanceMethod
     update(user: Partial<this>): void {
         if (user.firstName) this.setFirstName(user.firstName as string);
         if (user.lastName) this.setLastName(user.lastName as string);
@@ -333,7 +316,6 @@ export class User extends BaseEntity implements IMustHaveTenant {
      *
      * @memberof User
      */
-    @instanceMethod
     clearLockOut() {
         (this as Writable<User>).lockOutEndDate = undefined;
         (this as Writable<User>).failedSignInAttempts = 0;

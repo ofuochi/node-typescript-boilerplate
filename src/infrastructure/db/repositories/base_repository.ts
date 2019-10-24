@@ -7,20 +7,27 @@ import {
     Query
 } from "../../../domain/interfaces/repositories";
 import { BaseEntity } from "../../../domain/model/base";
-import { iocContainer, provideSingleton } from "../../config/ioc";
 import { winstonLoggerInstance } from "../../bootstrapping/loaders/logger";
+import { iocContainer, provideSingleton } from "../../config/ioc";
 
 @provideSingleton(BaseRepository)
 export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
     implements IBaseRepository<TEntity> {
     protected Model: Model<TModel>;
-
     protected _constructor: () => TEntity;
 
     public constructor(
         @unmanaged() model: Model<TModel>,
         @unmanaged() constructor: () => TEntity
     ) {
+        model.schema.set("toObject", {
+            virtuals: true,
+            versionKey: false,
+            transform: (doc, ret) => {
+                delete ret._id;
+                return ret;
+            }
+        });
         this.Model = model;
         this._constructor = constructor;
     }
@@ -33,10 +40,9 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
             })
         );
         return new Promise<TEntity[]>((resolve, reject) => {
-            this.Model.find(query, "-__v", (err, res) => {
+            this.Model.find(query, (err, res) => {
                 if (err) return reject(err);
-                const results = res.map(r => this.readMapper(r));
-                return resolve(results);
+                return resolve(this.readMapper(res) as TEntity[]);
             });
         });
     }
@@ -46,8 +52,8 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
         limit
     }: {
         searchStr?: string;
-        skip?: number;
-        limit?: number;
+        skip: number;
+        limit: number;
     }) {
         const query = JSON.parse(
             JSON.stringify({
@@ -58,23 +64,20 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
         );
         if (!Object.keys(query.$text).length) delete query.$text;
 
-        skip = !skip || skip < 0 ? 0 : Math.floor(skip);
-        limit = !limit || limit < 0 ? 0 : Math.floor(limit);
+        skip = skip < 0 ? 0 : Math.floor(skip);
+        limit = limit < 0 ? 0 : Math.floor(limit);
         try {
             const [totalCount, res] = await Promise.all([
                 this.Model.find()
                     .countDocuments()
                     .exec(),
-                this.Model.find(query, "-__v")
+                this.Model.find(query)
                     .sort("-createdAt")
                     .skip(skip)
-                    .limit(limit || 50)
-                    .$where((res: any) => {
-                        console.log(res);
-                    })
+                    .limit(limit)
                     .exec()
             ]);
-            const items = res.map(r => this.readMapper(r));
+            const items = this.readMapper(res) as TEntity[];
             return { totalCount, items };
         } catch (error) {
             winstonLoggerInstance.error(error);
@@ -91,10 +94,10 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
         );
 
         return new Promise<TEntity>((resolve, reject) => {
-            this.Model.findOne(query, "-__v", (err, res) => {
+            this.Model.findOne(query, (err, res) => {
                 if (err) return reject(err);
                 if (!res) return resolve();
-                resolve(this.readMapper(res));
+                resolve(this.readMapper(res) as TEntity);
             });
         });
     }
@@ -104,8 +107,7 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
                 if (err) return reject(err);
                 if (!res) return resolve();
 
-                const result = this.readMapper(res);
-                return resolve(result);
+                return resolve(this.readMapper(res) as TEntity);
             });
         });
     }
@@ -141,7 +143,16 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
             }
         });
     }
-
+    public async insertMany(docs: TEntity[]): Promise<void> {
+        try {
+            const list = (await this.Model.insertMany(docs)) as any;
+            docs.length = 0;
+            [].push.apply(docs, list as TEntity[]);
+        } catch (error) {
+            winstonLoggerInstance.error(error);
+            throw new Error(error);
+        }
+    }
     public findManyById(ids: string[]) {
         const query = JSON.parse(
             JSON.stringify({
@@ -153,8 +164,7 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
         return new Promise<TEntity[]>((resolve, reject) => {
             this.Model.find(query, (err, res) => {
                 if (err) return reject(err);
-                const results = res.map(r => this.readMapper(r));
-                resolve(results);
+                resolve(this.readMapper(res) as TEntity[]);
             });
         });
     }
@@ -168,11 +178,10 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
             })
         );
         return new Promise<TEntity[]>((resolve, reject) => {
-            this.Model.find(query, "-__v", (err, res) => {
+            this.Model.find(query, (err, res) => {
                 if (err) return reject(err);
                 if (!res) return resolve();
-                const result = res.map(r => this.readMapper(r));
-                resolve(result);
+                resolve(this.readMapper(res) as TEntity[]);
             });
         });
     }
@@ -185,10 +194,10 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
             })
         );
         return new Promise<TEntity>((resolve, reject) => {
-            this.Model.findOne(query, "-__v", (err, res) => {
+            this.Model.findOne(query, (err, res) => {
                 if (err) return reject(err);
                 if (!res) return resolve();
-                resolve(this.readMapper(res));
+                resolve(this.readMapper(res) as TEntity);
             });
         });
     }
@@ -220,8 +229,7 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
                 (err, res) => {
                     if (err) return reject(err);
                     if (!res) return resolve();
-                    const result = this.readMapper(res);
-                    return resolve(result);
+                    return resolve(this.readMapper(res) as TEntity);
                 }
             );
         });
@@ -243,17 +251,16 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
      * @returns {TEntity}
      * @memberof BaseRepository
      */
-    private readMapper(model: TModel): TEntity {
-        const obj: any = model.toJSON();
-        const entity = this._constructor();
-        const propDesc = Object.getOwnPropertyDescriptor(
-            obj,
-            "_id"
-        ) as PropertyDescriptor;
-        Object.defineProperty(obj, "id", propDesc);
-        delete obj._id;
-        return plainToClassFromExist(entity, obj);
-    }
+    private readMapper = (model: TModel | TModel[]): TEntity | TEntity[] => {
+        if (Array.isArray(model)) {
+            const entities: TEntity[] = [];
+
+            return plainToClassFromExist(entities, model);
+        }
+        const entity: TEntity = this._constructor();
+
+        return plainToClassFromExist(entity, model.toJSON());
+    };
     private getCurrentTenant() {
         return this._constructor().type !== "Tenant"
             ? iocContainer.get<any>(TYPES.TenantId)
