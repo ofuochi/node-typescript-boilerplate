@@ -6,6 +6,7 @@ import { Writable } from "../utils/writable";
 import { BaseEntity } from "./base";
 import { IMustHaveTenant } from "./interfaces/must_have_tenant";
 import { Tenant } from "./tenant";
+import { inc, set } from "../data/db_operators";
 
 export const MAX_NAME_LENGTH = 225;
 export const PASSWORD_SALT_ROUND = 12;
@@ -230,8 +231,8 @@ export class User extends BaseEntity implements IMustHaveTenant {
             endDate.getMinutes() + config.userLockout.lockoutTime
         );
         return {
-            $inc: { failedSignInAttempts: 1 },
-            $set: { lockOutEndDate: endDate }
+            ...inc({ failedSignInAttempts: 1 }),
+            ...set({ lockOutEndDate: endDate })
         };
     }
 
