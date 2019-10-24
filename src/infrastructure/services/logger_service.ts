@@ -1,4 +1,4 @@
-import { ILoggerService } from "../../core/application/services";
+import { ILoggerService } from "../../core/application/logger_service";
 import {
     IWinstonLogger,
     winstonLoggerInstance
