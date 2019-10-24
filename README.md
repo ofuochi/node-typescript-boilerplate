@@ -83,7 +83,7 @@ npm run test-watch
 
 ## REST Services
 
-The application exposes a few REST endpoints which requires you to pass `x-tenant-id` header. First call the tenant endpoint `/api/v1/tenant` to get all the available tenants. Use any of the tenant IDs as the value for `x-tenant-id`
+The application exposes a few REST endpoints which require you to pass `x-tenant-id` header. First, call the tenant endpoint `/api/v1/tenant` to get all the available tenants. Use any of the tenant IDs as the value for `x-tenant-id`
 
 - `HTTP` `GET` `/api/v1/tenants`
 - `HTTP` `GET` `/api/v1/tenants/:query`
