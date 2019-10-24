@@ -1,7 +1,8 @@
 import { EventSubscriber, On } from "event-dispatch";
 import mongoose from "mongoose";
-import { ILoggerService, IMailService } from "../../domain/interfaces/services";
-import { User } from "../../domain/model/user";
+import { ILoggerService } from "../../core/application/logger_service";
+import { IMailService } from "../../core/application/mail_service";
+import { User } from "../../core/domain/models/user";
 import { iocContainer } from "../../infrastructure/config/ioc";
 import { MailJobType } from "../../infrastructure/jobs/mail_job";
 import { LoggerService } from "../../infrastructure/services/logger_service";

@@ -1,5 +1,5 @@
 import { Document } from "mongoose";
-import { Tenant } from "../../../domain/model/tenant";
+import { Tenant } from "../../../core/domain/models/tenant";
 import { provideSingleton } from "../../config/ioc";
 import { BaseRepository } from "./base_repository";
 

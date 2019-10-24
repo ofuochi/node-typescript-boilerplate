@@ -5,8 +5,8 @@ import {
     Ref,
     modelOptions
 } from "@typegoose/typegoose";
-import { config } from "../../infrastructure/config";
-import { iocContainer } from "../../infrastructure/config/ioc";
+import { iocContainer } from "../../../infrastructure/config/ioc";
+import { config } from "../../../infrastructure/config";
 import { TYPES } from "../constants/types";
 import { Writable } from "../utils/writable";
 import { BaseEntity } from "./base";

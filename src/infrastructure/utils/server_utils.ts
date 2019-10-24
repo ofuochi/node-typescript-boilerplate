@@ -1,6 +1,6 @@
 import { Server } from "http";
 import { Types } from "mongoose";
-import { TYPES } from "../../domain/constants/types";
+import { TYPES } from "../../core/domain/constants/types";
 import { App } from "../bootstrapping/loaders/express";
 import { winstonLoggerInstance as log } from "../bootstrapping/loaders/logger";
 import { config } from "../config";

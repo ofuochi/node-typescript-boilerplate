@@ -1,5 +1,5 @@
-import { ILoggerService } from "../../domain/interfaces/services";
-import { User } from "../../domain/model/user";
+import { ILoggerService } from "../../core/application/logger_service";
+import { User } from "../../core/domain/models/user";
 import { iocContainer } from "../config/ioc";
 import { LoggerService } from "../services/logger_service";
 

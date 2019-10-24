@@ -1,7 +1,9 @@
-import { ILoggerService } from "../../domain/interfaces/services";
-import { IWinstonLogger, winstonLoggerInstance } from "../bootstrapping/loaders/logger";
+import { ILoggerService } from "../../core/application/logger_service";
+import {
+    IWinstonLogger,
+    winstonLoggerInstance
+} from "../bootstrapping/loaders/logger";
 import { provideSingleton } from "../config/ioc";
-
 
 @provideSingleton(LoggerService)
 export class LoggerService implements ILoggerService {

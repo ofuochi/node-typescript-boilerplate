@@ -6,7 +6,7 @@ import {
     MaxLength,
     IsOptional
 } from "class-validator";
-import { MAX_NAME_LENGTH } from "../../domain/model/user";
+import { MAX_NAME_LENGTH } from "../../core/domain/models/user";
 import { BaseEntityDto } from "./base_dto";
 
 export class UserSignUpInput {

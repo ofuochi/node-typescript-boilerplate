@@ -1,5 +1,5 @@
-import { Tenant } from "../model/tenant";
-import { User } from "../model/user";
+import { Tenant } from "../models/tenant";
+import { User } from "../models/user";
 
 export type Query<T> = {
     [P in keyof T]?: T[P] | { $regex: RegExp };
