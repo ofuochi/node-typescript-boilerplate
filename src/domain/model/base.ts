@@ -7,7 +7,6 @@ import { TYPES } from "../constants/types";
 import { Writable } from "../utils/writable";
 import { User } from "./user";
 
-// eslint-disable-next-line
 /**
  * Base entity from which other entities inherit
  *
@@ -16,6 +15,7 @@ import { User } from "./user";
  * @class BaseEntity
  * @extends {Typegoose}
  */
+// eslint-disable-next-line
 @pre<BaseEntity>("findOneAndUpdate", function(this: Query<BaseEntity>, next) {
     try {
         const entity = this.getUpdate();

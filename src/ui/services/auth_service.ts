@@ -13,6 +13,7 @@ import { HttpError } from "../error";
 import { IAuthService } from "../interfaces/auth_service";
 import { UserDto, UserSignInInput, UserSignUpInput } from "../models/user_dto";
 import { events } from "../subscribers/events";
+import { and, or, lt } from "../../domain/data/db_operators";
 
 export interface DecodedJwt {
     userId: string;
@@ -114,30 +115,19 @@ export class AuthService implements IAuthService {
     private getSignInQuery(
         emailOrUsername: string
     ): Query<{ [key: string]: object }> {
-        return {
-            $and: [
+        return and(
+            or({ email: emailOrUsername }, { username: emailOrUsername }),
+            or(
                 {
-                    $or: [
-                        { email: emailOrUsername },
-                        { username: emailOrUsername }
-                    ]
+                    failedSignInAttempts: lt(
+                        config.userLockout.maxSignInAttempts
+                    )
                 },
                 {
-                    $or: [
-                        {
-                            failedSignInAttempts: {
-                                $lt: config.userLockout.maxSignInAttempts
-                            }
-                        },
-                        {
-                            lockOutEndDate: {
-                                $lt: new Date()
-                            }
-                        }
-                    ]
+                    lockOutEndDate: lt(new Date())
                 }
-            ]
-        };
+            )
+        );
     }
 
     private async generateToken(user: User) {
