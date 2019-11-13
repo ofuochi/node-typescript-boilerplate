@@ -135,7 +135,7 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
 					return resolve(doc);
 				});
 			} else {
-				if (this._ctor().type !== "Tenant") {
+				if ("tenant" in this._ctor()) {
 					doc = { ...doc, tenant: this.getCurrentTenant() };
 				}
 				const instance = new this.Model(doc);
@@ -287,7 +287,8 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
 		if (!tenant) {
 			return undefined;
 		}
-		return this._ctor().type !== "Tenant" ? tenant : undefined;
+
+		return "tenant" in this._ctor() ? tenant : undefined;
 	}
 	private getCurrentUser() {
 		const user = this._req.user as any;

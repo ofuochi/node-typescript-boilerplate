@@ -1,16 +1,19 @@
+import { TypegooseModule } from "nestjs-typegoose";
+import * as request from "supertest";
+
 import { HttpStatus, ValidationPipe } from "@nestjs/common";
 import { NestApplication } from "@nestjs/core";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 import { Test, TestingModule } from "@nestjs/testing";
-import { TypegooseModule } from "nestjs-typegoose";
-import * as request from "supertest";
+
 import { AuthController } from "../../src/auth/auth.controller";
 import { AuthService } from "../../src/auth/auth.service";
 import { headerConstants } from "../../src/auth/constants/header.constant";
 import { LoginInput } from "../../src/auth/dto/LoginInput";
 import { RegisterInput } from "../../src/auth/dto/RegisterInput";
 import { RegisterResponse } from "../../src/auth/dto/RegisterResponse";
+import { VerificationInput } from "../../src/auth/dto/VerificationInput";
 import { SessionSerializer } from "../../src/auth/session.serializer";
 import { JwtStrategy } from "../../src/auth/strategies/jwt.strategy";
 import { ConfigModule } from "../../src/config/config.module";
@@ -179,7 +182,7 @@ describe("AuthController (e2e)", () => {
 				expect(body).toHaveProperty("access_token");
 			});
 		});
-		describe("Invalid User Signin", () => {
+		describe("Invalid User sign-in", () => {
 			let invalidLoginInput: LoginInput;
 			let maxLoginAttempts: number;
 			let userId: string;
@@ -249,6 +252,21 @@ describe("AuthController (e2e)", () => {
 				});
 				expect(userFinal.failedSignInAttempts).toEqual(maxLoginAttempts);
 			});
+		});
+	});
+	describe("User account auth operations", () => {
+		const verificationInput: VerificationInput = {
+			email: "email@gmail.com",
+			clientBaseUrl: "http://www.clientbaseurl.com",
+			emailParameterName: "email",
+			verificationCodeParameterName: "verification_code"
+		};
+		it("should send password reset token to user", async () => {
+			const { body } = await req
+				.post(`${endpoint}/send_password_reset_token`)
+				.set(headerConstants.tenantIdKey, defaultTenant.id)
+				.send(verificationInput)
+				.expect(HttpStatus.NO_CONTENT);
 		});
 	});
 	afterAll(async () => {

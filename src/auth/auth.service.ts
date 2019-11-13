@@ -1,12 +1,14 @@
-import { ConflictException, Injectable, Scope } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
-import * as bcrypt from "bcrypt";
-import { ConfigService } from "../config/config.service";
-import { Query } from "../db/interfaces/repo.interface";
-import { UserRepository } from "../user/repository/user.repository";
-import { User, UserRole } from "../user/user.entity";
-import { hashPw } from "../utils/pwHash";
-import { errors } from "./constants/error.constant";
+import * as bcrypt from 'bcrypt'
+import { ConflictException, Injectable, Scope } from '@nestjs/common'
+import { JwtService } from '@nestjs/jwt'
+
+import { ConfigService } from '../config/config.service'
+import { Query } from '../db/interfaces/repo.interface'
+import { UserRepository } from '../user/repository/user.repository'
+import { User, UserRole } from '../user/user.entity'
+import { hashPw } from '../utils/pwHash'
+import { errors } from './constants/error.constant'
+import { Temp_PasswordReset } from '../entities/pw_reset.entity'
 
 export interface DecodedJwt {
 	username: string;
@@ -66,6 +68,12 @@ export class AuthService {
 	async register(
 		user: User
 	): Promise<{ id: string; canLogin: boolean; access_token: string }> {
+		// const pwReset = Temp_PasswordReset.createInstance(
+		// 	"5dcc12d39b94ad1d6afa3b3f",
+		// 	"string"
+		// );
+		// console.info(pwReset);
+		// const res = await Temp_PasswordReset.getModel().create(pwReset);
 		let existingUser = await this._userRepository.findOneByQuery({
 			email: user.email
 		});
