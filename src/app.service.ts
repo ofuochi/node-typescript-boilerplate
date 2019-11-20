@@ -1,9 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common'
-import { Command } from 'nestjs-command'
+import { Command } from 'nestjs-command';
 
-import { Tenant } from './tenant/tenant.entity'
-import { User, UserRole } from './user/user.entity'
-import { hashPw } from './utils/pwHash'
+import { Injectable, Logger } from '@nestjs/common';
+
+import { Tenant } from './tenant/tenant.entity';
+import { User, UserRole } from './user/user.entity';
+import { hashPw } from './utils/pwHash';
 
 @Injectable()
 export class AppService {
@@ -50,6 +51,7 @@ export class AppService {
 			password,
 			tenant
 		});
+		user.setRoles([UserRole.ADMIN]);
 		await User.getModel().create(user);
 		Logger.log("Seeded Default Admin");
 	}

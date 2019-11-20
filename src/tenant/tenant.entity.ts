@@ -1,7 +1,9 @@
-import { getModelForClass, prop, modelOptions } from "@typegoose/typegoose";
-import { Expose } from "class-transformer";
-import { Writable } from "../utils/writable";
-import { BaseEntity } from "../base.entity";
+import { Expose } from 'class-transformer';
+
+import { getModelForClass, modelOptions, prop } from '@typegoose/typegoose';
+
+import { BaseEntity } from '../base.entity';
+import { Writable } from '../utils/writable';
 
 /**
  *
@@ -24,7 +26,6 @@ export class Tenant extends BaseEntity {
 		index: true,
 		unique: true
 	})
-	@Expose()
 	readonly name!: string;
 	/**
 	 * Gets the description of the tenant
@@ -33,7 +34,6 @@ export class Tenant extends BaseEntity {
 	 * @memberof Tenant
 	 */
 	@prop({ required: true })
-	@Expose()
 	readonly description!: string;
 
 	constructor(arg?: { name: string; description: string }) {

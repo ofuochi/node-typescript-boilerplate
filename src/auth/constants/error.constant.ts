@@ -1,5 +1,6 @@
-import { BadRequestException, UnauthorizedException } from "@nestjs/common";
-import { headerConstants } from "./header.constant";
+import { BadRequestException, UnauthorizedException } from '@nestjs/common';
+
+import { headerConstants } from './header.constant';
 
 export const errors = {
   INVALID_LOGIN_ATTEMPT: new UnauthorizedException("Invalid login attempt!"),

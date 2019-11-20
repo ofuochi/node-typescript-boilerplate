@@ -1,7 +1,8 @@
+import * as failFast from "jasmine-fail-fast";
+import * as mongoose from "mongoose";
 import { Logger } from "@nestjs/common";
 import { MongoMemoryServer } from "mongodb-memory-server";
-import * as mongoose from "mongoose";
-import * as failFast from "jasmine-fail-fast";
+
 import { Tenant } from "../src/tenant/tenant.entity";
 import { ConfigService, EnvConfig } from "../src/config/config.service";
 
@@ -38,7 +39,6 @@ beforeAll(async () => {
 	process.env.MONGODB_URI = connStr;
 	config = new ConfigService(`${process.env.NODE_ENV || "test"}.env`).env;
 });
-
 afterAll(async () => {
 	if (mongoose.connection.db) {
 		await cleanupDb();

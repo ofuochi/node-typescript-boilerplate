@@ -1,11 +1,13 @@
-import { Inject, Injectable, Logger, Scope } from "@nestjs/common";
-import { REQUEST } from "@nestjs/core";
-import { plainToClassFromExist } from "class-transformer";
-import { Request } from "express";
-import { Document, Model } from "mongoose";
-import { headerConstants } from "../../auth/constants/header.constant";
-import { BaseEntity } from "../../base.entity";
-import { IBaseRepository, Query } from "../interfaces/repo.interface";
+import { plainToClassFromExist } from 'class-transformer';
+import { Request } from 'express';
+import { Document, Model } from 'mongoose';
+
+import { Inject, Injectable, Logger, Scope } from '@nestjs/common';
+import { REQUEST } from '@nestjs/core';
+
+import { headerConstants } from '../../auth/constants/header.constant';
+import { BaseEntity } from '../../base.entity';
+import { IBaseRepository, Query } from '../interfaces/repo.interface';
 
 @Injectable({ scope: Scope.REQUEST })
 export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
@@ -111,9 +113,9 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
 		});
 	}
 
-	public async insertOrUpdate(doc: TEntity): Promise<TEntity> {
+	public async insertOrUpdate(doc: TEntity): Promise<void> {
 		const currentUser = this.getCurrentUser();
-		return new Promise<TEntity>((resolve, reject) => {
+		return new Promise<void>((resolve, reject) => {
 			if (doc.id) {
 				const query = JSON.parse(
 					JSON.stringify({
@@ -132,7 +134,7 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
 						return resolve();
 					}
 					Object.assign(doc, this.readMapper(res));
-					return resolve(doc);
+					resolve();
 				});
 			} else {
 				if ("tenant" in this._ctor()) {
@@ -142,11 +144,9 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
 				instance.set("createdBy", this.getCurrentUser() || instance._id);
 
 				instance.save((err, res) => {
-					if (err) {
-						return reject(err);
-					}
+					if (err) return reject(err);
 					Object.assign(doc, this.readMapper(res));
-					return resolve(doc);
+					resolve();
 				});
 			}
 		});

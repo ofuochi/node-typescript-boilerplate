@@ -1,6 +1,9 @@
-import { ApiModelProperty } from "@nestjs/swagger";
-import { IsNotEmpty, MaxLength, MinLength } from "class-validator";
-import { MAX_NAME_LENGTH } from "../../user/constants";
+import { IsNotEmpty, MaxLength, MinLength } from 'class-validator';
+
+import { ApiModelProperty } from '@nestjs/swagger';
+
+import { MAX_NAME_LENGTH } from '../../user/constants';
+
 export class LoginInput {
   @ApiModelProperty({
     required: true,

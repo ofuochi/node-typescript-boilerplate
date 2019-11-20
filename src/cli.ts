@@ -1,6 +1,8 @@
-import { NestFactory } from "@nestjs/core";
-import { CommandModule, CommandService } from "nestjs-command";
-import { AppModule } from "./app.module";
+import { CommandModule, CommandService } from 'nestjs-command';
+
+import { NestFactory } from '@nestjs/core';
+
+import { AppModule } from './app.module';
 
 (async () => {
   const app = await NestFactory.createApplicationContext(AppModule, {

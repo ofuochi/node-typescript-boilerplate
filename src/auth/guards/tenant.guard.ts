@@ -1,14 +1,11 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from "@nestjs/common";
-import { Request } from "express";
-import { Types } from "mongoose";
-import { errors } from "../constants/error.constant";
-import { headerConstants } from "../constants/header.constant";
-import { Tenant } from "../../tenant/tenant.entity";
+import { Request } from 'express';
+import { Types } from 'mongoose';
+
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+
+import { Tenant } from '../../tenant/tenant.entity';
+import { errors } from '../constants/error.constant';
+import { headerConstants } from '../constants/header.constant';
 
 @Injectable()
 export class TenantGuard implements CanActivate {

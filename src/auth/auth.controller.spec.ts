@@ -1,8 +1,9 @@
-import { Test, TestingModule } from "@nestjs/testing";
-import { AuthController } from "./auth.controller";
-import { AuthService } from "./auth.service";
-import { LoginInput } from "./dto/LoginInput";
-import { RegisterInput } from "./dto/RegisterInput";
+import { Test, TestingModule } from '@nestjs/testing';
+
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
+import { LoginInput } from './dto/LoginInput';
+import { RegisterInput } from './dto/RegisterInput';
 
 jest.mock("./auth.service");
 

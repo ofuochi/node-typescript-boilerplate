@@ -1,24 +1,13 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Request,
-  UseGuards,
-} from "@nestjs/common";
-import { AuthGuard } from "@nestjs/passport";
-import {
-  ApiBearerAuth,
-  ApiCreatedResponse,
-  ApiOperation,
-  ApiUseTags,
-} from "@nestjs/swagger";
-import { plainToClass } from "class-transformer";
-import { CreateTenantInput, TenantDto } from "./tenant.dto";
-import { TenantService } from "./tenant.service";
-import { Roles } from "../decorators/roles.decorator";
-import { UserRole } from "../user/user.entity";
+import { plainToClass } from 'class-transformer';
+
+import { Body, Controller, Get, Param, Post, Request, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOperation, ApiUseTags } from '@nestjs/swagger';
+
+import { Roles } from '../decorators/roles.decorator';
+import { UserRole } from '../user/user.entity';
+import { CreateTenantInput, TenantDto } from './tenant.dto';
+import { TenantService } from './tenant.service';
 
 @ApiUseTags("Tenants")
 @Controller("tenant")

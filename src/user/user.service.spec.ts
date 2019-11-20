@@ -1,11 +1,13 @@
-import { Test, TestingModule } from "@nestjs/testing";
-import { TypegooseModule } from "nestjs-typegoose";
-import { UserRepository } from "./repository/user.repository";
-import { UserController } from "./user.controller";
-import { User } from "./user.entity";
-import { UserService } from "./user.service";
-import { ConfigModule } from "../config/config.module";
-import { ConfigService } from "../config/config.service";
+import { TypegooseModule } from 'nestjs-typegoose';
+
+import { Test, TestingModule } from '@nestjs/testing';
+
+import { ConfigModule } from '../config/config.module';
+import { ConfigService } from '../config/config.service';
+import { UserRepository } from './repository/user.repository';
+import { UserController } from './user.controller';
+import { User } from './user.entity';
+import { UserService } from './user.service';
 
 describe("UserService", () => {
 	let service: UserService;

@@ -1,6 +1,7 @@
-import { Injectable } from "@nestjs/common";
-import { TenantRepository } from "./repository/tenant.repository";
-import { Tenant } from "./tenant.entity";
+import { Injectable } from '@nestjs/common';
+
+import { TenantRepository } from './repository/tenant.repository';
+import { Tenant } from './tenant.entity';
 
 @Injectable()
 export class TenantService {

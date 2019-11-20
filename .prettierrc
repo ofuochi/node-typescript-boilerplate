@@ -1,6 +1,5 @@
 {
 	"useTabs": true,
-	"jsxSingleQuote": true,
 	"editor.codeActionsOnSave": {
 		"source.fixAll.tslint": true
 	}

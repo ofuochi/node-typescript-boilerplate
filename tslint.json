@@ -12,12 +12,12 @@
 		"prettier": true,
 		"quotemark": [true, "double"],
 		"member-access": [false],
-		"ordered-imports": [false],
+		"ordered-imports": [true],
 		"max-line-length": [true, 150],
-		"member-ordering": [false],
+		"member-ordering": [true],
 		"interface-name": [false],
 		"arrow-parens": false,
-		"object-literal-sort-keys": false
+		"object-literal-sort-keys": true
 	},
 	"rulesDirectory": []
 }

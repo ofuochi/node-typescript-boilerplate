@@ -1,9 +1,11 @@
-import { Module } from "@nestjs/common";
-import { TypegooseModule } from "nestjs-typegoose";
-import { TenantRepository } from "./repository/tenant.repository";
-import { TenantController } from "./tenant.controller";
-import { Tenant } from "./tenant.entity";
-import { TenantService } from "./tenant.service";
+import { TypegooseModule } from 'nestjs-typegoose';
+
+import { Module } from '@nestjs/common';
+
+import { TenantRepository } from './repository/tenant.repository';
+import { TenantController } from './tenant.controller';
+import { Tenant } from './tenant.entity';
+import { TenantService } from './tenant.service';
 
 @Module({
 	imports: [TypegooseModule.forFeature([Tenant])],

@@ -1,6 +1,7 @@
-import * as Joi from "@hapi/joi";
-import * as dotenv from "dotenv";
-import * as fs from "fs";
+import * as dotenv from 'dotenv';
+import * as fs from 'fs';
+
+import * as Joi from '@hapi/joi';
 
 export interface EnvConfig {
 	nodeEnv: string;

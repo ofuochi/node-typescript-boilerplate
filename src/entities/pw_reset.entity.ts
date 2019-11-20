@@ -1,26 +1,27 @@
-import { getModelForClass, modelOptions, prop, Ref } from '@typegoose/typegoose'
+import { getModelForClass, index, modelOptions, prop, Ref } from '@typegoose/typegoose';
 
-import { User } from '../user/user.entity'
-import { BaseEntity } from '../base.entity'
+import { BaseEntity } from '../base.entity';
+import { User } from '../user/user.entity';
 
+export const PW_RESET_EXPIRY_SECS = 1;
 @modelOptions({ options: { customName: "temp_password_resets" } })
-export class Temp_PasswordReset extends BaseEntity {
-	readonly token: string;
-	@prop({ type: Date, expires: 3600 })
-	readonly createdAt: Date;
+@index({ createdAt: 1 }, { expireAfterSeconds: PW_RESET_EXPIRY_SECS })
+export class TempPasswordReset extends BaseEntity {
+	@prop({ maxlength: 50, type: String, required: true })
+	readonly token!: string;
 
-	@prop({ ref: User, unique: true })
-	readonly user: Ref<User>;
+	@prop({ ref: User, unique: true, required: true })
+	readonly user!: Ref<User>;
 
-	constructor(args?: { user: any; token: string }) {
+	constructor(args?: { userId: any; token: string }) {
 		super();
 		if (!args) return;
-		const { token, user } = args;
+		const { token, userId: user } = args;
 		this.token = token;
 		this.user = user;
 	}
-	static createInstance(user: any, token: string) {
-		return new this({ user, token });
+	static createInstance(userId: any, token: string) {
+		return new this({ userId, token });
 	}
 	public static getModel() {
 		return getModelForClass(this);

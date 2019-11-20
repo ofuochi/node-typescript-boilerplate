@@ -1,9 +1,8 @@
-import { ApiModelProperty } from "@nestjs/swagger";
-import { BaseEntityDto } from "../../base.dto";
+import { ApiModelProperty } from '@nestjs/swagger';
 
-export class RegisterResponse extends BaseEntityDto {
-  @ApiModelProperty()
-  canLogin: boolean;
-  @ApiModelProperty()
-  access_token: string;
+export class RegisterResponse {
+	@ApiModelProperty()
+	canLogin: boolean;
+	@ApiModelProperty()
+	access_token: string;
 }

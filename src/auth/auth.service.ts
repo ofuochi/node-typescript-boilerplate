@@ -1,14 +1,25 @@
-import * as bcrypt from 'bcrypt'
-import { ConflictException, Injectable, Scope } from '@nestjs/common'
-import { JwtService } from '@nestjs/jwt'
+import * as bcrypt from "bcrypt";
+import * as crypto from "crypto";
+import * as querystring from "querystring";
 
-import { ConfigService } from '../config/config.service'
-import { Query } from '../db/interfaces/repo.interface'
-import { UserRepository } from '../user/repository/user.repository'
-import { User, UserRole } from '../user/user.entity'
-import { hashPw } from '../utils/pwHash'
-import { errors } from './constants/error.constant'
-import { Temp_PasswordReset } from '../entities/pw_reset.entity'
+import {
+	ConflictException,
+	Injectable,
+	NotFoundException,
+	Scope
+} from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+
+import { ConfigService } from "../config/config.service";
+import { Query } from "../db/interfaces/repo.interface";
+import { TempPwResetRepository } from "../db/repos/pw_reset.repo";
+import { TempPasswordReset } from "../entities/pw_reset.entity";
+import { UserRepository } from "../user/repository/user.repository";
+import { User, UserRole } from "../user/user.entity";
+import { hashPw } from "../utils/pwHash";
+import { errors } from "./constants/error.constant";
+import { CallbackUrlPropsInput } from "./dto/CallbackUrlPropsInput";
+import { MailService } from "../shared/services/mail.service";
 
 export interface DecodedJwt {
 	username: string;
@@ -22,7 +33,9 @@ export class AuthService {
 	constructor(
 		private readonly _jwtService: JwtService,
 		private readonly _userRepository: UserRepository,
-		private readonly _configService: ConfigService
+		private readonly _tempPwResetRepository: TempPwResetRepository,
+		private readonly _configService: ConfigService,
+		private readonly _mailService: MailService
 	) {}
 	/**
 	 * Checks if a User exist and returns the User
@@ -62,18 +75,12 @@ export class AuthService {
 	 * Registers a new user
 	 *
 	 * @param {User} user
-	 * @returns {Promise<{ id: string; canLogin: boolean; access_token: string }>}
+	 * @returns {Promise<{ canLogin: boolean; access_token: string }>}
 	 * @memberof AuthService
 	 */
 	async register(
 		user: User
-	): Promise<{ id: string; canLogin: boolean; access_token: string }> {
-		// const pwReset = Temp_PasswordReset.createInstance(
-		// 	"5dcc12d39b94ad1d6afa3b3f",
-		// 	"string"
-		// );
-		// console.info(pwReset);
-		// const res = await Temp_PasswordReset.getModel().create(pwReset);
+	): Promise<{ canLogin: boolean; access_token: string }> {
 		let existingUser = await this._userRepository.findOneByQuery({
 			email: user.email
 		});
@@ -91,11 +98,31 @@ export class AuthService {
 			);
 		}
 		user.setPassword(await hashPw(user.password));
-		const newUser = await this._userRepository.insertOrUpdate(user);
+		await this._userRepository.insertOrUpdate(user);
 		const { access_token } = await this.generateJwt(user);
-		return { canLogin: !!access_token, access_token, id: newUser.id };
+		return { canLogin: !!access_token, access_token };
 	}
 
+	async sendPasswordResetToken(input: CallbackUrlPropsInput) {
+		const user = await this._userRepository.findOneByQuery({
+			email: input.email
+		});
+		if (!user) throw new NotFoundException(`${input.email} does not exist!`);
+		const randomToken = crypto.randomBytes(20).toString("hex");
+		let pwResetEntity = await this._tempPwResetRepository.findOneByQuery({
+			user: user.id
+		});
+		if (!pwResetEntity)
+			pwResetEntity = TempPasswordReset.createInstance(user.id, randomToken);
+		await this._tempPwResetRepository.insertOrUpdate(pwResetEntity);
+		let callbackUrl = querystring.stringify({
+			[input.emailParameterName]: input.emailParameterName,
+			[input.verificationCodeParameterName]: input.verificationCodeParameterName
+		});
+
+		callbackUrl = `${input.clientBaseUrl}/?${callbackUrl}`;
+		this._mailService.sendMail("from@gmail.com", "to@gmail.com", callbackUrl);
+	}
 	//#region
 	private async processSignInAttempt(pw: string, user: User) {
 		if (!user) {

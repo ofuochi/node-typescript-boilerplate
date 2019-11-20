@@ -1,14 +1,10 @@
-import { ApiModelProperty } from "@nestjs/swagger";
-import { Expose } from "class-transformer";
-import {
-  IsBoolean,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  MaxLength,
-} from "class-validator";
-import { BaseCreateEntityDto, BaseEntityDto } from "../base.dto";
-import { MAX_NAME_LENGTH } from "../user/user.entity";
+import { Expose } from 'class-transformer';
+import { IsBoolean, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+
+import { ApiModelProperty } from '@nestjs/swagger';
+
+import { BaseCreateEntityDto, BaseEntityDto } from '../base.dto';
+import { MAX_NAME_LENGTH } from '../user/user.entity';
 
 export class CreateTenantInput extends BaseCreateEntityDto {
   @ApiModelProperty({

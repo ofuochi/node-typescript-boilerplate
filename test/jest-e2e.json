@@ -1,10 +1,10 @@
 {
 	"moduleFileExtensions": ["js", "json", "ts"],
-	"bail": 1,
-	"preset": "@shelf/jest-mongodb",
-	"testEnvironment": "node",
-	"setupFilesAfterEnv": ["<rootDir>/setup.ts"],
 	"rootDir": ".",
+	"bail": 1,
+	"verbose": false,
+	"setupFilesAfterEnv": ["<rootDir>/setup.ts"],
+	"testEnvironment": "node",
 	"testRegex": ".e2e-spec.ts$",
 	"transform": {
 		"^.+\\.(t|j)s$": "ts-jest"

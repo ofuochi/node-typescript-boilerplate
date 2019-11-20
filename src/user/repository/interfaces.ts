@@ -1,6 +1,7 @@
-import { Query } from "mongoose";
-import { IBaseRepository } from "../../db/interfaces/repo.interface";
-import { User } from "../user.entity";
+import { Query } from 'mongoose';
+
+import { IBaseRepository } from '../../db/interfaces/repo.interface';
+import { User } from '../user.entity';
 
 export interface IUserRepository extends IBaseRepository<User> {
   /**

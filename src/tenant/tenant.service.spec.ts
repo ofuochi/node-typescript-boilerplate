@@ -1,11 +1,13 @@
-import { Test, TestingModule } from "@nestjs/testing";
-import { TypegooseModule } from "nestjs-typegoose";
-import { TenantRepository } from "./repository/tenant.repository";
-import { TenantController } from "./tenant.controller";
-import { Tenant } from "./tenant.entity";
-import { TenantService } from "./tenant.service";
-import { ConfigModule } from "../config/config.module";
-import { ConfigService } from "../config/config.service";
+import { TypegooseModule } from 'nestjs-typegoose';
+
+import { Test, TestingModule } from '@nestjs/testing';
+
+import { ConfigModule } from '../config/config.module';
+import { ConfigService } from '../config/config.service';
+import { TenantRepository } from './repository/tenant.repository';
+import { TenantController } from './tenant.controller';
+import { Tenant } from './tenant.entity';
+import { TenantService } from './tenant.service';
 
 describe("TenantService", () => {
 	let service: TenantService;

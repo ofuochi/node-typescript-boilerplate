@@ -1,9 +1,11 @@
-import { ReturnModelType } from "@typegoose/typegoose";
-import { Document } from "mongoose";
-import { InjectModel } from "nestjs-typegoose";
-import { BaseRepository } from "../../db/repos/base.repo";
-import { User } from "../user.entity";
-import { IUserRepository } from "./interfaces";
+import { Document } from 'mongoose';
+import { InjectModel } from 'nestjs-typegoose';
+
+import { ReturnModelType } from '@typegoose/typegoose';
+
+import { BaseRepository } from '../../db/repos/base.repo';
+import { User } from '../user.entity';
+import { IUserRepository } from './interfaces';
 
 export type UserModel = User & Document;
 

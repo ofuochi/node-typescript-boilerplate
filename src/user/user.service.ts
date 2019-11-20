@@ -1,7 +1,8 @@
-import { Injectable } from "@nestjs/common";
-import { hashPw } from "../utils/pwHash";
-import { UserRepository } from "./repository/user.repository";
-import { User } from "./user.entity";
+import { Injectable } from '@nestjs/common';
+
+import { hashPw } from '../utils/pwHash';
+import { UserRepository } from './repository/user.repository';
+import { User } from './user.entity';
 
 @Injectable()
 export class UserService {

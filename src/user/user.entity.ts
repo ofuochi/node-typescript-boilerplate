@@ -1,15 +1,9 @@
-import {
-	arrayProp,
-	getModelForClass,
-	index,
-	modelOptions,
-	prop,
-	Ref
-} from "@typegoose/typegoose";
-import { BaseEntity } from "../base.entity";
-import { Tenant } from "../tenant/tenant.entity";
-import { IMustHaveTenant } from "../tenant/tenant.interface";
-import { Writable } from "../utils/writable";
+import { arrayProp, getModelForClass, index, modelOptions, prop, Ref } from '@typegoose/typegoose';
+
+import { BaseEntity } from '../base.entity';
+import { Tenant } from '../tenant/tenant.entity';
+import { IMustHaveTenant } from '../tenant/tenant.interface';
+import { Writable } from '../utils/writable';
 
 export const MAX_NAME_LENGTH = 225;
 export const PASSWORD_SALT_ROUND = 12;

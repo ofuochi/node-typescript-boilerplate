@@ -1,27 +1,33 @@
-import { UnauthorizedException } from "@nestjs/common";
-import { JwtModule } from "@nestjs/jwt";
-import { PassportModule } from "@nestjs/passport";
-import { Test, TestingModule } from "@nestjs/testing";
-import { TypegooseModule } from "nestjs-typegoose";
-import { ConfigModule } from "../config/config.module";
-import { ConfigService } from "../config/config.service";
-import { UserRepository } from "../user/repository/user.repository";
-import { User } from "../user/user.entity";
-import { UserModule } from "../user/user.module";
-import { hashPw } from "../utils/pwHash";
-import { AuthController } from "./auth.controller";
-import { AuthService } from "./auth.service";
-import { errors } from "./constants/error.constant";
-import { SessionSerializer } from "./session.serializer";
-import { JwtStrategy } from "./strategies/jwt.strategy";
-import { objectExpression } from "@babel/types";
+import { Types } from 'mongoose';
+import { TypegooseModule } from 'nestjs-typegoose';
+
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { Test, TestingModule } from '@nestjs/testing';
+
+import { ConfigModule } from '../config/config.module';
+import { ConfigService } from '../config/config.service';
+import { TempPwResetRepository } from '../db/repos/pw_reset.repo';
+import { MailService } from '../shared/services/mail.service';
+import { UserRepository } from '../user/repository/user.repository';
+import { User } from '../user/user.entity';
+import { UserModule } from '../user/user.module';
+import { hashPw } from '../utils/pwHash';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
+import { errors } from './constants/error.constant';
+import { SessionSerializer } from './session.serializer';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 jest.mock("../user/repository/user.repository");
-process.env.JWT_SECRET = "JWT_SECRET";
+jest.mock("../db/repos/pw_reset.repo");
 
 describe("AuthService", () => {
 	let authService: AuthService;
 	let userRepo: UserRepository;
+	let mailService: MailService;
+	let tempPwResetRepo: TempPwResetRepository;
 	beforeAll(async () => {
 		const typegooseConfig = TypegooseModule.forRootAsync({
 			imports: [ConfigModule],
@@ -45,12 +51,16 @@ describe("AuthService", () => {
 					signOptions: { expiresIn: "2 days" }
 				})
 			],
-			providers: [AuthService, JwtStrategy, SessionSerializer],
+			providers: [AuthService, JwtStrategy, SessionSerializer, MailService],
 			controllers: [AuthController]
 		}).compile();
 
 		authService = await module.resolve<AuthService>(AuthService);
 		userRepo = module.get<UserRepository>(UserRepository);
+		tempPwResetRepo = await module.resolve<TempPwResetRepository>(
+			TempPwResetRepository
+		);
+		mailService = module.get<MailService>(MailService);
 	});
 	afterEach(() => jest.resetAllMocks());
 
@@ -67,12 +77,11 @@ describe("AuthService", () => {
 	it("should register new user", async () => {
 		const spy = jest
 			.spyOn(userRepo, "insertOrUpdate")
-			.mockResolvedValue(Promise.resolve({ id: "da" } as User));
-		const { canLogin, access_token, id } = await authService.register(user);
+			.mockResolvedValue(Promise.resolve());
+		const { canLogin, access_token } = await authService.register(user);
 
 		expect(spy).toHaveBeenCalledWith(user);
 		expect(canLogin).toBe(true);
-		expect(id).toBeTruthy();
 		expect(access_token).toBeTruthy();
 	});
 	it("should generate access token", async () => {
@@ -124,6 +133,22 @@ describe("AuthService", () => {
 			expect(spy).toHaveBeenCalled();
 			expect(error).toBeInstanceOf(UnauthorizedException);
 			expect(error.message).toEqual(errors.INVALID_LOGIN_ATTEMPT.message);
+		}
+	});
+	it("should send password reset token", async () => {
+		userRepo.findOneByQuery = jest.fn(() => Promise.resolve(user));
+		tempPwResetRepo.insertOrUpdate = jest.fn(() => Promise.resolve());
+		mailService.sendMail = jest.fn(() => Promise.resolve());
+
+		await authService.sendPasswordResetToken(user.email);
+		expect(mailService.sendMail).toHaveBeenCalled();
+	});
+	it("should throw not found exception for nonexisting email", async () => {
+		try {
+			await authService.sendPasswordResetToken(user.email);
+		} catch (error) {
+			expect(error).toBeInstanceOf(NotFoundException);
+			expect(mailService.sendMail).toHaveBeenCalledTimes(0);
 		}
 	});
 });

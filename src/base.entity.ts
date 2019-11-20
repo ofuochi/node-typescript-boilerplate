@@ -1,8 +1,8 @@
-import { modelOptions, prop, Ref } from "@typegoose/typegoose";
-import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
-import { Expose } from "class-transformer";
-import { User } from "./user/user.entity";
-import { Writable } from "./utils/writable";
+import { modelOptions, prop, Ref, setGlobalOptions } from '@typegoose/typegoose';
+import { TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
+
+import { User } from './user/user.entity';
+import { Writable } from './utils/writable';
 
 @modelOptions({
 	schemaOptions: {
@@ -25,7 +25,6 @@ export abstract class BaseEntity extends TimeStamps {
 	 * @type {*}
 	 * @memberof BaseEntity
 	 */
-	@Expose()
 	id?: any;
 
 	/**
@@ -34,7 +33,6 @@ export abstract class BaseEntity extends TimeStamps {
 	 * @type {Date}
 	 * @memberof BaseEntity
 	 */
-	@Expose()
 	@prop({ required: true, default: new Date() })
 	readonly createdAt: Date = new Date();
 	/**
@@ -43,7 +41,6 @@ export abstract class BaseEntity extends TimeStamps {
 	 * @type {(Ref<User | null>)}
 	 * @memberof BaseEntity
 	 */
-	@Expose()
 	@prop({ default: null, ref: BaseEntity })
 	readonly createdBy: Ref<User | null> = null;
 	/**
@@ -52,7 +49,6 @@ export abstract class BaseEntity extends TimeStamps {
 	 * @type {Date}
 	 * @memberof BaseEntity
 	 */
-	@Expose()
 	@prop({ default: null, ref: BaseEntity })
 	readonly updatedBy: Ref<User | null> = null;
 	/**
@@ -61,7 +57,6 @@ export abstract class BaseEntity extends TimeStamps {
 	 * @type {boolean}
 	 * @memberof BaseEntity
 	 */
-	@Expose()
 	@prop({ required: true, default: true })
 	readonly isActive: boolean = true;
 	/**
@@ -70,7 +65,6 @@ export abstract class BaseEntity extends TimeStamps {
 	 * @type {boolean}
 	 * @memberof BaseEntity
 	 */
-	@Expose()
 	@prop({ required: true, default: false })
 	readonly isDeleted: boolean = false;
 	/**
@@ -79,7 +73,6 @@ export abstract class BaseEntity extends TimeStamps {
 	 * @type {(Ref<User | null>)}
 	 * @memberof BaseEntity
 	 */
-	@Expose()
 	@prop({ default: null, ref: BaseEntity })
 	readonly deletedBy: Ref<User | null> = null;
 	/**
@@ -88,7 +81,6 @@ export abstract class BaseEntity extends TimeStamps {
 	 * @type {Date}
 	 * @memberof BaseEntity
 	 */
-	@Expose()
 	@prop({ default: null })
 	readonly deletionTime?: Date;
 

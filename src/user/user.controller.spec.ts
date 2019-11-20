@@ -1,8 +1,10 @@
-import { Test, TestingModule } from "@nestjs/testing";
-import { UserController } from "./user.controller";
-import { TypegooseModule } from "nestjs-typegoose";
-import { ConfigModule } from "../config/config.module";
-import { ConfigService } from "../config/config.service";
+import { TypegooseModule } from 'nestjs-typegoose';
+
+import { Test, TestingModule } from '@nestjs/testing';
+
+import { ConfigModule } from '../config/config.module';
+import { ConfigService } from '../config/config.service';
+import { UserController } from './user.controller';
 
 describe("User Controller", () => {
 	let controller: UserController;
