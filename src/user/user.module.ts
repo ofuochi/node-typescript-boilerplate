@@ -1,16 +1,16 @@
-import { TypegooseModule } from 'nestjs-typegoose';
+import { TypegooseModule } from "nestjs-typegoose";
 
-import { Module } from '@nestjs/common';
+import { Module } from "@nestjs/common";
 
-import { TempPwResetRepository } from '../db/repos/pw_reset.repo';
-import { TempPasswordReset } from '../entities/pw_reset.entity';
-import { UserRepository } from './repository/user.repository';
-import { UserController } from './user.controller';
-import { User } from './user.entity';
-import { UserService } from './user.service';
+import { TempPwResetRepository } from "../db/repos/pw_reset.repo";
+import { TempToken } from "../entities/temp_token.entity";
+import { UserRepository } from "./repository/user.repository";
+import { UserController } from "./user.controller";
+import { User } from "./user.entity";
+import { UserService } from "./user.service";
 
 @Module({
-	imports: [TypegooseModule.forFeature([User, TempPasswordReset])],
+	imports: [TypegooseModule.forFeature([User, TempToken])],
 	exports: [UserService, UserRepository, TempPwResetRepository],
 	providers: [UserService, UserRepository, TempPwResetRepository],
 	controllers: [UserController]

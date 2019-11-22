@@ -1,24 +1,24 @@
-import { Types } from 'mongoose';
-import { TypegooseModule } from 'nestjs-typegoose';
+import { TypegooseModule } from "nestjs-typegoose";
 
-import { NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
-import { PassportModule } from '@nestjs/passport';
-import { Test, TestingModule } from '@nestjs/testing';
+import { NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { JwtModule } from "@nestjs/jwt";
+import { PassportModule } from "@nestjs/passport";
+import { Test, TestingModule } from "@nestjs/testing";
 
-import { ConfigModule } from '../config/config.module';
-import { ConfigService } from '../config/config.service';
-import { TempPwResetRepository } from '../db/repos/pw_reset.repo';
-import { MailService } from '../shared/services/mail.service';
-import { UserRepository } from '../user/repository/user.repository';
-import { User } from '../user/user.entity';
-import { UserModule } from '../user/user.module';
-import { hashPw } from '../utils/pwHash';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
-import { errors } from './constants/error.constant';
-import { SessionSerializer } from './session.serializer';
-import { JwtStrategy } from './strategies/jwt.strategy';
+import { ConfigModule } from "../config/config.module";
+import { ConfigService } from "../config/config.service";
+import { TempPwResetRepository } from "../db/repos/pw_reset.repo";
+import { MailService } from "../shared/services/mail.service";
+import { UserRepository } from "../user/repository/user.repository";
+import { User } from "../user/user.entity";
+import { UserModule } from "../user/user.module";
+import { hashPw } from "../utils/pwHash";
+import { AuthController } from "./auth.controller";
+import { AuthService } from "./auth.service";
+import { errors } from "./constants/error.constant";
+import { SessionSerializer } from "./session.serializer";
+import { JwtStrategy } from "./strategies/jwt.strategy";
+import { CallbackUrlPropsInput } from "./dto/CallbackUrlPropsInput";
 
 jest.mock("../user/repository/user.repository");
 jest.mock("../db/repos/pw_reset.repo");
@@ -135,17 +135,23 @@ describe("AuthService", () => {
 			expect(error.message).toEqual(errors.INVALID_LOGIN_ATTEMPT.message);
 		}
 	});
+	let input: CallbackUrlPropsInput;
 	it("should send password reset token", async () => {
 		userRepo.findOneByQuery = jest.fn(() => Promise.resolve(user));
 		tempPwResetRepo.insertOrUpdate = jest.fn(() => Promise.resolve());
 		mailService.sendMail = jest.fn(() => Promise.resolve());
-
-		await authService.sendPasswordResetToken(user.email);
+		input = {
+			email: "email@gmail.com",
+			clientBaseUrl: "http://www.clientbaseurl.com",
+			emailParameterName: "email",
+			verificationCodeParameterName: "verification_code"
+		};
+		await authService.sendPasswordResetToken(input);
 		expect(mailService.sendMail).toHaveBeenCalled();
 	});
 	it("should throw not found exception for nonexisting email", async () => {
 		try {
-			await authService.sendPasswordResetToken(user.email);
+			await authService.sendPasswordResetToken(input);
 		} catch (error) {
 			expect(error).toBeInstanceOf(NotFoundException);
 			expect(mailService.sendMail).toHaveBeenCalledTimes(0);

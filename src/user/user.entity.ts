@@ -1,9 +1,16 @@
-import { arrayProp, getModelForClass, index, modelOptions, prop, Ref } from '@typegoose/typegoose';
+import {
+	arrayProp,
+	getModelForClass,
+	index,
+	modelOptions,
+	prop,
+	Ref
+} from "@typegoose/typegoose";
 
-import { BaseEntity } from '../base.entity';
-import { Tenant } from '../tenant/tenant.entity';
-import { IMustHaveTenant } from '../tenant/tenant.interface';
-import { Writable } from '../utils/writable';
+import { BaseEntity } from "../base.entity";
+import { Tenant } from "../tenant/tenant.entity";
+import { IMustHaveTenant } from "../tenant/tenant.interface";
+import { Writable } from "../utils/writable";
 
 export const MAX_NAME_LENGTH = 225;
 export const PASSWORD_SALT_ROUND = 12;
@@ -109,7 +116,14 @@ export class User extends BaseEntity implements IMustHaveTenant {
 	 */
 	@prop({ default: undefined })
 	readonly lockOutEndDate?: Date;
-
+	/**
+	 * Specifies whether the user's email has been verified or not
+	 *
+	 * @type {boolean}
+	 * @memberof BaseEntity
+	 */
+	@prop({ required: true, default: false })
+	readonly isEmailVerified: boolean = false;
 	/**
 	 * Returns true if the user is currently locked out
 	 *
@@ -290,6 +304,9 @@ export class User extends BaseEntity implements IMustHaveTenant {
 		if (user.roles) {
 			this.setRoles(user.roles as UserRole[]);
 		}
+	}
+	verifyEmail() {
+		(this as Writable<User>).isEmailVerified = true;
 	}
 	/**
 	 * Returns true if the user is currently locked out

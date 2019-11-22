@@ -75,7 +75,7 @@
     "@types/yargs": "^13.0.3",
     "jasmine-fail-fast": "^2.0.0",
     "jest": "^24.9.0",
-    "nodemon": "^1.19.4",
+    "nodemon": "^2.0.0",
     "nyc": "^14.1.1",
     "prettier": "^1.19.1",
     "supertest": "^4.0.2",

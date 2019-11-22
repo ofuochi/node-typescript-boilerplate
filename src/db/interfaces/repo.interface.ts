@@ -1,6 +1,3 @@
-import { Tenant } from '../../tenant/tenant.entity';
-import { User } from '../../user/user.entity';
-
 export type Query<T> = {
 	[P in keyof T]?: T[P] | { $regex: RegExp };
 };
@@ -117,7 +114,7 @@ export interface IBaseRepository<T> {
 	 * @returns {Promise<boolean>}
 	 * @memberof IBaseRepository
 	 */
-	deleteById(id: string): Promise<boolean>;
-	// deleteOneByQuery(query: Query<T>): Promise<number>;
+	deleteById(id: string): Promise<void>;
+	deleteOneByQuery(query: Query<T>): Promise<void>;
 	// deleteManyByQuery(query?: Query<T>): Promise<number>;
 }

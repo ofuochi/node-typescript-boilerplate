@@ -1,35 +1,40 @@
+import * as bcrypt from "bcrypt";
+import * as crypto from "crypto";
+import { TypegooseModule } from "nestjs-typegoose";
+import * as request from "supertest";
+
 import { HttpStatus, ValidationPipe } from "@nestjs/common";
 import { NestApplication } from "@nestjs/core";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 import { Test, TestingModule } from "@nestjs/testing";
-import { TypegooseModule } from "nestjs-typegoose";
-import * as request from "supertest";
+
 import { AuthController } from "../../src/auth/auth.controller";
+import { AuthModule } from "../../src/auth/auth.module";
 import { AuthService } from "../../src/auth/auth.service";
 import { headerConstants } from "../../src/auth/constants/header.constant";
+import { CallbackUrlPropsInput } from "../../src/auth/dto/CallbackUrlPropsInput";
 import { LoginInput } from "../../src/auth/dto/LoginInput";
 import { RegisterInput } from "../../src/auth/dto/RegisterInput";
 import { RegisterResponse } from "../../src/auth/dto/RegisterResponse";
-import { CallbackUrlPropsInput } from "../../src/auth/dto/CallbackUrlPropsInput";
+import { VerificationInput } from "../../src/auth/dto/VerificationInput";
 import { SessionSerializer } from "../../src/auth/session.serializer";
 import { JwtStrategy } from "../../src/auth/strategies/jwt.strategy";
 import { ConfigModule } from "../../src/config/config.module";
-import { TempPwResetRepository } from "../../src/db/repos/pw_reset.repo";
-import { TempPasswordReset } from "../../src/entities/pw_reset.entity";
+import { TempToken } from "../../src/entities/temp_token.entity";
 import { MailService } from "../../src/shared/services/mail.service";
 import { Tenant } from "../../src/tenant/tenant.entity";
 import { User } from "../../src/user/user.entity";
 import { UserModule } from "../../src/user/user.module";
 import { config, connStr, defaultTenant } from "../setup";
-import { AuthModule } from "../../src/auth/auth.module";
+import { PasswordResetInput } from "../../src/auth/dto/PasswordResetInput";
 
 describe("AuthController (e2e)", () => {
 	const endpoint = "/auth";
 	let app: NestApplication;
 	let req: request.SuperTest<request.Test>;
 	let tenant2: Tenant;
-	let tempPwResetRepo: TempPwResetRepository;
+	let userId: any;
 
 	beforeAll(async () => {
 		const typegooseConfig = TypegooseModule.forRoot(connStr, {
@@ -55,9 +60,7 @@ describe("AuthController (e2e)", () => {
 		}).compile();
 
 		app = module.createNestApplication();
-		tempPwResetRepo = await module.resolve<TempPwResetRepository>(
-			TempPwResetRepository
-		);
+
 		app.useGlobalPipes(
 			new ValidationPipe({
 				whitelist: true,
@@ -96,6 +99,8 @@ describe("AuthController (e2e)", () => {
 				.sort("-createdAt");
 			expect(createdBy.toString()).toBe(id);
 			expect(tenant.toString()).toBe(defaultTenant.id);
+
+			userId = id;
 		});
 		it("should return conflict if email already exists on the same tenant", async () => {
 			const input = { ...registerInput };
@@ -262,33 +267,130 @@ describe("AuthController (e2e)", () => {
 		});
 	});
 	describe("User account auth operations", () => {
-		const verificationInput: CallbackUrlPropsInput = {
+		const callbackUrlInput: CallbackUrlPropsInput = {
 			email: registerInput.email,
 			clientBaseUrl: "http://www.clientbaseurl.com",
 			emailParameterName: "email",
 			verificationCodeParameterName: "verification_code"
 		};
+		let callbackUrlToken: string;
 		it("should send password reset token to user", async () => {
+			jest
+				.spyOn(crypto, "randomBytes")
+				.mockImplementationOnce((size: number) => {
+					const buffer = Buffer.alloc(size);
+					callbackUrlToken = buffer.toString("hex");
+					return buffer;
+				});
+
 			await req
 				.post(`${endpoint}/send_password_reset_token`)
 				.set(headerConstants.tenantIdKey, defaultTenant.id)
-				.send(verificationInput)
+				.send(callbackUrlInput)
 				.expect(HttpStatus.NO_CONTENT);
 
 			// Get the just created TemPasswordReset
-			let tempPw = await TempPasswordReset.getModel()
+			let tempPw = await TempToken.getModel()
 				.findOne()
 				.sort("-createdAt");
 
 			expect(tempPw).toBeDefined();
 			expect(tempPw.token).toBeDefined();
 		});
-		it("should return 404 for non-existing email", async () => {
+		it("should return 404 non-existing email tries to send password reset token", async () => {
 			await req
 				.post(`${endpoint}/send_password_reset_token`)
 				.set(headerConstants.tenantIdKey, defaultTenant.id)
-				.send({ ...verificationInput, email: "non_existing@email.com" })
+				.send({ ...callbackUrlInput, email: "non_existing@email.com" })
 				.expect(HttpStatus.NOT_FOUND);
+		});
+		let passwordResetInput: PasswordResetInput;
+		it("should reset user password", async () => {
+			passwordResetInput = {
+				newPassword: "new_password",
+				email: registerInput.email,
+				token: callbackUrlToken
+			};
+
+			await req
+				.post(`${endpoint}/reset_password`)
+				.set(headerConstants.tenantIdKey, defaultTenant.id)
+				.send(passwordResetInput)
+				.expect(HttpStatus.NO_CONTENT);
+
+			const { password } = await User.getModel().findById(userId);
+			const isCorrectPassword = await bcrypt.compare(
+				passwordResetInput.newPassword,
+				password
+			);
+			const tempToken = await TempToken.getModel()
+				.findOne()
+				.sort("-createdAt");
+
+			expect(tempToken.isDeleted).toBe(true);
+			expect(isCorrectPassword).toBe(true);
+
+			tempToken.set("isDeleted", false);
+			await tempToken.save();
+		});
+		it("should return unauthorized for wrong password reset token", async () => {
+			passwordResetInput = {
+				newPassword: "new_password",
+				email: registerInput.email,
+				token: "wrong_password_reset_token"
+			};
+
+			await req
+				.post(`${endpoint}/reset_password`)
+				.set(headerConstants.tenantIdKey, defaultTenant.id)
+				.send(passwordResetInput)
+				.expect(HttpStatus.UNAUTHORIZED);
+		});
+		it("should return 404 for non existing email", async () => {
+			await req
+				.post(`${endpoint}/reset_password`)
+				.set(headerConstants.tenantIdKey, defaultTenant.id)
+				.send({ ...passwordResetInput, email: "invalid_email@mail.com" })
+				.expect(HttpStatus.NOT_FOUND);
+		});
+		it("should return unauthorized for invalid token", async () => {
+			await req
+				.post(`${endpoint}/reset_password`)
+				.set(headerConstants.tenantIdKey, defaultTenant.id)
+				.send({ ...passwordResetInput, token: "invalid_token" })
+				.expect(HttpStatus.UNAUTHORIZED);
+		});
+		it("should send email verification code", async () => {
+			const emailVerificationInput = {
+				...callbackUrlInput,
+				email: registerInput.email
+			};
+
+			await req
+				.post(`${endpoint}/send_email_verification_token`)
+				.set(headerConstants.tenantIdKey, defaultTenant.id)
+				.send(emailVerificationInput)
+				.expect(HttpStatus.NO_CONTENT);
+		});
+		it("should verify email via the email verification token", async () => {
+			const verificationInput: VerificationInput = {
+				email: registerInput.email,
+				token: callbackUrlToken
+			};
+			await req
+				.post(`${endpoint}/verify_email`)
+				.set(headerConstants.tenantIdKey, defaultTenant.id)
+				.send(verificationInput)
+				.expect(HttpStatus.NO_CONTENT);
+
+			const { isEmailVerified } = await User.getModel().findById(userId);
+
+			const tempToken = await TempToken.getModel()
+				.findOne()
+				.sort("-createdAt");
+
+			expect(tempToken.isDeleted).toBe(true);
+			expect(isEmailVerified).toBe(true);
 		});
 	});
 	afterAll(async () => {

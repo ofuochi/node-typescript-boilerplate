@@ -1,22 +1,22 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 
-import { hashPw } from '../utils/pwHash';
-import { UserRepository } from './repository/user.repository';
-import { User } from './user.entity';
+import { hashPassword } from "../utils/pwHash";
+import { UserRepository } from "./repository/user.repository";
+import { User } from "./user.entity";
 
 @Injectable()
 export class UserService {
-  constructor(private readonly _userRepository: UserRepository) {}
+	constructor(private readonly _userRepository: UserRepository) {}
 
-  async createUser(user: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    username: string;
-    password: string;
-  }) {
-    user.password = await hashPw(user.password);
-    const newUser = User.createInstance(user);
-    return this._userRepository.insertOrUpdate(newUser);
-  }
+	async createUser(user: {
+		firstName: string;
+		lastName: string;
+		email: string;
+		username: string;
+		password: string;
+	}) {
+		user.password = await hashPassword(user.password);
+		const newUser = User.createInstance(user);
+		return this._userRepository.insertOrUpdate(newUser);
+	}
 }

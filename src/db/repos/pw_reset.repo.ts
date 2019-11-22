@@ -1,19 +1,19 @@
-import { Document } from 'mongoose';
-import { InjectModel } from 'nestjs-typegoose';
+import { Document } from "mongoose";
+import { InjectModel } from "nestjs-typegoose";
 
-import { ReturnModelType } from '@typegoose/typegoose';
+import { ReturnModelType } from "@typegoose/typegoose";
 
-import { TempPasswordReset } from '../../entities/pw_reset.entity';
-import { BaseRepository } from './base.repo';
+import { TempToken } from "../../entities/temp_token.entity";
+import { BaseRepository } from "./base.repo";
 
 export class TempPwResetRepository extends BaseRepository<
-	TempPasswordReset,
-	TempPasswordReset & Document
+	TempToken,
+	TempToken & Document
 > {
 	constructor(
-		@InjectModel(TempPasswordReset)
-		private readonly _entity: ReturnModelType<typeof TempPasswordReset>
+		@InjectModel(TempToken)
+		private readonly _entity: ReturnModelType<typeof TempToken>
 	) {
-		super(_entity, () => new TempPasswordReset());
+		super(_entity, () => new TempToken());
 	}
 }

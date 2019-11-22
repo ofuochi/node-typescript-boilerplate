@@ -6,20 +6,23 @@ import {
 	ConflictException,
 	Injectable,
 	NotFoundException,
-	Scope
+	Scope,
+	UnauthorizedException
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 
 import { ConfigService } from "../config/config.service";
 import { Query } from "../db/interfaces/repo.interface";
 import { TempPwResetRepository } from "../db/repos/pw_reset.repo";
-import { TempPasswordReset } from "../entities/pw_reset.entity";
+import { TempToken } from "../entities/temp_token.entity";
 import { UserRepository } from "../user/repository/user.repository";
 import { User, UserRole } from "../user/user.entity";
-import { hashPw } from "../utils/pwHash";
+import { hashPassword } from "../utils/pwHash";
 import { errors } from "./constants/error.constant";
 import { CallbackUrlPropsInput } from "./dto/CallbackUrlPropsInput";
 import { MailService } from "../shared/services/mail.service";
+import { PasswordResetInput } from "./dto/PasswordResetInput";
+import { VerificationInput } from "./dto/VerificationInput";
 
 export interface DecodedJwt {
 	username: string;
@@ -33,7 +36,7 @@ export class AuthService {
 	constructor(
 		private readonly _jwtService: JwtService,
 		private readonly _userRepository: UserRepository,
-		private readonly _tempPwResetRepository: TempPwResetRepository,
+		private readonly _tempTokenRepository: TempPwResetRepository,
 		private readonly _configService: ConfigService,
 		private readonly _mailService: MailService
 	) {}
@@ -97,33 +100,81 @@ export class AuthService {
 				`User with username ${user.username} already exists`
 			);
 		}
-		user.setPassword(await hashPw(user.password));
+		const hashedPassword = await hashPassword(user.password);
+
+		user.setPassword(hashedPassword);
 		await this._userRepository.insertOrUpdate(user);
 		const { access_token } = await this.generateJwt(user);
 		return { canLogin: !!access_token, access_token };
 	}
-
+	async sendEmailVerificationToken(input: CallbackUrlPropsInput) {
+		await this.sendToken(input);
+	}
 	async sendPasswordResetToken(input: CallbackUrlPropsInput) {
+		await this.sendToken(input);
+	}
+
+	async resetPassword(input: PasswordResetInput) {
+		const { token, newPassword, email } = input;
+		const user = await this.validateUserByEmail(email);
+		await this.validateToken(user, token);
+
+		user.setPassword(await hashPassword(newPassword));
+		await this._userRepository.insertOrUpdate(user);
+		await this._tempTokenRepository.deleteOneByQuery({ user: user.id });
+	}
+	async verifyEmail(input: VerificationInput) {
+		const { token, email } = input;
+		const user = await this.validateUserByEmail(email);
+		await this.validateToken(user, token);
+
+		user.verifyEmail();
+		await this._userRepository.insertOrUpdate(user);
+		await this._tempTokenRepository.deleteOneByQuery({ user: user.id });
+	}
+
+	//#region
+	private async validateToken(user: User, token: string) {
+		const tempPw = await this._tempTokenRepository.findOneByQuery({
+			user: user.id
+		});
+		if (!tempPw)
+			throw new NotFoundException(
+				"Token has expired! Re-send password reset token."
+			);
+		const isCorrectToken = await bcrypt.compare(token, tempPw.token);
+		if (!isCorrectToken) throw new UnauthorizedException("Invalid token!");
+	}
+
+	private async validateUserByEmail(email: string) {
+		const user = await this._userRepository.findOneByQuery({ email });
+		if (!user) throw new NotFoundException(`${email} was not found!`);
+		return user;
+	}
+	private async sendToken(input: CallbackUrlPropsInput) {
 		const user = await this._userRepository.findOneByQuery({
 			email: input.email
 		});
 		if (!user) throw new NotFoundException(`${input.email} does not exist!`);
-		const randomToken = crypto.randomBytes(20).toString("hex");
-		let pwResetEntity = await this._tempPwResetRepository.findOneByQuery({
+		const tokenToSend = crypto.randomBytes(32).toString("hex");
+		const tokenToSave = await hashPassword(tokenToSend);
+		let pwResetEntity = await this._tempTokenRepository.findOneByQuery({
 			user: user.id
 		});
 		if (!pwResetEntity)
-			pwResetEntity = TempPasswordReset.createInstance(user.id, randomToken);
-		await this._tempPwResetRepository.insertOrUpdate(pwResetEntity);
+			pwResetEntity = TempToken.createInstance(user.id, tokenToSave);
+		await this._tempTokenRepository.insertOrUpdate(pwResetEntity);
 		let callbackUrl = querystring.stringify({
-			[input.emailParameterName]: input.emailParameterName,
-			[input.verificationCodeParameterName]: input.verificationCodeParameterName
+			[input.emailParameterName]: input.email,
+			[input.verificationCodeParameterName]: tokenToSend
 		});
-
 		callbackUrl = `${input.clientBaseUrl}/?${callbackUrl}`;
-		this._mailService.sendMail("from@gmail.com", "to@gmail.com", callbackUrl);
+		this._mailService.sendMail(
+			this._configService.env.appEmail,
+			input.email,
+			callbackUrl
+		);
 	}
-	//#region
 	private async processSignInAttempt(pw: string, user: User) {
 		if (!user) {
 			throw errors.INVALID_LOGIN_ATTEMPT;

@@ -1,13 +1,19 @@
-import { getModelForClass, index, modelOptions, prop, Ref } from '@typegoose/typegoose';
+import {
+	getModelForClass,
+	index,
+	modelOptions,
+	prop,
+	Ref
+} from "@typegoose/typegoose";
 
-import { BaseEntity } from '../base.entity';
-import { User } from '../user/user.entity';
+import { BaseEntity } from "../base.entity";
+import { User, MAX_NAME_LENGTH } from "../user/user.entity";
 
 export const PW_RESET_EXPIRY_SECS = 1;
-@modelOptions({ options: { customName: "temp_password_resets" } })
+@modelOptions({ options: { customName: "temp_tokens" } })
 @index({ createdAt: 1 }, { expireAfterSeconds: PW_RESET_EXPIRY_SECS })
-export class TempPasswordReset extends BaseEntity {
-	@prop({ maxlength: 50, type: String, required: true })
+export class TempToken extends BaseEntity {
+	@prop({ maxlength: MAX_NAME_LENGTH, type: String, required: true })
 	readonly token!: string;
 
 	@prop({ ref: User, unique: true, required: true })

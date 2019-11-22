@@ -1,21 +1,35 @@
-import { plainToClass } from 'class-transformer';
+import { plainToClass } from "class-transformer";
 
-import { Body, Controller, HttpCode, HttpStatus, Post, Request, UseGuards } from '@nestjs/common';
 import {
-    ApiCreatedResponse, ApiImplicitHeader, ApiNoContentResponse, ApiOkResponse, ApiOperation,
-    ApiUseTags
-} from '@nestjs/swagger';
+	Body,
+	Controller,
+	HttpCode,
+	HttpStatus,
+	Post,
+	Request,
+	UseGuards
+} from "@nestjs/common";
+import {
+	ApiCreatedResponse,
+	ApiImplicitHeader,
+	ApiNoContentResponse,
+	ApiOkResponse,
+	ApiOperation,
+	ApiUseTags
+} from "@nestjs/swagger";
 
-import { User } from '../user/user.entity';
-import { AuthService } from './auth.service';
-import { headerConstants } from './constants/header.constant';
-import { AuthResponse } from './dto/AuthResponse';
-import { CallbackUrlPropsInput } from './dto/CallbackUrlPropsInput';
-import { LoginInput } from './dto/LoginInput';
-import { RegisterInput } from './dto/RegisterInput';
-import { RegisterResponse } from './dto/RegisterResponse';
-import { LoginGuard } from './guards/login.guard';
-import { TenantGuard } from './guards/tenant.guard';
+import { User } from "../user/user.entity";
+import { AuthService } from "./auth.service";
+import { headerConstants } from "./constants/header.constant";
+import { AuthResponse } from "./dto/AuthResponse";
+import { CallbackUrlPropsInput } from "./dto/CallbackUrlPropsInput";
+import { LoginInput } from "./dto/LoginInput";
+import { RegisterInput } from "./dto/RegisterInput";
+import { RegisterResponse } from "./dto/RegisterResponse";
+import { LoginGuard } from "./guards/login.guard";
+import { TenantGuard } from "./guards/tenant.guard";
+import { VerificationInput } from "./dto/VerificationInput";
+import { PasswordResetInput } from "./dto/PasswordResetInput";
 
 @ApiUseTags("Auth")
 @Controller("auth")
@@ -66,5 +80,35 @@ export class AuthController {
 	@Post("send_password_reset_token")
 	async sendPwResetToken(@Body() input: CallbackUrlPropsInput) {
 		await this._authService.sendPasswordResetToken(input);
+	}
+	@HttpCode(HttpStatus.NO_CONTENT)
+	@ApiImplicitHeader({
+		name: headerConstants.tenantIdKey,
+		description: "Tenant ID"
+	})
+	@UseGuards(new TenantGuard())
+	@Post("send_email_verification_token")
+	async sendEmailVerification(@Body() input: CallbackUrlPropsInput) {
+		await this._authService.sendEmailVerificationToken(input);
+	}
+	@HttpCode(HttpStatus.NO_CONTENT)
+	@ApiImplicitHeader({
+		name: headerConstants.tenantIdKey,
+		description: "Tenant ID"
+	})
+	@UseGuards(new TenantGuard())
+	@Post("reset_password")
+	async resetPassword(@Body() input: PasswordResetInput) {
+		await this._authService.resetPassword(input);
+	}
+	@HttpCode(HttpStatus.NO_CONTENT)
+	@ApiImplicitHeader({
+		name: headerConstants.tenantIdKey,
+		description: "Tenant ID"
+	})
+	@UseGuards(new TenantGuard())
+	@Post("verify_email")
+	async verifyEmail(@Body() input: VerificationInput) {
+		await this._authService.verifyEmail(input);
 	}
 }

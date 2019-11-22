@@ -1,13 +1,13 @@
-import { plainToClassFromExist } from 'class-transformer';
-import { Request } from 'express';
-import { Document, Model } from 'mongoose';
+import { plainToClassFromExist } from "class-transformer";
+import { Request } from "express";
+import { Document, Model } from "mongoose";
 
-import { Inject, Injectable, Logger, Scope } from '@nestjs/common';
-import { REQUEST } from '@nestjs/core';
+import { Inject, Injectable, Logger, Scope } from "@nestjs/common";
+import { REQUEST } from "@nestjs/core";
 
-import { headerConstants } from '../../auth/constants/header.constant';
-import { BaseEntity } from '../../base.entity';
-import { IBaseRepository, Query } from '../interfaces/repo.interface';
+import { headerConstants } from "../../auth/constants/header.constant";
+import { BaseEntity } from "../../base.entity";
+import { IBaseRepository, Query } from "../interfaces/repo.interface";
 
 @Injectable({ scope: Scope.REQUEST })
 export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
@@ -219,17 +219,8 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
 			});
 		});
 	}
-	async deleteById(id: string): Promise<boolean> {
-		const entity = await this.findById(id);
-		if (!entity) {
-			return false;
-		}
-
-		entity.delete();
-		const newEntity = { ...entity } as any;
-		newEntity.deletedBy = this.getCurrentUser();
-		await this.insertOrUpdate(newEntity);
-		return true;
+	async deleteById(id: string): Promise<void> {
+		await this.findOneByQueryAndUpdate({ id }, { $set: { isDeleted: true } });
 	}
 
 	findOneByQueryAndUpdate(
@@ -256,9 +247,17 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
 		});
 	}
 
-	// deleteOneByQuery(query: Query<TEntity>): Promise<number> {
-	//     throw new Error("Method not implemented.");
-	// }
+	async deleteOneByQuery(query: Query<TEntity>): Promise<void> {
+		query = JSON.parse(
+			JSON.stringify({
+				...query,
+				isDeleted: { $ne: true },
+				tenant: this.getCurrentTenant()
+			})
+		);
+		await this.findOneByQueryAndUpdate(query, { $set: { isDeleted: true } });
+	}
+
 	// deleteManyByQuery(query?: Query<TEntity> | undefined): Promise<number> {
 	//     throw new Error("Method not implemented.");
 	// }

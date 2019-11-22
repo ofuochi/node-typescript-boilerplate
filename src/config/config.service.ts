@@ -1,12 +1,13 @@
-import * as dotenv from 'dotenv';
-import * as fs from 'fs';
+import * as dotenv from "dotenv";
+import * as fs from "fs";
 
-import * as Joi from '@hapi/joi';
+import * as Joi from "@hapi/joi";
 
 export interface EnvConfig {
 	nodeEnv: string;
 	port: number;
 	mongoDbUri: string;
+	appEmail: string;
 	jwtSecret: string;
 	maxLoginAttempts: number;
 	lockoutDurationMinutes: number;
@@ -38,6 +39,7 @@ export class ConfigService {
 			MAX_LOGIN_ATTEMPTS: Joi.number().default(5),
 			LOCKOUT_DURATION_MINUTES: Joi.number().default(5),
 			PORT: Joi.number().default(3000),
+			APP_EMAIL: Joi.string().required(),
 			API_AUTH_ENABLED: Joi.boolean().required()
 		});
 
@@ -52,6 +54,7 @@ export class ConfigService {
 			isApiAuthEnabled: value.API_AUTH_ENABLED,
 			nodeEnv: value.NODE_ENV,
 			port: value.PORT,
+			appEmail: value.APP_EMAIL,
 			jwtSecret: value.JWT_SECRET,
 			lockoutDurationMinutes: value.LOCKOUT_DURATION_MINUTES,
 			maxLoginAttempts: value.MAX_LOGIN_ATTEMPTS

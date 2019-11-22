@@ -1,10 +1,10 @@
-import { Command } from 'nestjs-command';
+import { Command } from "nestjs-command";
 
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from "@nestjs/common";
 
-import { Tenant } from './tenant/tenant.entity';
-import { User, UserRole } from './user/user.entity';
-import { hashPw } from './utils/pwHash';
+import { Tenant } from "./tenant/tenant.entity";
+import { User, UserRole } from "./user/user.entity";
+import { hashPassword } from "./utils/pwHash";
 
 @Injectable()
 export class AppService {
@@ -27,7 +27,7 @@ export class AppService {
 		return newTenant;
 	}
 	private async seedDefaultHostAdmin() {
-		const password = await hashPw("123qwe");
+		const password = await hashPassword("123qwe");
 
 		const user = User.createInstance({
 			firstName: "Admin",
@@ -41,7 +41,7 @@ export class AppService {
 		Logger.log("Seeded Default Host Admin");
 	}
 	private async seedDefaultAdmin(tenant: Tenant) {
-		const password = await hashPw("123qwe");
+		const password = await hashPassword("123qwe");
 
 		const user = User.createInstance({
 			firstName: "Admin",
