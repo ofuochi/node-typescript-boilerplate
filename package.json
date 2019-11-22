@@ -45,6 +45,7 @@
     "express-session": "^1.17.0",
     "helmet": "^3.21.2",
     "mongoose": "^5.7.12",
+    "nest-schedule": "^0.6.3",
     "nestjs-command": "^1.3.0",
     "nestjs-typegoose": "^7.0.0",
     "passport": "^0.4.0",
