@@ -9,6 +9,7 @@ import { ConfigService, EnvConfig } from "../src/config/config.service";
 let config: EnvConfig;
 let defaultTenant: Tenant;
 let connStr: string;
+
 beforeAll(async () => {
 	if (process.argv.includes("--bail")) {
 		const jasmineEnv = (jasmine as any).getEnv();

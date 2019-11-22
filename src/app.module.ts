@@ -1,15 +1,16 @@
-import { CommandModule } from 'nestjs-command';
-import { TypegooseModule } from 'nestjs-typegoose';
+import { ScheduleModule } from "nest-schedule";
+import { CommandModule } from "nestjs-command";
+import { TypegooseModule } from "nestjs-typegoose";
 
-import { Module } from '@nestjs/common';
+import { Module } from "@nestjs/common";
 
-import { AccountModule } from './account/account.module';
-import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import { ConfigModule } from './config/config.module';
-import { ConfigService } from './config/config.service';
-import { TenantModule } from './tenant/tenant.module';
-import { UserModule } from './user/user.module';
+import { AccountModule } from "./account/account.module";
+import { AppService } from "./app.service";
+import { AuthModule } from "./auth/auth.module";
+import { ConfigModule } from "./config/config.module";
+import { ConfigService } from "./config/config.service";
+import { TenantModule } from "./tenant/tenant.module";
+import { UserModule } from "./user/user.module";
 
 const typegooseConfig = TypegooseModule.forRootAsync({
 	imports: [ConfigModule],
@@ -30,7 +31,8 @@ const typegooseConfig = TypegooseModule.forRootAsync({
 		UserModule,
 		TenantModule,
 		typegooseConfig,
-		AccountModule
+		AccountModule,
+		ScheduleModule.register()
 	],
 	providers: [AppService]
 })
