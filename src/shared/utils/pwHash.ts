@@ -1,5 +1,5 @@
 import * as bcrypt from "bcrypt";
-import { PASSWORD_SALT_ROUND } from "../user/user.entity";
+import { PASSWORD_SALT_ROUND } from "../../user/user.entity";
 
 export const hashPassword = async (password: string) => {
 	const env = process.env.NODE_ENV;

@@ -6,7 +6,7 @@ import { Inject, Injectable, Logger, Scope } from "@nestjs/common";
 import { REQUEST } from "@nestjs/core";
 
 import { headerConstants } from "../../auth/constants/header.constant";
-import { BaseEntity } from "../../base.entity";
+import { BaseEntity } from "../../shared/entities/base.entity";
 import { IBaseRepository, Query } from "../interfaces/repo.interface";
 
 @Injectable({ scope: Scope.REQUEST })
@@ -38,24 +38,22 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
 		});
 	}
 	public async pagedFindAll({
-		searchStr,
+		limit,
 		skip,
-		limit
+		search
 	}: {
-		searchStr?: string;
-		skip: number;
 		limit: number;
+		skip: number;
+		search?: string;
 	}) {
 		const query = JSON.parse(
 			JSON.stringify({
-				$text: { $search: searchStr },
+				$text: { $search: search },
 				isDeleted: { $ne: true },
 				tenant: this.getCurrentTenant()
 			})
 		);
-		if (!Object.keys(query.$text).length) {
-			delete query.$text;
-		}
+		if (!Object.keys(query.$text).length) delete query.$text;
 
 		skip = skip < 0 ? 0 : Math.floor(skip);
 		limit = limit < 0 ? 0 : Math.floor(limit);
@@ -113,39 +111,27 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
 		});
 	}
 
-	public async insertOrUpdate(doc: TEntity): Promise<void> {
+	public async insertOrUpdate(entity: TEntity): Promise<void> {
 		const currentUser = this.getCurrentUser();
 		return new Promise<void>((resolve, reject) => {
-			if (doc.id) {
-				const query = JSON.parse(
-					JSON.stringify({
-						_id: doc.id,
-						isDeleted: { $ne: true },
-						tenant: this.getCurrentTenant(),
-						$set: { updatedBy: currentUser }
-					})
-				);
-				if (!currentUser) delete query.$set;
-				this.Model.findByIdAndUpdate(query, doc, { new: true }, (err, res) => {
-					if (err) {
-						return reject(err);
-					}
-					if (!res) {
-						return resolve();
-					}
-					Object.assign(doc, this.readMapper(res));
+			if (entity.id) {
+				const instance = new this.Model(entity);
+				instance.set("updatedBy", currentUser || entity.id);
+				const doc = this.readMapper(instance);
+				this.Model.findByIdAndUpdate(entity.id, doc, (err, res) => {
+					if (err) return reject(err);
 					resolve();
 				});
 			} else {
 				if ("tenant" in this._ctor()) {
-					doc = { ...doc, tenant: this.getCurrentTenant() };
+					entity = { ...entity, tenant: this.getCurrentTenant() };
 				}
-				const instance = new this.Model(doc);
-				instance.set("createdBy", this.getCurrentUser() || instance._id);
+				const instance = new this.Model(entity);
+				instance.set("createdBy", currentUser || instance._id);
 
 				instance.save((err, res) => {
 					if (err) return reject(err);
-					Object.assign(doc, this.readMapper(res));
+					Object.assign(entity, this.readMapper(res));
 					resolve();
 				});
 			}
@@ -220,7 +206,13 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
 		});
 	}
 	async deleteById(id: string): Promise<void> {
-		await this.findOneByQueryAndUpdate({ id }, { $set: { isDeleted: true } });
+		const currentUser = await this.getCurrentUser();
+		const deleteQuery = JSON.parse(
+			JSON.stringify({
+				$set: { isDeleted: true, deletedBy: currentUser, deletedAt: new Date() }
+			})
+		);
+		await this.findOneByQueryAndUpdate({ _id: id }, deleteQuery);
 	}
 
 	findOneByQueryAndUpdate(
@@ -271,7 +263,7 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
 	 * @returns {TEntity}
 	 * @memberof BaseRepository
 	 */
-	private readMapper = (model: TModel | TModel[]): TEntity | TEntity[] => {
+	protected readMapper = (model: TModel | TModel[]): TEntity | TEntity[] => {
 		if (Array.isArray(model)) {
 			const entities: TEntity[] = [];
 
@@ -281,15 +273,12 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
 
 		return plainToClassFromExist(entity, model.toJSON());
 	};
-	private getCurrentTenant() {
-		const tenant = this._req && this._req.header(headerConstants.tenantIdKey);
-		if (!tenant) {
-			return undefined;
-		}
-
-		return "tenant" in this._ctor() ? tenant : undefined;
+	protected getCurrentTenant() {
+		if (!("tenant" in this._ctor())) return undefined;
+		let tenant = this._req && this._req.header(headerConstants.tenantIdKey);
+		return !!tenant ? tenant : undefined;
 	}
-	private getCurrentUser() {
+	protected getCurrentUser() {
 		const user = this._req.user as any;
 		return user && user.userId;
 	}

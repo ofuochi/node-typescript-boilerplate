@@ -4,7 +4,7 @@ import { Injectable, Logger } from "@nestjs/common";
 
 import { Tenant } from "./tenant/tenant.entity";
 import { User, UserRole } from "./user/user.entity";
-import { hashPassword } from "./utils/pwHash";
+import { hashPassword } from "./shared/utils/pwHash";
 
 @Injectable()
 export class AppService {
@@ -36,7 +36,7 @@ export class AppService {
 			username: "admin",
 			password
 		});
-		user.setRoles([UserRole.ADMIN]);
+		user.setRoles(UserRole.HOST);
 		await User.getModel().create(user);
 		Logger.log("Seeded Default Host Admin");
 	}
@@ -51,7 +51,7 @@ export class AppService {
 			password,
 			tenant
 		});
-		user.setRoles([UserRole.ADMIN]);
+		user.setRoles(UserRole.ADMIN);
 		await User.getModel().create(user);
 		Logger.log("Seeded Default Admin");
 	}

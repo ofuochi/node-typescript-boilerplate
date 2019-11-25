@@ -7,17 +7,18 @@ import {
 	Ref
 } from "@typegoose/typegoose";
 
-import { BaseEntity } from "../base.entity";
+import { BaseEntity } from "../shared/entities/base.entity";
 import { Tenant } from "../tenant/tenant.entity";
 import { IMustHaveTenant } from "../tenant/tenant.interface";
-import { Writable } from "../utils/writable";
+import { Writable } from "../shared/utils/writable";
 
 export const MAX_NAME_LENGTH = 225;
 export const PASSWORD_SALT_ROUND = 12;
 
 export enum UserRole {
 	USER = "User",
-	ADMIN = "Admin"
+	ADMIN = "Admin",
+	HOST = "Host"
 }
 
 @modelOptions({ options: { customName: "users" } })
@@ -216,7 +217,7 @@ export class User extends BaseEntity implements IMustHaveTenant {
 	 * @param {UserRole} role
 	 * @memberof User
 	 */
-	setRoles(roles: UserRole[]) {
+	setRoles(...roles: UserRole[]) {
 		(this as Writable<User>).roles = roles;
 	}
 
@@ -302,7 +303,7 @@ export class User extends BaseEntity implements IMustHaveTenant {
 			this.setEmail(user.email as string);
 		}
 		if (user.roles) {
-			this.setRoles(user.roles as UserRole[]);
+			this.setRoles(...(user.roles as UserRole[]));
 		}
 	}
 	verifyEmail() {

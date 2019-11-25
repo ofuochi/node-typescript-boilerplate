@@ -21,7 +21,7 @@ import { VerificationInput } from "../../src/auth/dto/VerificationInput";
 import { SessionSerializer } from "../../src/auth/session.serializer";
 import { JwtStrategy } from "../../src/auth/strategies/jwt.strategy";
 import { ConfigModule } from "../../src/config/config.module";
-import { TempToken } from "../../src/entities/temp_token.entity";
+import { TempToken } from "../../src/shared/entities/temp_token.entity";
 import { MailService } from "../../src/shared/services/mail.service";
 import { Tenant } from "../../src/tenant/tenant.entity";
 import { User } from "../../src/user/user.entity";

@@ -3,7 +3,7 @@ import { TypegooseModule } from "nestjs-typegoose";
 import { Module } from "@nestjs/common";
 
 import { TempPwResetRepository } from "../db/repos/pw_reset.repo";
-import { TempToken } from "../entities/temp_token.entity";
+import { TempToken } from "../shared/entities/temp_token.entity";
 import { UserRepository } from "./repository/user.repository";
 import { UserController } from "./user.controller";
 import { User } from "./user.entity";

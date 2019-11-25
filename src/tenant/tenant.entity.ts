@@ -1,9 +1,6 @@
-import { Expose } from 'class-transformer';
-
-import { getModelForClass, modelOptions, prop } from '@typegoose/typegoose';
-
-import { BaseEntity } from '../base.entity';
-import { Writable } from '../utils/writable';
+import { getModelForClass, modelOptions, prop } from "@typegoose/typegoose";
+import { BaseEntity } from "../shared/entities/base.entity";
+import { Writable } from "../shared/utils/writable";
 
 /**
  *
@@ -24,7 +21,8 @@ export class Tenant extends BaseEntity {
 		required: true,
 		uppercase: true,
 		index: true,
-		unique: true
+		unique: true,
+		text: true
 	})
 	readonly name!: string;
 	/**

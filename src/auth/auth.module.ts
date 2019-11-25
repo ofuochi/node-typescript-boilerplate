@@ -1,7 +1,6 @@
 import { Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
-
 import { ConfigModule } from "../config/config.module";
 import { MailService } from "../shared/services/mail.service";
 import { UserModule } from "../user/user.module";
@@ -20,7 +19,7 @@ import { JwtStrategy } from "./strategies/jwt.strategy";
 			signOptions: { expiresIn: "2 days" }
 		})
 	],
-	exports: [JwtStrategy],
+	exports: [JwtStrategy, AuthService],
 	providers: [AuthService, JwtStrategy, SessionSerializer, MailService],
 	controllers: [AuthController]
 })

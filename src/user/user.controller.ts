@@ -1,9 +1,9 @@
-import { Controller, Post, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiUseTags } from '@nestjs/swagger';
+import { Controller, Post, UseGuards } from "@nestjs/common";
+import { AuthGuard } from "@nestjs/passport";
+import { ApiBearerAuth, ApiUseTags } from "@nestjs/swagger";
 
 @ApiUseTags("Users")
-@Controller("user")
+@Controller("users")
 export class UserController {
 	@UseGuards(AuthGuard("jwt"))
 	@ApiBearerAuth()

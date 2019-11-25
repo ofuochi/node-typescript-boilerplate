@@ -1,9 +1,15 @@
-import { modelOptions, prop, Ref, setGlobalOptions } from '@typegoose/typegoose';
-import { TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
+import {
+	modelOptions,
+	prop,
+	Ref,
+	setGlobalOptions
+} from "@typegoose/typegoose";
+import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 
-import { User } from './user/user.entity';
-import { Writable } from './utils/writable';
+import { User } from "../../user/user.entity";
+import { Writable } from "../utils/writable";
 
+setGlobalOptions({ globalOptions: { useNewEnum: true } });
 @modelOptions({
 	schemaOptions: {
 		toJSON: {
@@ -25,7 +31,7 @@ export abstract class BaseEntity extends TimeStamps {
 	 * @type {*}
 	 * @memberof BaseEntity
 	 */
-	id?: any;
+	id: any;
 
 	/**
 	 * Gets the date and time the entity was created
@@ -82,7 +88,7 @@ export abstract class BaseEntity extends TimeStamps {
 	 * @memberof BaseEntity
 	 */
 	@prop({ default: null })
-	readonly deletionTime?: Date;
+	readonly deletedAt?: Date;
 
 	/**
 	 * Sets {isDeleted} to true

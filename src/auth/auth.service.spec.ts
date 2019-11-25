@@ -12,7 +12,7 @@ import { MailService } from "../shared/services/mail.service";
 import { UserRepository } from "../user/repository/user.repository";
 import { User } from "../user/user.entity";
 import { UserModule } from "../user/user.module";
-import { hashPw } from "../utils/pwHash";
+import { hashPw } from "../shared/utils/pwHash";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { errors } from "./constants/error.constant";

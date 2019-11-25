@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 
-import { hashPassword } from "../utils/pwHash";
+import { hashPassword } from "../shared/utils/pwHash";
 import { UserRepository } from "./repository/user.repository";
 import { User } from "./user.entity";
 

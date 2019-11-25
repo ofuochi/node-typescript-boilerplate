@@ -14,10 +14,10 @@ import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "../config/config.service";
 import { Query } from "../db/interfaces/repo.interface";
 import { TempPwResetRepository } from "../db/repos/pw_reset.repo";
-import { TempToken } from "../entities/temp_token.entity";
+import { TempToken } from "../shared/entities/temp_token.entity";
 import { UserRepository } from "../user/repository/user.repository";
 import { User, UserRole } from "../user/user.entity";
-import { hashPassword } from "../utils/pwHash";
+import { hashPassword } from "../shared/utils/pwHash";
 import { errors } from "./constants/error.constant";
 import { CallbackUrlPropsInput } from "./dto/CallbackUrlPropsInput";
 import { MailService } from "../shared/services/mail.service";
@@ -69,9 +69,19 @@ export class AuthService {
 			roles: user.roles,
 			tenant: user.tenant
 		};
-		return {
-			access_token: this._jwtService.sign(payload)
-		};
+		const access_token = await this._jwtService.signAsync(payload);
+		return { access_token };
+	}
+
+	/**
+	 * Decode JWT
+	 *
+	 * @param {string} jwt
+	 * @returns
+	 * @memberof AuthService
+	 */
+	async decodeJwt(jwt: string) {
+		return this._jwtService.decode(jwt) as DecodedJwt;
 	}
 
 	/**

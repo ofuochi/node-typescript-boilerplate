@@ -1,12 +1,12 @@
-import * as passport from 'passport';
+import * as passport from "passport";
 
-import { ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ValidationPipe } from "@nestjs/common";
+import { NestFactory } from "@nestjs/core";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
-import { AppModule } from './app.module';
-import { headerConstants } from './auth/constants/header.constant';
-import { ConfigService } from './config/config.service';
+import { AppModule } from "./app.module";
+import { headerConstants } from "./auth/constants/header.constant";
+import { ConfigService } from "./config/config.service";
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
@@ -29,7 +29,10 @@ async function bootstrap() {
 			whitelist: true,
 			forbidNonWhitelisted: true,
 			transform: true,
-			transformOptions: { enableImplicitConversion: true }
+			transformOptions: {
+				enableImplicitConversion: true,
+				enableCircularCheck: true
+			}
 		})
 	);
 	// app.use(

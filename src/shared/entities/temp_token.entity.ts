@@ -6,8 +6,8 @@ import {
 	Ref
 } from "@typegoose/typegoose";
 
-import { BaseEntity } from "../base.entity";
-import { User, MAX_NAME_LENGTH } from "../user/user.entity";
+import { BaseEntity } from "./base.entity";
+import { User, MAX_NAME_LENGTH } from "../../user/user.entity";
 
 export const PW_RESET_EXPIRY_SECS = 1;
 @modelOptions({ options: { customName: "temp_tokens" } })

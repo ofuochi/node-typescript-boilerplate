@@ -3,7 +3,7 @@ import { InjectModel } from "nestjs-typegoose";
 
 import { ReturnModelType } from "@typegoose/typegoose";
 
-import { TempToken } from "../../entities/temp_token.entity";
+import { TempToken } from "../../shared/entities/temp_token.entity";
 import { BaseRepository } from "./base.repo";
 
 export class TempPwResetRepository extends BaseRepository<
