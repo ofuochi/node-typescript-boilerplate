@@ -11,6 +11,7 @@ import { BaseEntity } from "../shared/entities/base.entity";
 import { Tenant } from "../tenant/tenant.entity";
 import { IMustHaveTenant } from "../tenant/tenant.interface";
 import { Writable } from "../shared/utils/writable";
+import { Expose } from "class-transformer";
 
 export const MAX_NAME_LENGTH = 225;
 export const PASSWORD_SALT_ROUND = 12;
@@ -140,7 +141,7 @@ export class User extends BaseEntity implements IMustHaveTenant {
 	//   );
 	// }
 
-	public constructor(arg?: {
+	constructor(arg?: {
 		firstName: string;
 		lastName: string;
 		email: string;
@@ -149,9 +150,8 @@ export class User extends BaseEntity implements IMustHaveTenant {
 		tenant?: any;
 	}) {
 		super();
-		if (!arg) {
-			return;
-		}
+		if (!arg) return;
+
 		const { firstName, lastName, email, username, password, tenant } = arg;
 		this.firstName = firstName;
 		this.lastName = lastName;

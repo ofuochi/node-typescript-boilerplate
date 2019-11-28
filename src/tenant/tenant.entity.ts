@@ -36,9 +36,7 @@ export class Tenant extends BaseEntity {
 
 	constructor(arg?: { name: string; description: string }) {
 		super();
-		if (!arg) {
-			return;
-		}
+		if (!arg) return;
 
 		const { name, description } = arg;
 		this.name = name;

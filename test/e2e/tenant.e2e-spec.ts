@@ -77,6 +77,7 @@ describe("TenantController (e2e)", () => {
 	};
 	let createdTenant: TenantDto;
 	let headers: object;
+
 	it("should create new tenant if user is host admin", async () => {
 		headers = {
 			[headerConstants.tenantIdKey]: defaultTenant.id,

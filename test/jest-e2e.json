@@ -3,6 +3,7 @@
 	"rootDir": ".",
 	"bail": 1,
 	"verbose": false,
+	"modulePaths": ["<rootDir>/src"],
 	"setupFilesAfterEnv": ["<rootDir>/setup.ts"],
 	"testEnvironment": "node",
 	"testRegex": ".e2e-spec.ts$",

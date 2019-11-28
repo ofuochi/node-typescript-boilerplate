@@ -96,31 +96,17 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
 			});
 		});
 	}
-	hardFindById(id: string): Promise<TEntity> {
-		return new Promise<TEntity>((resolve, reject) => {
-			this.Model.findById(id, (err, res) => {
-				if (err) {
-					return reject(err);
-				}
-				if (!res) {
-					return resolve();
-				}
 
-				return resolve(this.readMapper(res) as TEntity);
-			});
-		});
-	}
-
-	public async insertOrUpdate(entity: TEntity): Promise<void> {
+	public async insertOrUpdate(entity: TEntity): Promise<TEntity> {
 		const currentUser = this.getCurrentUser();
-		return new Promise<void>((resolve, reject) => {
+		return new Promise<TEntity>((resolve, reject) => {
 			if (entity.id) {
 				const instance = new this.Model(entity);
 				instance.set("updatedBy", currentUser || entity.id);
 				const doc = this.readMapper(instance);
 				this.Model.findByIdAndUpdate(entity.id, doc, (err, res) => {
 					if (err) return reject(err);
-					resolve();
+					resolve(doc as TEntity);
 				});
 			} else {
 				if ("tenant" in this._ctor()) {
@@ -132,7 +118,8 @@ export class BaseRepository<TEntity extends BaseEntity, TModel extends Document>
 				instance.save((err, res) => {
 					if (err) return reject(err);
 					Object.assign(entity, this.readMapper(res));
-					resolve();
+
+					resolve(entity);
 				});
 			}
 		});

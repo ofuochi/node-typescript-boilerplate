@@ -193,6 +193,20 @@ describe("AuthController (e2e)", () => {
 					.expect(HttpStatus.OK);
 				expect(body).toHaveProperty("access_token");
 			});
+			it("should return unauthorized for disabled user", async () => {
+				const user = await User.getModel().findOne({
+					email: loginInput.emailOrUsername,
+					tenant: defaultTenant.id
+				});
+				user.deactivate();
+				await user.save();
+
+				await req
+					.post(`${endpoint}/login`)
+					.set(headerConstants.tenantIdKey, defaultTenant.id)
+					.send(loginInput)
+					.expect(HttpStatus.UNAUTHORIZED);
+			});
 		});
 		describe("Invalid User sign-in", () => {
 			let invalidLoginInput: LoginInput;

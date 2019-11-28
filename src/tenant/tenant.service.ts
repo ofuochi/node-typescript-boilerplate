@@ -10,6 +10,7 @@ import { Tenant } from "./tenant.entity";
 @Injectable()
 export class TenantService {
 	constructor(private readonly _tenantRepository: TenantRepository) {}
+
 	async deleteById(id: string) {
 		await this._tenantRepository.deleteById(id);
 	}

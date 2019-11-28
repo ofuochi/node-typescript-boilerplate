@@ -1,8 +1,7 @@
-import { plainToClass } from "class-transformer";
-
 import {
 	Body,
 	Controller,
+	Delete,
 	Get,
 	HttpCode,
 	HttpStatus,
@@ -10,26 +9,23 @@ import {
 	Post,
 	Put,
 	Query,
-	Request,
-	UseGuards,
-	Delete
+	UseGuards
 } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import {
 	ApiBearerAuth,
 	ApiCreatedResponse,
 	ApiOkResponse,
-	ApiOperation,
 	ApiUseTags
 } from "@nestjs/swagger";
-
+import { plainToClass } from "class-transformer";
+import { RolesGuard } from "../auth/guards/roles.guard";
 import { Roles } from "../decorators/roles.decorator";
 import { PagedResultDto } from "../shared/dto/base.dto";
 import { GetAllInput } from "../shared/dto/GetAll";
 import { UserRole } from "../user/user.entity";
 import { CreateTenantInput, PagedTenantDto, TenantDto } from "./tenant.dto";
 import { TenantService } from "./tenant.service";
-import { RolesGuard } from "../auth/guards/roles.guard";
 
 @ApiUseTags("Tenants")
 @Controller("tenants")
@@ -37,26 +33,18 @@ export class TenantController {
 	constructor(private readonly _tenantService: TenantService) {}
 
 	@Post()
-	@ApiOperation({
-		description:
-			"Create a new tenant. This operation can only be done by the admin.",
-		operationId: "CreateTenant",
-		title: "Creates Tenant"
-	})
 	@ApiCreatedResponse({
 		type: TenantDto
 	})
 	@Roles(UserRole.HOST)
 	@UseGuards(AuthGuard("jwt"), RolesGuard)
 	@ApiBearerAuth()
-	async createTenant(
-		@Body() input: CreateTenantInput,
-		@Request() req: any
-	): Promise<TenantDto> {
+	async createTenant(@Body() input: CreateTenantInput): Promise<TenantDto> {
 		const tenant = await this._tenantService.create(
 			input.name,
 			input.description
 		);
+
 		return plainToClass(TenantDto, tenant, {
 			enableImplicitConversion: true,
 			excludeExtraneousValues: true
@@ -64,12 +52,10 @@ export class TenantController {
 	}
 
 	@Get()
+	@ApiBearerAuth()
 	@Roles(UserRole.HOST)
 	@UseGuards(AuthGuard("jwt"), RolesGuard)
-	@ApiOkResponse({
-		type: PagedTenantDto
-	})
-	@ApiBearerAuth()
+	@ApiOkResponse({ type: PagedTenantDto })
 	async getTenants(
 		@Query() input: GetAllInput
 	): Promise<PagedResultDto<TenantDto>> {
@@ -84,10 +70,8 @@ export class TenantController {
 		};
 	}
 
-	@ApiCreatedResponse({
-		type: TenantDto
-	})
 	@Get(":tenantName")
+	@ApiCreatedResponse({ type: TenantDto })
 	async getTenant(@Param("tenantName") tenantName: string): Promise<TenantDto> {
 		const tenant = await this._tenantService.getTenantByName(tenantName);
 
@@ -105,6 +89,7 @@ export class TenantController {
 	async updateTenant(@Body() input: TenantDto) {
 		await this._tenantService.update(input);
 	}
+
 	@Delete(":id")
 	@Roles(UserRole.HOST)
 	@UseGuards(AuthGuard("jwt"), RolesGuard)

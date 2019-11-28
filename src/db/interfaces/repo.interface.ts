@@ -10,7 +10,7 @@ export interface IBaseRepository<T> {
 	 * @returns {Promise<T>}
 	 * @memberof IBaseRepository
 	 */
-	insertOrUpdate(doc: T): Promise<void>;
+	insertOrUpdate(doc: T): Promise<T>;
 	/**
 	 * Returns all documents in the collection
 	 *
@@ -27,13 +27,12 @@ export interface IBaseRepository<T> {
 	 */
 	findById(id: string): Promise<T>;
 	/**
-	 * Returns a document with the given id in the collection even if the document has been deleted
+	 * Returns a document with the given id in the collection
 	 *
 	 * @param {string} id
 	 * @returns {Promise<T>}
 	 * @memberof IBaseRepository
 	 */
-	hardFindById(id: string): Promise<T>;
 	findManyById(ids: string[]): Promise<T[]>;
 
 	/**

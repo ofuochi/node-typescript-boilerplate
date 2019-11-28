@@ -1,10 +1,11 @@
-import { TypegooseModule } from 'nestjs-typegoose';
+import { TypegooseModule } from "nestjs-typegoose";
 
-import { Test, TestingModule } from '@nestjs/testing';
+import { Test, TestingModule } from "@nestjs/testing";
 
-import { ConfigModule } from '../config/config.module';
-import { ConfigService } from '../config/config.service';
-import { UserController } from './user.controller';
+import { ConfigModule } from "../config/config.module";
+import { ConfigService } from "../config/config.service";
+import { UserController } from "./user.controller";
+import { UserModule } from "./user.module";
 
 describe("User Controller", () => {
 	let controller: UserController;
@@ -22,6 +23,7 @@ describe("User Controller", () => {
 			inject: [ConfigService]
 		});
 		const module: TestingModule = await Test.createTestingModule({
+			imports: [typegooseConfig, UserModule],
 			controllers: [UserController]
 		}).compile();
 

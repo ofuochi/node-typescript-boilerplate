@@ -1,3 +1,4 @@
+import { TempToken } from "./../shared/entities/temp_token.entity";
 import { TypegooseModule } from "nestjs-typegoose";
 
 import { NotFoundException, UnauthorizedException } from "@nestjs/common";
@@ -12,7 +13,7 @@ import { MailService } from "../shared/services/mail.service";
 import { UserRepository } from "../user/repository/user.repository";
 import { User } from "../user/user.entity";
 import { UserModule } from "../user/user.module";
-import { hashPw } from "../shared/utils/pwHash";
+import { hashPassword } from "../shared/utils/pwHash";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { errors } from "./constants/error.constant";
@@ -77,7 +78,7 @@ describe("AuthService", () => {
 	it("should register new user", async () => {
 		const spy = jest
 			.spyOn(userRepo, "insertOrUpdate")
-			.mockResolvedValue(Promise.resolve());
+			.mockResolvedValue(Promise.resolve(user));
 		const { canLogin, access_token } = await authService.register(user);
 
 		expect(spy).toHaveBeenCalledWith(user);
@@ -89,7 +90,7 @@ describe("AuthService", () => {
 		expect(res.access_token).toBeTruthy();
 	});
 	it("should validate user for correct details", async () => {
-		const hashedPw = await hashPw(user.password);
+		const hashedPw = await hashPassword(user.password);
 		const cloneUser = Object.create({ ...user, password: hashedPw }) as User;
 
 		const spyFindOneByQuery = jest
@@ -120,7 +121,7 @@ describe("AuthService", () => {
 		}
 	});
 	it("should throw unauthorized exception for invalid user credentials", async () => {
-		const hashedPw = await hashPw(user.password);
+		const hashedPw = await hashPassword(user.password);
 		const cloneUser = { ...user, password: hashedPw } as User;
 
 		const spy = jest
@@ -138,7 +139,9 @@ describe("AuthService", () => {
 	let input: CallbackUrlPropsInput;
 	it("should send password reset token", async () => {
 		userRepo.findOneByQuery = jest.fn(() => Promise.resolve(user));
-		tempPwResetRepo.insertOrUpdate = jest.fn(() => Promise.resolve());
+		tempPwResetRepo.insertOrUpdate = jest.fn(() =>
+			Promise.resolve(new TempToken())
+		);
 		mailService.sendMail = jest.fn(() => Promise.resolve());
 		input = {
 			email: "email@gmail.com",
