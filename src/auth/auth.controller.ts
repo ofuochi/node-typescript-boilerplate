@@ -36,11 +36,11 @@ import { PasswordResetInput } from "./dto/PasswordResetInput";
 export class AuthController {
 	constructor(private readonly _authService: AuthService) {}
 
+	@Post("register")
 	@ApiImplicitHeader({
 		name: headerConstants.tenantIdKey,
 		description: "Tenant ID"
 	})
-	@Post("register")
 	@UseGuards(new TenantGuard())
 	@ApiCreatedResponse({ type: RegisterResponse })
 	async register(@Body() input: RegisterInput): Promise<RegisterResponse> {
@@ -49,6 +49,7 @@ export class AuthController {
 		return plainToClass(RegisterResponse, result);
 	}
 
+	@Post("login")
 	@ApiOperation({
 		description:
 			"This returns authorization token. Pass this token in the header for subsequent requests",
@@ -63,11 +64,11 @@ export class AuthController {
 	@ApiOkResponse({ type: AuthResponse })
 	@HttpCode(HttpStatus.OK)
 	@UseGuards(new TenantGuard(false), LoginGuard)
-	@Post("login")
 	async login(@Body() input: LoginInput, @Request() req: any) {
 		return this._authService.generateJwt(req.user);
 	}
 
+	@Post("send_password_reset_token")
 	@ApiNoContentResponse({
 		description: "Sends a password reset token to the user"
 	})
@@ -77,7 +78,6 @@ export class AuthController {
 	})
 	@HttpCode(HttpStatus.NO_CONTENT)
 	@UseGuards(new TenantGuard())
-	@Post("send_password_reset_token")
 	async sendPwResetToken(@Body() input: CallbackUrlPropsInput) {
 		await this._authService.sendPasswordResetToken(input);
 	}
@@ -108,7 +108,7 @@ export class AuthController {
 	})
 	@UseGuards(new TenantGuard())
 	@Post("verify_email")
-	async verifyEmail(@Body() input: VerificationInput) {
-		await this._authService.verifyEmail(input);
+	async verifyUserEmail(@Body() input: VerificationInput) {
+		await this._authService.verifyUserEmail(input);
 	}
 }

@@ -1,18 +1,61 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { RoleController } from './role.controller';
+import { TypegooseModule } from "nestjs-typegoose";
 
-describe('Role Controller', () => {
-  let controller: RoleController;
+import { Test, TestingModule } from "@nestjs/testing";
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [RoleController],
-    }).compile();
+import { ConfigModule } from "../../src/config/config.module";
+import { ConfigService } from "../../src/config/config.service";
+import { CreateRoleInput } from "./dto/CreateRoleInput";
+import { RoleController } from "./role.controller";
+import { Role } from "./role.entity";
+import { RoleModule } from "./role.module";
+import { RoleService } from "./role.service";
 
-    controller = module.get<RoleController>(RoleController);
-  });
+jest.mock("./role.service");
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
+describe("Role Controller", () => {
+	let controller: RoleController;
+	let service: RoleService;
+	let role: Role;
+
+	beforeEach(async () => {
+		const typegooseConfig = TypegooseModule.forRootAsync({
+			imports: [ConfigModule],
+			useFactory: async (config: ConfigService) => ({
+				uri: config.env.mongoDbUri,
+				useNewUrlParser: true,
+				useUnifiedTopology: true,
+				useCreateIndex: true,
+				useFindAndModify: false
+			}),
+			inject: [ConfigService]
+		});
+		const module: TestingModule = await Test.createTestingModule({
+			imports: [typegooseConfig, RoleModule],
+			controllers: [RoleController]
+		}).compile();
+
+		controller = module.get<RoleController>(RoleController);
+		service = module.get<RoleService>(RoleService);
+	});
+
+	it("should be defined", () => {
+		expect(controller).toBeDefined();
+	});
+	it("should create role", async () => {
+		const input: CreateRoleInput = {
+			name: "Name",
+			description: "Description"
+		};
+		role = Role.createInstance(input.name, input.description);
+		role = { ...role, id: "id" } as Role;
+		jest.spyOn(service, "create").mockReturnValue(Promise.resolve(role));
+
+		const roleDto = await controller.createRole(input);
+		expect(role).toMatchObject(roleDto);
+		expect(service.create).toHaveBeenNthCalledWith(
+			1,
+			input.name,
+			input.description
+		);
+	});
 });

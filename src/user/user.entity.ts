@@ -8,10 +8,9 @@ import {
 } from "@typegoose/typegoose";
 
 import { BaseEntity } from "../shared/entities/base.entity";
+import { Writable } from "../shared/utils/writable";
 import { Tenant } from "../tenant/tenant.entity";
 import { IMustHaveTenant } from "../tenant/tenant.interface";
-import { Writable } from "../shared/utils/writable";
-import { Expose } from "class-transformer";
 
 export const MAX_NAME_LENGTH = 225;
 export const PASSWORD_SALT_ROUND = 12;

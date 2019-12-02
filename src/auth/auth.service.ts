@@ -127,17 +127,17 @@ export class AuthService {
 	async resetPassword(input: PasswordResetInput) {
 		const { token, newPassword, email } = input;
 		const user = await this.validateUserByEmail(email);
-		await this.validateToken(user, token);
+		await this.validateToken(user.id, token);
+		const hashedPw = await hashPassword(newPassword);
+		user.setPassword(hashedPw);
 
-		user.setPassword(await hashPassword(newPassword));
 		await this._userRepository.insertOrUpdate(user);
 		await this._tempTokenRepository.deleteOneByQuery({ user: user.id });
 	}
-	async verifyEmail(input: VerificationInput) {
+	async verifyUserEmail(input: VerificationInput) {
 		const { token, email } = input;
 		const user = await this.validateUserByEmail(email);
-		await this.validateToken(user, token);
-
+		await this.validateToken(user.id, token);
 		user.verifyEmail();
 		await this._userRepository.insertOrUpdate(user);
 		await this._tempTokenRepository.deleteOneByQuery({ user: user.id });

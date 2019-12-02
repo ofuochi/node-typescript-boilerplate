@@ -12,6 +12,7 @@ import { TenantController } from "./tenant/tenant.controller";
 import { TenantModule } from "./tenant/tenant.module";
 import { UserModule } from "./user/user.module";
 import { RoleModule } from './role/role.module';
+import { GroupModule } from './group/group.module';
 
 const typegooseConfig = TypegooseModule.forRootAsync({
 	imports: [ConfigModule],
@@ -34,7 +35,8 @@ const typegooseConfig = TypegooseModule.forRootAsync({
 		typegooseConfig,
 		AccountModule,
 		ScheduleModule.register(),
-		RoleModule
+		RoleModule,
+		GroupModule
 	],
 	providers: [AppService]
 })

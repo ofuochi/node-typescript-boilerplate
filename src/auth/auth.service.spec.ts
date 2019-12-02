@@ -1,6 +1,8 @@
+import { PasswordResetInput } from "./dto/PasswordResetInput";
+import { VerificationInput } from "./dto/VerificationInput";
 import { TempToken } from "./../shared/entities/temp_token.entity";
 import { TypegooseModule } from "nestjs-typegoose";
-
+import * as bcrypt from "bcrypt";
 import { NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
@@ -13,13 +15,14 @@ import { MailService } from "../shared/services/mail.service";
 import { UserRepository } from "../user/repository/user.repository";
 import { User } from "../user/user.entity";
 import { UserModule } from "../user/user.module";
-import { hashPassword } from "../shared/utils/pwHash";
+
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { errors } from "./constants/error.constant";
 import { SessionSerializer } from "./session.serializer";
 import { JwtStrategy } from "./strategies/jwt.strategy";
 import { CallbackUrlPropsInput } from "./dto/CallbackUrlPropsInput";
+import { hashPassword } from "../shared/utils/pwHash";
 
 jest.mock("../user/repository/user.repository");
 jest.mock("../db/repos/pw_reset.repo");
@@ -28,6 +31,7 @@ describe("AuthService", () => {
 	let authService: AuthService;
 	let userRepo: UserRepository;
 	let mailService: MailService;
+	let user: User;
 	let tempPwResetRepo: TempPwResetRepository;
 	beforeAll(async () => {
 		const typegooseConfig = TypegooseModule.forRootAsync({
@@ -62,20 +66,24 @@ describe("AuthService", () => {
 			TempPwResetRepository
 		);
 		mailService = module.get<MailService>(MailService);
+
+		user = User.createInstance({
+			firstName: "John",
+			lastName: "Doa",
+			username: "username",
+			email: "email@gmail.com",
+			password: "123qwe"
+		});
 	});
 	afterEach(() => jest.resetAllMocks());
 
 	it("should be defined", () => {
 		expect(authService).toBeDefined();
 	});
-	const user = User.createInstance({
-		firstName: "John",
-		lastName: "Doa",
-		username: "username",
-		email: "email@gmail.com",
-		password: "123qwe"
-	});
+
 	it("should register new user", async () => {
+		user = Object.create(user);
+		user.id = "5a1154523a6bcc1d245e143d";
 		const spy = jest
 			.spyOn(userRepo, "insertOrUpdate")
 			.mockResolvedValue(Promise.resolve(user));
@@ -136,28 +144,110 @@ describe("AuthService", () => {
 			expect(error.message).toEqual(errors.INVALID_LOGIN_ATTEMPT.message);
 		}
 	});
-	let input: CallbackUrlPropsInput;
+	let callbackUrlPropsInput: CallbackUrlPropsInput;
+	it("should send email verification token", async () => {
+		userRepo.findOneByQuery = jest.fn(() => Promise.resolve(user));
+		tempPwResetRepo.insertOrUpdate = jest.fn(() =>
+			Promise.resolve(new TempToken())
+		);
+		mailService.sendMail = jest.fn(() => Promise.resolve());
+		callbackUrlPropsInput = {
+			email: "email@gmail.com",
+			clientBaseUrl: "http://www.clientbaseurl.com",
+			emailParameterName: "email",
+			verificationCodeParameterName: "verification_code"
+		};
+		await authService.sendEmailVerificationToken(callbackUrlPropsInput);
+		expect(mailService.sendMail).toHaveBeenCalled();
+	});
 	it("should send password reset token", async () => {
 		userRepo.findOneByQuery = jest.fn(() => Promise.resolve(user));
 		tempPwResetRepo.insertOrUpdate = jest.fn(() =>
 			Promise.resolve(new TempToken())
 		);
 		mailService.sendMail = jest.fn(() => Promise.resolve());
-		input = {
+		callbackUrlPropsInput = {
 			email: "email@gmail.com",
 			clientBaseUrl: "http://www.clientbaseurl.com",
 			emailParameterName: "email",
 			verificationCodeParameterName: "verification_code"
 		};
-		await authService.sendPasswordResetToken(input);
+		await authService.sendPasswordResetToken(callbackUrlPropsInput);
 		expect(mailService.sendMail).toHaveBeenCalled();
 	});
-	it("should throw not found exception for nonexisting email", async () => {
+
+	it("should throw NotFound exception for nonexisting email trying to send reset password", async () => {
 		try {
-			await authService.sendPasswordResetToken(input);
+			await authService.sendPasswordResetToken(callbackUrlPropsInput);
 		} catch (error) {
 			expect(error).toBeInstanceOf(NotFoundException);
 			expect(mailService.sendMail).toHaveBeenCalledTimes(0);
 		}
+	});
+	it("should throw NotFound exception for expired email verification token", async () => {
+		const verificationInput: VerificationInput = {
+			email: user.email,
+			token: "token"
+		};
+		try {
+			jest
+				.spyOn(tempPwResetRepo, "findOneByQuery")
+				.mockReturnValueOnce(Promise.resolve(undefined));
+			jest
+				.spyOn(userRepo, "findOneByQuery")
+				.mockReturnValueOnce(Promise.resolve(user));
+			await authService.verifyUserEmail(verificationInput);
+		} catch (error) {
+			expect(tempPwResetRepo.findOneByQuery).toHaveBeenCalledTimes(1);
+			expect(error).toBeInstanceOf(NotFoundException);
+		}
+	});
+
+	it("should reset password", async () => {
+		const pwResetInput: PasswordResetInput = {
+			email: user.email,
+			newPassword: "new_Pa@@wor1d",
+			token: "token"
+		};
+		user = { ...user, id: "5a1154523a6bcc1d245e143d" } as User;
+		user.setPassword = jest.fn();
+		jest
+			.spyOn(userRepo, "findOneByQuery")
+			.mockReturnValueOnce(Promise.resolve(user));
+		jest
+			.spyOn(tempPwResetRepo, "findOneByQuery")
+			.mockReturnValueOnce(
+				Promise.resolve(TempToken.createInstance(user.id, "token"))
+			);
+
+		jest.spyOn(bcrypt, "compare").mockReturnValueOnce(Promise.resolve(true));
+		await authService.resetPassword(pwResetInput);
+
+		expect(user.setPassword).toHaveBeenCalledTimes(1);
+	});
+	it("should verify email", async () => {
+		user = { ...user, id: "5a1154523a6bcc1d245e143d" } as User;
+
+		const input: VerificationInput = {
+			email: user.email,
+			token: "token"
+		};
+		jest
+			.spyOn(userRepo, "findOneByQuery")
+			.mockReturnValueOnce(Promise.resolve(user));
+		jest
+			.spyOn(tempPwResetRepo, "findOneByQuery")
+			.mockReturnValueOnce(
+				Promise.resolve(TempToken.createInstance(user.id, "token"))
+			);
+
+		jest.spyOn(tempPwResetRepo, "deleteOneByQuery");
+
+		user.verifyEmail = jest.fn();
+
+		jest.spyOn(bcrypt, "compare").mockReturnValueOnce(Promise.resolve(true));
+
+		await authService.verifyUserEmail(input);
+		expect(user.verifyEmail).toHaveBeenCalledTimes(1);
 	});
 });

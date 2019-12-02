@@ -1,18 +1,39 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { RoleService } from './role.service';
+import { TypegooseModule } from "nestjs-typegoose";
 
-describe('RoleService', () => {
-  let service: RoleService;
+import { Test, TestingModule } from "@nestjs/testing";
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [RoleService],
-    }).compile();
+import { ConfigModule } from "../config/config.module";
+import { ConfigService } from "../config/config.service";
+import { RoleController } from "./role.controller";
+import { Role } from "./role.entity";
+import { RoleRepository } from "./role.repo";
+import { RoleService } from "./role.service";
 
-    service = module.get<RoleService>(RoleService);
-  });
+describe("RoleService", () => {
+	let service: RoleService;
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
+	beforeEach(async () => {
+		const typegooseConfig = TypegooseModule.forRootAsync({
+			imports: [ConfigModule],
+			useFactory: async (config: ConfigService) => ({
+				uri: config.env.mongoDbUri,
+				useNewUrlParser: true,
+				useUnifiedTopology: true,
+				useCreateIndex: true,
+				useFindAndModify: false
+			}),
+			inject: [ConfigService]
+		});
+		const module: TestingModule = await Test.createTestingModule({
+			imports: [typegooseConfig, TypegooseModule.forFeature([Role])],
+			exports: [RoleService, RoleRepository],
+			providers: [RoleService, RoleRepository],
+			controllers: [RoleController]
+		}).compile();
+		service = module.get<RoleService>(RoleService);
+	});
+
+	it("should be defined", () => {
+		expect(service).toBeDefined();
+	});
 });
