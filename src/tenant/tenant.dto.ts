@@ -1,8 +1,6 @@
 import { Expose } from "class-transformer";
 import { IsBoolean, IsNotEmpty, IsString, MaxLength } from "class-validator";
 
-import { ApiModelProperty } from "@nestjs/swagger";
-
 import {
 	BaseCreateEntityDto,
 	BaseEntityDto,
@@ -10,9 +8,10 @@ import {
 } from "../shared/dto/base.dto";
 import { MAX_NAME_LENGTH } from "../user/user.entity";
 import { Optional } from "@nestjs/common";
+import { ApiProperty } from "@nestjs/swagger";
 
 export class CreateTenantInput extends BaseCreateEntityDto {
-	@ApiModelProperty({
+	@ApiProperty({
 		required: true,
 		maxLength: MAX_NAME_LENGTH,
 		description: "The tenant name"
@@ -20,7 +19,7 @@ export class CreateTenantInput extends BaseCreateEntityDto {
 	@MaxLength(MAX_NAME_LENGTH)
 	@IsNotEmpty()
 	name: string;
-	@ApiModelProperty({
+	@ApiProperty({
 		required: true,
 		maxLength: MAX_NAME_LENGTH,
 		description: "Brief description about this tenant"
@@ -36,7 +35,7 @@ export class TenantDto extends BaseEntityDto {
 	@IsString()
 	@Expose()
 	@Optional()
-	@ApiModelProperty({
+	@ApiProperty({
 		required: false,
 		type: String,
 		maxLength: MAX_NAME_LENGTH
@@ -46,7 +45,7 @@ export class TenantDto extends BaseEntityDto {
 	@IsNotEmpty()
 	@Expose()
 	@Optional()
-	@ApiModelProperty({
+	@ApiProperty({
 		required: false,
 		type: String,
 		maxLength: MAX_NAME_LENGTH
@@ -55,11 +54,11 @@ export class TenantDto extends BaseEntityDto {
 	@IsBoolean()
 	@Expose()
 	@Optional()
-	@ApiModelProperty({ required: false, type: Boolean })
+	@ApiProperty({ required: false, type: Boolean })
 	isActive?: boolean;
 }
 export class PagedTenantDto extends PagedResultDto<TenantDto> {
-	@ApiModelProperty({
+	@ApiProperty({
 		required: false,
 		type: TenantDto
 	})

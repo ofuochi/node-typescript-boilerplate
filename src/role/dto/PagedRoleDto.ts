@@ -1,10 +1,10 @@
-import { ApiModelProperty } from "@nestjs/swagger";
+import { ApiProperty } from "@nestjs/swagger";
 
 import { PagedResultDto } from "../../shared/dto/base.dto";
 import { RoleDto } from "./RoleDto";
 
 export class PagedTenantDto extends PagedResultDto<RoleDto> {
-	@ApiModelProperty({
+	@ApiProperty({
 		required: false,
 		type: RoleDto
 	})

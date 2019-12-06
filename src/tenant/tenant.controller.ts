@@ -16,7 +16,7 @@ import {
 	ApiBearerAuth,
 	ApiCreatedResponse,
 	ApiOkResponse,
-	ApiUseTags
+	ApiTags
 } from "@nestjs/swagger";
 import { plainToClass } from "class-transformer";
 import { RolesGuard } from "../auth/guards/roles.guard";
@@ -27,7 +27,7 @@ import { UserRole } from "../user/user.entity";
 import { CreateTenantInput, PagedTenantDto, TenantDto } from "./tenant.dto";
 import { TenantService } from "./tenant.service";
 
-@ApiUseTags("Tenants")
+@ApiTags("Tenants")
 @Controller("tenants")
 export class TenantController {
 	constructor(private readonly _tenantService: TenantService) {}

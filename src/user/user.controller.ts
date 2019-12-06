@@ -19,7 +19,7 @@ import {
 	ApiBearerAuth,
 	ApiCreatedResponse,
 	ApiOkResponse,
-	ApiUseTags
+	ApiTags,
 } from "@nestjs/swagger";
 
 import { RegisterInput } from "../auth/dto/RegisterInput";
@@ -33,7 +33,7 @@ import { UserDto } from "./dto/UserResponse";
 import { UserRole } from "./user.entity";
 import { UserService } from "./user.service";
 
-@ApiUseTags("Users")
+@ApiTags("Users")
 @Controller("users")
 @UseGuards(AuthGuard("jwt"), RolesGuard)
 @ApiBearerAuth()

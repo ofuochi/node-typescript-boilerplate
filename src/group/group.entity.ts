@@ -7,7 +7,7 @@ import {
 	Ref
 } from "@typegoose/typegoose";
 
-import { schemaConsts } from "../shared/constants/entity.constant";
+import { schemaConst } from "../shared/constants/entity.constant";
 import { BaseEntity } from "../shared/entities/base.entity";
 import { Writable } from "../shared/utils/writable";
 import { Tenant } from "../tenant/tenant.entity";
@@ -19,10 +19,10 @@ export const MIN_GRP_SIZE = 1;
 export const MAX_GRP_SIZE = 255;
 
 @modelOptions({ options: { customName: "groups" } })
-@index({ name: 1, tenant: 1 }, { unique: true })
+@index({ title: 1, tenant: 1 }, { unique: true })
 export class Group extends BaseEntity implements IMustHaveTenant {
 	constructor(grp?: {
-		name: string;
+		title: string;
 		size: number;
 		goal: string;
 		expiresAt: Date;
@@ -31,9 +31,9 @@ export class Group extends BaseEntity implements IMustHaveTenant {
 		super();
 		if (!grp) return;
 
-		this.name = grp.name;
+		this.title = grp.title;
 		this.size = grp.size;
-		this.goal = grp.goal;
+		this.description = grp.goal;
 		this.expiresAt = grp.expiresAt;
 		this.isPublic = grp.isPublic;
 	}
@@ -47,9 +47,9 @@ export class Group extends BaseEntity implements IMustHaveTenant {
 		trim: true,
 		unique: false,
 		text: true,
-		maxlength: schemaConsts.MAX_DESC_LENGTH
+		maxlength: schemaConst.MAX_NAME_LENGTH
 	})
-	readonly name!: string;
+	readonly title!: string;
 
 	@prop({ type: Boolean, default: false })
 	readonly isPublic: boolean = false;
@@ -63,11 +63,11 @@ export class Group extends BaseEntity implements IMustHaveTenant {
 	readonly size: number = DEFAULT_GRP_SIZE;
 
 	@prop({
-		maxlength: schemaConsts.MAX_DESC_LENGTH,
+		maxlength: schemaConst.MAX_DESC_LENGTH,
 		required: true,
 		trim: true
 	})
-	readonly goal!: string;
+	readonly description!: string;
 
 	@prop({
 		required: true,
@@ -80,10 +80,10 @@ export class Group extends BaseEntity implements IMustHaveTenant {
 		itemsRef: User,
 		required: false
 	})
-	readonly members: Ref<User>[] = [this.createdBy];
+	readonly members: Ref<User>[] = [];
 
 	static createInstance(group: {
-		name: string;
+		title: string;
 		size: number;
 		goal: string;
 		expiresAt: Date;
@@ -93,9 +93,9 @@ export class Group extends BaseEntity implements IMustHaveTenant {
 	}
 
 	update(entity: Partial<this>): void {
-		if (entity.name) this.setName(entity.name);
+		if (entity.title) this.setName(entity.title);
 		if (entity.size) this.setSize(entity.size);
-		if (entity.goal) this.setGoal(entity.goal);
+		if (entity.description) this.setGoal(entity.description);
 		if (entity.isPublic) (this as Writable<this>).isPublic = entity.isPublic;
 	}
 	/**
@@ -106,14 +106,15 @@ export class Group extends BaseEntity implements IMustHaveTenant {
 	setSize(size: number) {
 		(this as Writable<this>).size = size;
 	}
-	setName(name: string) {
-		(this as Writable<this>).name = name;
+	setName(title: string) {
+		(this as Writable<this>).title = title;
 	}
 	setGoal(goal: string) {
-		(this as Writable<this>).goal = goal;
+		(this as Writable<this>).description = goal;
 	}
 	addMember(member: Ref<User>) {
-		this.members.push(member);
+		const index = this.members.indexOf(member);
+		if (index < 0) this.members.push(member);
 	}
 	removeMember(member: Ref<User>) {
 		const index = this.members.indexOf(member);

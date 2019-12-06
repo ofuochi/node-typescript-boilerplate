@@ -1,45 +1,45 @@
-import { IsEmail, IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, MaxLength } from "class-validator";
 
-import { ApiModelProperty } from '@nestjs/swagger';
+import { ApiProperty } from "@nestjs/swagger";
 
-import { MAX_NAME_LENGTH } from '../../user/constants';
+import { MAX_NAME_LENGTH } from "../../user/constants";
 
 export class RegisterInput {
-  @ApiModelProperty({
-    required: true,
-    maxLength: MAX_NAME_LENGTH,
-  })
-  @MaxLength(MAX_NAME_LENGTH)
-  @IsNotEmpty()
-  @IsString()
-  firstName: string;
-  @ApiModelProperty({
-    required: true,
-    maxLength: MAX_NAME_LENGTH,
-  })
-  @MaxLength(MAX_NAME_LENGTH)
-  @IsNotEmpty()
-  @IsString()
-  lastName: string;
-  @ApiModelProperty({
-    required: true,
-    maxLength: MAX_NAME_LENGTH,
-  })
-  @IsEmail()
-  email: string;
-  @ApiModelProperty({
-    required: true,
-    maxLength: MAX_NAME_LENGTH,
-  })
-  @MaxLength(MAX_NAME_LENGTH)
-  @IsNotEmpty()
-  @IsString()
-  username: string;
-  @ApiModelProperty({
-    required: true,
-    maxLength: MAX_NAME_LENGTH,
-  })
-  @MaxLength(MAX_NAME_LENGTH)
-  @IsNotEmpty()
-  password: string;
+	@ApiProperty({
+		required: true,
+		maxLength: MAX_NAME_LENGTH
+	})
+	@MaxLength(MAX_NAME_LENGTH)
+	@IsNotEmpty()
+	@IsString()
+	firstName: string;
+	@ApiProperty({
+		required: true,
+		maxLength: MAX_NAME_LENGTH
+	})
+	@MaxLength(MAX_NAME_LENGTH)
+	@IsNotEmpty()
+	@IsString()
+	lastName: string;
+	@ApiProperty({
+		required: true,
+		maxLength: MAX_NAME_LENGTH
+	})
+	@IsEmail()
+	email: string;
+	@ApiProperty({
+		required: true,
+		maxLength: MAX_NAME_LENGTH
+	})
+	@MaxLength(MAX_NAME_LENGTH)
+	@IsNotEmpty()
+	@IsString()
+	username: string;
+	@ApiProperty({
+		required: true,
+		maxLength: MAX_NAME_LENGTH
+	})
+	@MaxLength(MAX_NAME_LENGTH)
+	@IsNotEmpty()
+	password: string;
 }

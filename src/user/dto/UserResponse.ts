@@ -10,7 +10,7 @@ import {
 
 import { MAX_NAME_LENGTH } from "../user.entity";
 import { BaseEntityDto } from "../../shared/dto/base.dto";
-import { ApiModelProperty } from "@nestjs/swagger";
+import { ApiProperty } from "@nestjs/swagger";
 
 export class UserDto extends BaseEntityDto {
 	@MaxLength(MAX_NAME_LENGTH)
@@ -18,32 +18,32 @@ export class UserDto extends BaseEntityDto {
 	@IsOptional()
 	@IsString()
 	@Expose()
-	@ApiModelProperty()
+	@ApiProperty()
 	firstName: string;
 	@MaxLength(MAX_NAME_LENGTH)
 	@IsNotEmpty()
 	@IsOptional()
 	@IsString()
 	@Expose()
-	@ApiModelProperty()
+	@ApiProperty()
 	lastName: string;
 	@MaxLength(MAX_NAME_LENGTH)
 	@IsEmail()
 	@IsOptional()
 	@Expose()
-	@ApiModelProperty()
+	@ApiProperty()
 	email: string;
 	@MaxLength(MAX_NAME_LENGTH)
 	@IsNotEmpty()
 	@IsOptional()
 	@IsString()
 	@Expose()
-	@ApiModelProperty()
+	@ApiProperty()
 	username: string;
 	@IsBoolean()
 	@IsOptional()
 	@IsString()
 	@Expose()
-	@ApiModelProperty({ type: Boolean })
+	@ApiProperty({ type: Boolean })
 	isActive: boolean;
 }

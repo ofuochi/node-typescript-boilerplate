@@ -5,7 +5,6 @@ import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
 import { AppModule } from "./app.module";
-import { headerConstants } from "./auth/constants/header.constant";
 import { ConfigService } from "./config/config.service";
 
 async function bootstrap() {
@@ -15,7 +14,7 @@ async function bootstrap() {
 		.setTitle("NODE-TYPESCRIPT-BOILERPLATE")
 		.setDescription("The NODE-TYPESCRIPT-BOILERPLATE API documentation")
 		.setLicense("MIT", "https://opensource.org/licenses/MIT")
-		.addBearerAuth(headerConstants.authorizationKey, "header")
+		.addBearerAuth({ type: "apiKey", name: "Bearer token", in: "Header" })
 		.setVersion("1.0")
 		.build();
 

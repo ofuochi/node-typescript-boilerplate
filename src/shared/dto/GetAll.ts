@@ -1,22 +1,23 @@
 import {
-	MaxLength,
 	IsNotEmpty,
+	IsNumber,
 	IsOptional,
 	IsString,
 	Max,
-	Min,
-	IsNumber
+	MaxLength,
+	Min
 } from "class-validator";
 
+import { ApiProperty } from "@nestjs/swagger";
+
 import { MAX_NAME_LENGTH } from "../../user/user.entity";
-import { ApiModelProperty } from "@nestjs/swagger";
 
 export class GetAllInput {
 	@MaxLength(MAX_NAME_LENGTH)
 	@IsNotEmpty()
 	@IsOptional()
 	@IsString()
-	@ApiModelProperty({
+	@ApiProperty({
 		required: false,
 		maxLength: MAX_NAME_LENGTH
 	})
@@ -25,14 +26,14 @@ export class GetAllInput {
 	@Max(100)
 	@IsNumber()
 	@IsOptional()
-	@ApiModelProperty({
+	@ApiProperty({
 		required: false,
 		maximum: 100,
 		minimum: 1,
 		default: 1
 	})
 	limit?: number = 0;
-	@ApiModelProperty({
+	@ApiProperty({
 		required: false,
 		minimum: 0,
 		default: 0

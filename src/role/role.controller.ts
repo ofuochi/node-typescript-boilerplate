@@ -2,7 +2,7 @@ import { plainToClass } from "class-transformer";
 
 import { Body, Controller, Post, UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
-import { ApiBearerAuth, ApiCreatedResponse, ApiUseTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiCreatedResponse, ApiTags } from "@nestjs/swagger";
 
 import { RolesGuard } from "../auth/guards/roles.guard";
 import { Roles } from "../decorators/roles.decorator";
@@ -12,7 +12,7 @@ import { RoleDto } from "./dto/RoleDto";
 import { RoleService } from "./role.service";
 
 @Controller("roles")
-@ApiUseTags("Roles")
+@ApiTags("Roles")
 export class RoleController {
 	constructor(private readonly _roleService: RoleService) {}
 

@@ -18,4 +18,10 @@ export class GroupRepository extends BaseRepository<Group, GroupModel>
 	) {
 		super(groupModel, () => new Group());
 	}
+
+	public async insertOrUpdate(grp: Group): Promise<Group> {
+		grp.addMember(super.getCurrentUser());
+		grp = await super.insertOrUpdate(grp);
+		return grp;
+	}
 }

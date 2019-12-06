@@ -1,7 +1,7 @@
 import { TypegooseModule } from "nestjs-typegoose";
 import * as request from "supertest";
 
-import { HttpStatus } from "@nestjs/common";
+import { HttpStatus, HttpModule } from "@nestjs/common";
 import { NestApplication } from "@nestjs/core";
 import { Test, TestingModule } from "@nestjs/testing";
 
@@ -19,12 +19,13 @@ import { TempToken } from "../../src/shared/entities/temp_token.entity";
 import { hashPassword } from "../../src/shared/utils/pwHash";
 import { User } from "../../src/user/user.entity";
 import { connStr, defaultTenant } from "../setup";
+import { ConfigModule } from "../../src/config/config.module";
 
 describe("GroupController (e2e)", () => {
 	let app: NestApplication;
-	let role: Group;
+	let grp: Group;
 	let authService: AuthService;
-	let roleRepository: GroupRepository;
+	let grpRepository: GroupRepository;
 	let req: request.SuperTest<request.Test>;
 	let adminJwt: string;
 	const password = "admin_p@ssW0rd";
@@ -42,7 +43,9 @@ describe("GroupController (e2e)", () => {
 			imports: [
 				TypegooseModule.forFeature([Group, TempToken]),
 				typegooseConfig,
-				AuthModule
+				AuthModule,
+				HttpModule,
+				ConfigModule
 			],
 			exports: [GroupService, GroupRepository, TempPwResetRepository],
 			providers: [GroupService, GroupRepository, TempPwResetRepository],
@@ -51,13 +54,13 @@ describe("GroupController (e2e)", () => {
 
 		app = module.createNestApplication();
 		authService = await module.resolve<AuthService>(AuthService);
-		roleRepository = await module.resolve<GroupRepository>(GroupRepository);
+		grpRepository = await module.resolve<GroupRepository>(GroupRepository);
 		await app.init();
 
 		user = User.createInstance({
-			firstName: "Admin",
+			firstName: "User",
 			email: "user@email.com",
-			lastName: "Admin",
+			lastName: "User",
 			password: await hashPassword(password),
 			username: "user",
 			tenant: defaultTenant.id
@@ -72,7 +75,7 @@ describe("GroupController (e2e)", () => {
 
 	let headers: object;
 	let createdGroup: GroupDto;
-	describe("Admin User CRUD Operations", () => {
+	describe(" User CRUD Operations", () => {
 		beforeAll(
 			() =>
 				(headers = {
@@ -80,9 +83,9 @@ describe("GroupController (e2e)", () => {
 					[headerConstants.authorizationKey]: `Bearer ${adminJwt}`
 				})
 		);
-		it("should create a new role", async () => {
+		it("should create a new group", async () => {
 			const createGroupInput: CreateGroupInput = {
-				name: "Grp1",
+				title: "Grp1",
 				size: 57,
 				goal: "The goals",
 				expiresAt: new Date(),
@@ -94,14 +97,14 @@ describe("GroupController (e2e)", () => {
 				.send(createGroupInput)
 				.expect(HttpStatus.CREATED);
 
-			const roleRecFromDb = await Group.getModel().findById(body.id);
+			const grpRecFromDb = await Group.getModel().findById(body.id);
 
 			expect(body).toHaveProperty("id");
-			expect(roleRecFromDb.createdBy.toString()).toEqual(user.id.toString());
+			expect(grpRecFromDb.createdBy.toString()).toEqual(user.id.toString());
+			expect(grpRecFromDb.members).toContainEqual(grpRecFromDb.createdBy);
+			expect(user.tenant.toString()).toEqual(grpRecFromDb.tenant.toString());
+			expect(grpRecFromDb.tenant.toString()).toEqual(user.tenant.toString());
 
-			expect(user.tenant.toString()).toEqual(roleRecFromDb.tenant.toString());
-
-			expect(roleRecFromDb.tenant.toString()).toEqual(user.tenant.toString());
 			createdGroup = body;
 		});
 	});

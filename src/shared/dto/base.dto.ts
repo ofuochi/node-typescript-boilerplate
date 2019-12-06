@@ -1,20 +1,20 @@
 import { Expose } from "class-transformer";
 import { IsMongoId } from "class-validator";
 
-import { ApiModelProperty } from "@nestjs/swagger";
+import { ApiProperty } from "@nestjs/swagger";
 
 export abstract class BaseCreateEntityDto {}
 
 export abstract class BaseEntityDto {
 	@Expose()
 	@IsMongoId()
-	@ApiModelProperty()
+	@ApiProperty()
 	id: string;
 }
 export abstract class PagedResultDto<T> {
-	@ApiModelProperty({ required: false })
+	@ApiProperty({ required: false })
 	totalCount: number;
-	@ApiModelProperty({
+	@ApiProperty({
 		isArray: true
 	})
 	abstract items: T[];

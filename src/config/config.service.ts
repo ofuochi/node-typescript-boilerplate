@@ -12,6 +12,9 @@ export interface EnvConfig {
 	maxLoginAttempts: number;
 	lockoutDurationMinutes: number;
 	isApiAuthEnabled: boolean;
+	packageBaseUrl: string;
+	packageEmail: string;
+	packagePassword: string;
 }
 
 export class ConfigService {
@@ -39,7 +42,16 @@ export class ConfigService {
 			MAX_LOGIN_ATTEMPTS: Joi.number().default(5),
 			LOCKOUT_DURATION_MINUTES: Joi.number().default(5),
 			PORT: Joi.number().default(3000),
-			APP_EMAIL: Joi.string().required(),
+			APP_EMAIL: Joi.string()
+				.email()
+				.required(),
+			PACKAGE_EMAIL: Joi.string()
+				.email()
+				.required(),
+			PACKAGE_BASE_URL: Joi.string()
+				.uri()
+				.required(),
+			PACKAGE_PASSWORD: Joi.string().required(),
 			API_AUTH_ENABLED: Joi.boolean().required()
 		});
 
@@ -57,7 +69,10 @@ export class ConfigService {
 			appEmail: value.APP_EMAIL,
 			jwtSecret: value.JWT_SECRET,
 			lockoutDurationMinutes: value.LOCKOUT_DURATION_MINUTES,
-			maxLoginAttempts: value.MAX_LOGIN_ATTEMPTS
+			maxLoginAttempts: value.MAX_LOGIN_ATTEMPTS,
+			packageEmail: value.PACKAGE_EMAIL,
+			packagePassword: value.PACKAGE_PASSWORD,
+			packageBaseUrl: value.PACKAGE_BASE_URL
 		};
 	}
 	get env() {

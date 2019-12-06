@@ -1,12 +1,12 @@
 import { IsNotEmpty, MaxLength } from "class-validator";
 
-import { ApiModelProperty } from "@nestjs/swagger";
+import { ApiProperty } from "@nestjs/swagger";
 
 import { BaseCreateEntityDto } from "../../shared/dto/base.dto";
 import { MAX_NAME_LENGTH } from "../../user/user.entity";
 
 export class CreateRoleInput extends BaseCreateEntityDto {
-	@ApiModelProperty({
+	@ApiProperty({
 		required: true,
 		maxLength: MAX_NAME_LENGTH,
 		description: "Non-space role name"
@@ -14,7 +14,7 @@ export class CreateRoleInput extends BaseCreateEntityDto {
 	@MaxLength(MAX_NAME_LENGTH)
 	@IsNotEmpty()
 	name: string;
-	@ApiModelProperty({
+	@ApiProperty({
 		required: true,
 		maxLength: MAX_NAME_LENGTH,
 		description: "Brief description about this role"

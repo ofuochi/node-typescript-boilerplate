@@ -11,7 +11,7 @@ import { BaseEntity } from "../shared/entities/base.entity";
 import { Writable } from "../shared/utils/writable";
 import { Tenant } from "../tenant/tenant.entity";
 import { IMustHaveTenant } from "../tenant/tenant.interface";
-import { schemaConsts } from "../shared/constants/entity.constant";
+import { schemaConst } from "../shared/constants/entity.constant";
 
 @modelOptions({ options: { customName: "roles" } })
 @index({ name: 1, tenant: 1 }, { unique: true })
@@ -25,10 +25,10 @@ export class Role extends BaseEntity implements IMustHaveTenant {
 		trim: true,
 		unique: false,
 		text: true,
-		maxlength: schemaConsts.MAX_DESC_LENGTH
+		maxlength: schemaConst.MAX_DESC_LENGTH
 	})
 	readonly name!: string;
-	@prop({ required: true, trim: true, maxlength: schemaConsts.MAX_DESC_LENGTH })
+	@prop({ required: true, trim: true, maxlength: schemaConst.MAX_DESC_LENGTH })
 	readonly description!: string;
 
 	constructor(arg?: { name: string; description: string; tenant?: any }) {

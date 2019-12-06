@@ -24,7 +24,6 @@ setGlobalOptions({ globalOptions: { useNewEnum: true } });
 })
 export abstract class BaseEntity extends TimeStamps {
 	abstract update(entity: Partial<BaseEntity>): void;
-
 	/**
 	 * Gets the primary key
 	 *

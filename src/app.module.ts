@@ -11,8 +11,9 @@ import { TenantMiddleware } from "./shared/middlewares/tenant.middleware";
 import { TenantController } from "./tenant/tenant.controller";
 import { TenantModule } from "./tenant/tenant.module";
 import { UserModule } from "./user/user.module";
-import { RoleModule } from './role/role.module';
-import { GroupModule } from './group/group.module';
+import { RoleModule } from "./role/role.module";
+import { GroupModule } from "./group/group.module";
+import { TravelPackageModule } from "./travel-package/travel-package.module";
 
 const typegooseConfig = TypegooseModule.forRootAsync({
 	imports: [ConfigModule],
@@ -36,7 +37,9 @@ const typegooseConfig = TypegooseModule.forRootAsync({
 		AccountModule,
 		ScheduleModule.register(),
 		RoleModule,
-		GroupModule
+		GroupModule,
+		TravelPackageModule
+		//GrpPackageModule
 	],
 	providers: [AppService]
 })

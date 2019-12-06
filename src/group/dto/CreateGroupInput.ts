@@ -1,6 +1,7 @@
-import { DEFAULT_GRP_SIZE } from "./../group.entity";
+import { ApiProperty } from "@nestjs/swagger";
 import {
 	IsBoolean,
+	IsDate,
 	IsInt,
 	IsNotEmpty,
 	IsString,
@@ -8,25 +9,49 @@ import {
 	MaxLength,
 	Min,
 	MinDate,
-	IsDate
+	ValidationArguments,
+	ValidatorConstraint,
+	ValidatorConstraintInterface
 } from "class-validator";
+import { schemaConst } from "../../shared/constants/entity.constant";
 import { BaseCreateEntityDto } from "../../shared/dto/base.dto";
-
-import { ApiModelProperty } from "@nestjs/swagger";
-
-import { schemaConsts } from "../../shared/constants/entity.constant";
 import { MAX_GRP_SIZE, MIN_GRP_SIZE } from "../group.entity";
+import { DEFAULT_GRP_SIZE } from "./../group.entity";
 
+@ValidatorConstraint()
+class IsPublic implements ValidatorConstraintInterface {
+	validate(isPublic: boolean, args: ValidationArguments) {
+		// I want to use the request object here
+		return true;
+	}
+
+	defaultMessage(args: ValidationArguments) {
+		return "You don't have the right to create a public group";
+	}
+}
+
+@ValidatorConstraint()
+class CheckIsPublic implements ValidatorConstraintInterface {
+	validate(text: string, args: ValidationArguments) {
+		console.log("I dey here o");
+		return false; // for async validations you must return a Promise<boolean> here
+	}
+
+	defaultMessage(args: ValidationArguments) {
+		// here you can provide default error message if validation failed
+		return "Text ($value) is too short or too long!";
+	}
+}
 export class CreateGroupInput extends BaseCreateEntityDto {
-	@ApiModelProperty({
-		maxLength: schemaConsts.MAX_DESC_LENGTH,
+	@ApiProperty({
+		maxLength: schemaConst.MAX_NAME_LENGTH,
 		description: "Non-space group name"
 	})
-	@MaxLength(schemaConsts.MAX_DESC_LENGTH)
+	@MaxLength(schemaConst.MAX_NAME_LENGTH)
 	@IsNotEmpty()
-	name: string;
+	title: string;
 
-	@ApiModelProperty({
+	@ApiProperty({
 		minimum: MIN_GRP_SIZE,
 		maximum: MAX_GRP_SIZE,
 		default: DEFAULT_GRP_SIZE,
@@ -38,15 +63,15 @@ export class CreateGroupInput extends BaseCreateEntityDto {
 	@IsNotEmpty()
 	size: number;
 
-	@ApiModelProperty({
-		maxLength: schemaConsts.MAX_DESC_LENGTH
+	@ApiProperty({
+		maxLength: schemaConst.MAX_DESC_LENGTH
 	})
-	@MaxLength(schemaConsts.MAX_DESC_LENGTH)
+	@MaxLength(schemaConst.MAX_DESC_LENGTH)
 	@IsNotEmpty()
 	@IsString()
 	goal: string;
 
-	@ApiModelProperty({
+	@ApiProperty({
 		example: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
 		default: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
 		type: String,
@@ -56,9 +81,10 @@ export class CreateGroupInput extends BaseCreateEntityDto {
 	@MinDate(new Date())
 	expiresAt: Date;
 
-	@ApiModelProperty({
+	@ApiProperty({
 		type: Boolean
 	})
+	//@Validate(IsPublic, { always: true,context:true})
 	@IsBoolean()
 	isPublic: boolean;
 }

@@ -11,11 +11,11 @@ import {
 } from "@nestjs/common";
 import {
 	ApiCreatedResponse,
-	ApiImplicitHeader,
+	ApiHeader,
 	ApiNoContentResponse,
 	ApiOkResponse,
 	ApiOperation,
-	ApiUseTags
+	ApiTags
 } from "@nestjs/swagger";
 
 import { User } from "../user/user.entity";
@@ -31,13 +31,13 @@ import { TenantGuard } from "./guards/tenant.guard";
 import { VerificationInput } from "./dto/VerificationInput";
 import { PasswordResetInput } from "./dto/PasswordResetInput";
 
-@ApiUseTags("Auth")
+@ApiTags("Auth")
 @Controller("auth")
 export class AuthController {
 	constructor(private readonly _authService: AuthService) {}
 
 	@Post("register")
-	@ApiImplicitHeader({
+	@ApiHeader({
 		name: headerConstants.tenantIdKey,
 		description: "Tenant ID"
 	})
@@ -54,9 +54,9 @@ export class AuthController {
 		description:
 			"This returns authorization token. Pass this token in the header for subsequent requests",
 		operationId: "Login",
-		title: "Generates Access Token"
+		summary: "Generates Access Token"
 	})
-	@ApiImplicitHeader({
+	@ApiHeader({
 		name: headerConstants.tenantIdKey,
 		description: "Tenant ID. Leave empty for host",
 		required: false
@@ -72,7 +72,7 @@ export class AuthController {
 	@ApiNoContentResponse({
 		description: "Sends a password reset token to the user"
 	})
-	@ApiImplicitHeader({
+	@ApiHeader({
 		name: headerConstants.tenantIdKey,
 		description: "Tenant ID"
 	})
@@ -82,7 +82,7 @@ export class AuthController {
 		await this._authService.sendPasswordResetToken(input);
 	}
 	@HttpCode(HttpStatus.NO_CONTENT)
-	@ApiImplicitHeader({
+	@ApiHeader({
 		name: headerConstants.tenantIdKey,
 		description: "Tenant ID"
 	})
@@ -92,7 +92,7 @@ export class AuthController {
 		await this._authService.sendEmailVerificationToken(input);
 	}
 	@HttpCode(HttpStatus.NO_CONTENT)
-	@ApiImplicitHeader({
+	@ApiHeader({
 		name: headerConstants.tenantIdKey,
 		description: "Tenant ID"
 	})
@@ -102,7 +102,7 @@ export class AuthController {
 		await this._authService.resetPassword(input);
 	}
 	@HttpCode(HttpStatus.NO_CONTENT)
-	@ApiImplicitHeader({
+	@ApiHeader({
 		name: headerConstants.tenantIdKey,
 		description: "Tenant ID"
 	})

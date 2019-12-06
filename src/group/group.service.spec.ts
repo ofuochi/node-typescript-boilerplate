@@ -8,6 +8,7 @@ import { GroupController } from "./group.controller";
 import { Group } from "./group.entity";
 import { GroupRepository } from "./group.repo";
 import { GroupService } from "./group.service";
+import { HttpModule } from "@nestjs/common";
 
 describe("GroupService", () => {
 	let service: GroupService;

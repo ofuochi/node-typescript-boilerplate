@@ -1,10 +1,9 @@
-import { ApiModelProperty } from '@nestjs/swagger';
-
-import { PagedResultDto } from '../../shared/dto/base.dto';
-import { UserDto } from './UserResponse';
+import { PagedResultDto } from "../../shared/dto/base.dto";
+import { UserDto } from "./UserResponse";
+import { ApiProperty } from "@nestjs/swagger";
 
 export class PagedUserDto extends PagedResultDto<UserDto> {
-	@ApiModelProperty({
+	@ApiProperty({
 		required: false,
 		type: UserDto
 	})

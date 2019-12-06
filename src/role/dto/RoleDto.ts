@@ -2,7 +2,7 @@ import { Expose } from "class-transformer";
 import { IsBoolean, IsNotEmpty, IsString, MaxLength } from "class-validator";
 
 import { Optional } from "@nestjs/common";
-import { ApiModelProperty } from "@nestjs/swagger";
+import { ApiProperty } from "@nestjs/swagger";
 
 import { BaseEntityDto } from "../../shared/dto/base.dto";
 import { MAX_NAME_LENGTH } from "../../user/user.entity";
@@ -13,7 +13,7 @@ export class RoleDto extends BaseEntityDto {
 	@IsString()
 	@Expose()
 	@Optional()
-	@ApiModelProperty({
+	@ApiProperty({
 		required: false,
 		type: String,
 		maxLength: MAX_NAME_LENGTH
@@ -23,7 +23,7 @@ export class RoleDto extends BaseEntityDto {
 	@IsNotEmpty()
 	@Expose()
 	@Optional()
-	@ApiModelProperty({
+	@ApiProperty({
 		required: false,
 		type: String,
 		maxLength: MAX_NAME_LENGTH
@@ -32,6 +32,6 @@ export class RoleDto extends BaseEntityDto {
 	@IsBoolean()
 	@Expose()
 	@Optional()
-	@ApiModelProperty({ required: false, type: Boolean })
+	@ApiProperty({ required: false, type: Boolean })
 	isActive?: boolean;
 }
