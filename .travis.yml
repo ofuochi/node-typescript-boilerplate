@@ -1,0 +1,12 @@
+sudo: false
+language: node_js
+node_js:
+  - stable
+cache:
+  directories:
+    - "node_modules"
+script:
+  - npm run prebuild
+  - npm run test:cov
+  - npm run build
+  - npm run tsc

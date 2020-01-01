@@ -1,4 +1,10 @@
+import { ApiProperty } from "@nestjs/swagger";
+import { Expose } from "class-transformer";
 import {
+	ArrayMaxSize,
+	ArrayNotEmpty,
+	ArrayUnique,
+	IsArray,
 	IsBoolean,
 	IsInt,
 	IsOptional,
@@ -6,22 +12,12 @@ import {
 	Max,
 	MaxLength,
 	Min,
-	MinDate,
-	IsEmail,
-	IsArray,
-	ArrayUnique,
-	ArrayNotEmpty,
-	ArrayMaxSize,
-	ValidateNested
+	MinDate
 } from "class-validator";
-
-import { ApiProperty } from "@nestjs/swagger";
-
+import { MAX_NAME_LENGTH } from "../../user/user.entity";
 import { schemaConst } from "../../shared/constants/entity.constant";
 import { BaseEntityDto } from "../../shared/dto/base.dto";
-import { MAX_GRP_SIZE, MIN_GRP_SIZE, DEFAULT_GRP_SIZE } from "../group.entity";
-import { Expose, Type } from "class-transformer";
-import { MAX_NAME_LENGTH } from "src/user/user.entity";
+import { DEFAULT_GRP_SIZE, MAX_GRP_SIZE, MIN_GRP_SIZE } from "../group.entity";
 
 export class GroupDto extends BaseEntityDto {
 	@ApiProperty({

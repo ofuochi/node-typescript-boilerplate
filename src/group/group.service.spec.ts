@@ -1,3 +1,4 @@
+import { TravelPackageModule } from "./../travel-package/travel-package.module";
 import { TypegooseModule } from "nestjs-typegoose";
 
 import { Test, TestingModule } from "@nestjs/testing";
@@ -8,7 +9,6 @@ import { GroupController } from "./group.controller";
 import { Group } from "./group.entity";
 import { GroupRepository } from "./group.repo";
 import { GroupService } from "./group.service";
-import { HttpModule } from "@nestjs/common";
 
 describe("GroupService", () => {
 	let service: GroupService;
@@ -26,7 +26,11 @@ describe("GroupService", () => {
 			inject: [ConfigService]
 		});
 		const module: TestingModule = await Test.createTestingModule({
-			imports: [typegooseConfig, TypegooseModule.forFeature([Group])],
+			imports: [
+				typegooseConfig,
+				TravelPackageModule,
+				TypegooseModule.forFeature([Group])
+			],
 			exports: [GroupService, GroupRepository],
 			providers: [GroupService, GroupRepository],
 			controllers: [GroupController]

@@ -172,10 +172,8 @@ export class AuthService {
 		let pwResetEntity = await this._tempTokenRepository.findOneByQuery({
 			user: user.id
 		});
-		console.log(user.id);
 		if (!pwResetEntity)
 			pwResetEntity = TempToken.createInstance(user.id, tokenToSave);
-		console.log(user);
 		await this._tempTokenRepository.insertOrUpdate(pwResetEntity);
 		let callbackUrl = querystring.stringify({
 			[input.emailParameterName]: input.email,

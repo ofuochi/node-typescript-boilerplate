@@ -48,7 +48,8 @@ describe("Group Controller", () => {
 			size: 6,
 			goal: "Group goals",
 			expiresAt: new Date(),
-			isPublic: true
+			isPublic: true,
+			package: "Test"
 		};
 		const grpDto = { id: "id" } as Group;
 		service.create = jest.fn(() => Promise.resolve(grpDto));
@@ -62,7 +63,8 @@ describe("Group Controller", () => {
 			size: 6,
 			goal: "Group goals",
 			expiresAt: new Date(),
-			isPublic: true
+			isPublic: true,
+			package: "Test"
 		};
 		const grpDto = { id: "id" } as Group;
 		service.create = jest.fn(() => Promise.resolve(grpDto));

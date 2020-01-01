@@ -34,7 +34,6 @@ class IsPublic implements ValidatorConstraintInterface {
 @ValidatorConstraint()
 class CheckIsPublic implements ValidatorConstraintInterface {
 	validate(text: string, args: ValidationArguments) {
-		console.log("I dey here o");
 		return false; // for async validations you must return a Promise<boolean> here
 	}
 
