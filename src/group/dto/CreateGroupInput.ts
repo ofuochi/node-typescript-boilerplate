@@ -11,7 +11,8 @@ import {
 	MinDate,
 	ValidationArguments,
 	ValidatorConstraint,
-	ValidatorConstraintInterface
+	ValidatorConstraintInterface,
+	IsMongoId
 } from "class-validator";
 import { schemaConst } from "../../shared/constants/entity.constant";
 import { BaseCreateEntityDto } from "../../shared/dto/base.dto";
@@ -50,6 +51,14 @@ export class CreateGroupInput extends BaseCreateEntityDto {
 	@MaxLength(schemaConst.MAX_NAME_LENGTH)
 	@IsNotEmpty()
 	title: string;
+
+	@IsMongoId()
+	@IsNotEmpty()
+	@ApiProperty({
+		maxLength: schemaConst.MAX_NAME_LENGTH,
+		description: "Package ID"
+	})
+	package: string;
 
 	@ApiProperty({
 		minimum: MIN_GRP_SIZE,

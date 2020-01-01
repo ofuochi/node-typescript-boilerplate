@@ -1,3 +1,4 @@
+import { TravelPackageModule } from "../../src/travel-package/travel-package.module";
 import { TypegooseModule } from "nestjs-typegoose";
 import * as request from "supertest";
 
@@ -27,7 +28,7 @@ describe("GroupController (e2e)", () => {
 	let authService: AuthService;
 	let grpRepository: GroupRepository;
 	let req: request.SuperTest<request.Test>;
-	let adminJwt: string;
+	let jwt: string;
 	const password = "admin_p@ssW0rd";
 	const endpoint = "/groups";
 	let user: User;
@@ -43,6 +44,7 @@ describe("GroupController (e2e)", () => {
 			imports: [
 				TypegooseModule.forFeature([Group, TempToken]),
 				typegooseConfig,
+				TravelPackageModule,
 				AuthModule,
 				HttpModule,
 				ConfigModule
@@ -68,7 +70,7 @@ describe("GroupController (e2e)", () => {
 		user = await User.getModel().create(user);
 
 		const { access_token } = await authService.generateJwt(user);
-		adminJwt = access_token;
+		jwt = access_token;
 
 		req = request(app.getHttpServer());
 	});
@@ -80,16 +82,17 @@ describe("GroupController (e2e)", () => {
 			() =>
 				(headers = {
 					[headerConstants.tenantIdKey]: defaultTenant.id,
-					[headerConstants.authorizationKey]: `Bearer ${adminJwt}`
+					[headerConstants.authorizationKey]: `Bearer ${jwt}`
 				})
 		);
 		it("should create a new group", async () => {
 			const createGroupInput: CreateGroupInput = {
 				title: "Grp1",
 				size: 57,
+				package: "5df1f3078d1ebcea34230cf0",
 				goal: "The goals",
 				expiresAt: new Date(),
-				isPublic: true
+				isPublic: false
 			};
 			const { body } = await req
 				.post(endpoint)

@@ -24,6 +24,7 @@ export class Group extends BaseEntity implements IMustHaveTenant {
 	constructor(grp?: {
 		title: string;
 		size: number;
+		package: string;
 		goal: string;
 		expiresAt: Date;
 		isPublic: boolean;
@@ -36,10 +37,14 @@ export class Group extends BaseEntity implements IMustHaveTenant {
 		this.description = grp.goal;
 		this.expiresAt = grp.expiresAt;
 		this.isPublic = grp.isPublic;
+		this.package = grp.package;
 	}
 
 	@prop({ ref: Tenant, unique: false, default: null })
 	readonly tenant: Ref<Tenant | null> = null;
+
+	@prop({ type: String, required: true, default: null })
+	readonly package: string;
 
 	@prop({
 		required: true,
@@ -85,6 +90,7 @@ export class Group extends BaseEntity implements IMustHaveTenant {
 	static createInstance(group: {
 		title: string;
 		size: number;
+		package: string;
 		goal: string;
 		expiresAt: Date;
 		isPublic: boolean;

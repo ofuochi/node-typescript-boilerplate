@@ -128,6 +128,7 @@ export class AuthService {
 		const { token, newPassword, email } = input;
 		const user = await this.validateUserByEmail(email);
 		await this.validateToken(user.id, token);
+
 		const hashedPw = await hashPassword(newPassword);
 		user.setPassword(hashedPw);
 
@@ -137,7 +138,7 @@ export class AuthService {
 	async verifyUserEmail(input: VerificationInput) {
 		const { token, email } = input;
 		const user = await this.validateUserByEmail(email);
-		await this.validateToken(user.id, token);
+		await this.validateToken(user.id.toString(), token);
 		user.verifyEmail();
 		await this._userRepository.insertOrUpdate(user);
 		await this._tempTokenRepository.deleteOneByQuery({ user: user.id });
@@ -171,8 +172,10 @@ export class AuthService {
 		let pwResetEntity = await this._tempTokenRepository.findOneByQuery({
 			user: user.id
 		});
+		console.log(user.id);
 		if (!pwResetEntity)
 			pwResetEntity = TempToken.createInstance(user.id, tokenToSave);
+		console.log(user);
 		await this._tempTokenRepository.insertOrUpdate(pwResetEntity);
 		let callbackUrl = querystring.stringify({
 			[input.emailParameterName]: input.email,

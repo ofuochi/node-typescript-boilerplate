@@ -9,15 +9,21 @@ import {
 	BadRequestException
 } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
-import { ApiBearerAuth, ApiCreatedResponse, ApiTags } from "@nestjs/swagger";
+import {
+	ApiBearerAuth,
+	ApiCreatedResponse,
+	ApiTags,
+	ApiNoContentResponse
+} from "@nestjs/swagger";
 
 import { CreateGroupInput } from "./dto/CreateGroupInput";
-import { GroupDto } from "./dto/GroupDto";
+import { GroupDto, MembersInput } from "./dto/GroupDto";
 import { GroupService } from "./group.service";
 import { UserRole } from "../user/user.entity";
 
 @Controller("groups")
 @ApiTags("Groups")
+//@UseGuards(AuthGuard("jwt"))
 export class GroupController {
 	constructor(private readonly _roleService: GroupService) {}
 
@@ -25,7 +31,6 @@ export class GroupController {
 	@ApiCreatedResponse({
 		type: GroupDto
 	})
-	@UseGuards(AuthGuard("jwt"))
 	@ApiBearerAuth()
 	async createGroup(
 		@Body() input: CreateGroupInput,
@@ -44,4 +49,8 @@ export class GroupController {
 			excludeExtraneousValues: true
 		});
 	}
+	@Post("invite_members")
+	@ApiNoContentResponse()
+	@ApiBearerAuth()
+	async inviteMembers(@Body() input: MembersInput) {}
 }

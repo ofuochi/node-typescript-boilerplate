@@ -5,6 +5,7 @@ import { TravelPackageService } from "./travel-package.service";
 
 @Module({
 	imports: [ConfigModule, HttpModule],
+	exports: [TravelPackageService],
 	providers: [TravelPackageService],
 	controllers: [TravelPackageController]
 })
