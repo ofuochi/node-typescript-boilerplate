@@ -70,7 +70,7 @@
 		"inversify-binding-decorators": "^4.0.0",
 		"inversify-express-utils": "^6.3.2",
 		"inversify-logger-middleware": "^3.1.0",
-		"jsonwebtoken": "^8.5.1",
+		"jsonwebtoken": "^9.0.0",
 		"mailgun-js": "^0.22.0",
 		"method-override": "^3.0.0",
 		"mongoose": "^5.7.6",
